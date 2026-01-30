@@ -88,6 +88,10 @@ export class LinkedListAnim extends Engine implements Collection {
             if (this.linkedList.size === this.maxListSize) {
                 await this.pause("general.full");
             } else {
+                if(this.linkedList.size != 0){
+                    await this.find('tail of linked list');
+                    await this.pause("Tail of linked list found.");
+                }
                 await this.insertBack(val);
             }
         }
@@ -179,7 +183,15 @@ export class LinkedListAnim extends Engine implements Collection {
                 }
                 return curNode;
             } else {
-                await this.pause("find.notfound", value); //not found
+                if (value == "tail of linked list" && x + 1 >= this.nodeArray.length) {
+                    await this.pause("Node does not have child");
+                }
+                else if(value == "tail of linked list") { 
+                    await this.pause("Node has child");
+                }
+                else {
+                    await this.pause("find.notfound", value); //not found
+                }
                 this.highlight(curNode, false);
                 if (curConnection) {
                     this.highlight(curConnection, false);
@@ -195,8 +207,9 @@ export class LinkedListAnim extends Engine implements Collection {
                 }
             }
         }
-
-        await this.pause("find.nonExistent", value);
+        if(value != "tail of linked list"){
+            await this.pause("find.nonExistent", value);
+        }
         return null;
     }
 
