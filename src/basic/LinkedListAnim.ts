@@ -21,6 +21,11 @@ export const LinkedListMessages = {
         nonExistent: (element: string | number) =>
             `Element ${element} does not exist`,
     },
+    findTail:{
+        look: (element: string | number) => `Looking into the next node: ${element}`,
+        found: (element: string | number) => `Node ${element} does not have child`,
+        notfound: (element: string | number) => `Node ${element} has child`,
+    },
     insert: {
         element: (element: string | number) => `Insert element: ${element}`,
         head: (element: string | number) =>
@@ -38,7 +43,7 @@ export const LinkedListMessages = {
 };
 
 export class LinkedListAnim extends Engine implements Collection {
-    private readonly TOP_MARGIN = 100;
+    private readonly TOP_MARGIN = 200;
     private readonly MIN_SIDE_MARGIN = 20;
 
     messages: MessagesObject = LinkedListMessages;
@@ -50,6 +55,8 @@ export class LinkedListAnim extends Engine implements Collection {
         this.getObjectSize() * 2,
         this.getObjectSize(),
     ]; // Dimensions for the nodes
+    
+    headNode: [LinkedNode | LinkedConnection] = [new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth())];
 
     cols: number = Math.floor(this.$Svg.width / this.nodeDimensions[0] / 2); //number of columns
     rows: number = Math.ceil(this.$Svg.height / this.nodeDimensions[1] / 2); //number of rows based on size and height of the canvas
@@ -89,7 +96,7 @@ export class LinkedListAnim extends Engine implements Collection {
                 await this.pause("general.full");
             } else {
                 if(this.linkedList.size != 0){
-                    await this.find('tail of linked list');
+                    await this.findTail();
                     await this.pause("Tail of linked list found.");
                 }
                 await this.insertBack(val);
@@ -110,6 +117,14 @@ export class LinkedListAnim extends Engine implements Collection {
             this.nodeDimensions,
             this.getStrokeWidth()
         );
+
+        // Creates an invisible node to act as the head pointer
+        if(this.linkedList.size === 1){
+            this.Svg.add(this.headNode[0]);
+            this.headNode[0].move(35,110);
+            this.headNode[0].opacity(0);
+        }
+
         this.Svg.add(node);
 
         const coords = this.newNodeCoords();
@@ -126,7 +141,11 @@ export class LinkedListAnim extends Engine implements Collection {
         const connection = await this.makeConnections(node);
         if (connection) {
             this.highlight(connection, true);
+            if(this.linkedList.size === 1){
+                this.headNode.push(connection);
+            }
         }
+
 
         await this.pause(insertionText, value);
         // Move to the correct position with animation
@@ -183,15 +202,7 @@ export class LinkedListAnim extends Engine implements Collection {
                 }
                 return curNode;
             } else {
-                if (value == "tail of linked list" && x + 1 >= this.nodeArray.length) {
-                    await this.pause("Node does not have child");
-                }
-                else if(value == "tail of linked list") { 
-                    await this.pause("Node has child");
-                }
-                else {
-                    await this.pause("find.notfound", value); //not found
-                }
+                await this.pause("find.notfound", value); //not found
                 this.highlight(curNode, false);
                 if (curConnection) {
                     this.highlight(curConnection, false);
@@ -207,10 +218,39 @@ export class LinkedListAnim extends Engine implements Collection {
                 }
             }
         }
-        if(value != "tail of linked list"){
-            await this.pause("find.nonExistent", value);
-        }
+        await this.pause("find.nonExistent", value);
         return null;
+    }
+
+    async findTail() : Promise<void>{
+        await this.pause("Looking for tail of list"); //start the search
+        let curNode = this.nodeArray[0][0];
+        let curConnection;
+        this.highlight(curNode, true);
+        await this.pause("Looking at head of list"); //start the search
+        for (let x = 0; x < this.nodeArray.length; x++) {
+            curNode = this.nodeArray[x][0];
+            if (x + 1 >= this.nodeArray.length) {
+                await this.pause("findTail.found", curNode.value);
+            }
+            else { 
+                await this.pause("findTail.notfound", curNode.value);
+            }
+            this.highlight(curNode, false);
+            if (curConnection) {
+                this.highlight(curConnection, false);
+            }
+            if (x + 1 < this.nodeArray.length) {
+                const next = this.nodeArray[x + 1][0];
+                curConnection = this.nodeArray[
+                    x + 1
+                ][1] as LinkedConnection;
+                this.highlight(next, true);
+                this.highlight(curConnection, true); // Highlight the connection
+                await this.pause("findTail.look", next.value);
+            }
+            
+        }
     }
 
     // Visualization logic for deleting a node
@@ -314,13 +354,21 @@ export class LinkedListAnim extends Engine implements Collection {
     async print(): Promise<void> {}
 
     async makeConnections(node: LinkedNode): Promise<LinkedConnection | null> {
-        // If there is only one node in the list, then do nothing
-        if (this.linkedList.size === 1) {
-            return null; //what if we make it connect to a null node?
-        }
         // insertBack
-        const prevNode = this.nodeArray[this.nodeArray.length - 1][0];
 
+        // If there is only one node in the list, point from head
+        if (this.linkedList.size === 1) {
+            return new LinkedConnection(
+            this.headNode[0] as LinkedNode, 
+            node,
+            this.nodeDimensions,
+            this.getStrokeWidth(),
+            this.Svg
+            );
+        }
+       
+        const prevNode = this.nodeArray[this.nodeArray.length - 1][0];
+    
         const connection = new LinkedConnection(
             prevNode,
             node,
