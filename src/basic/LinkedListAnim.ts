@@ -56,7 +56,7 @@ export class LinkedListAnim extends Engine implements Collection {
         this.getObjectSize(),
     ]; // Dimensions for the nodes
     
-    headNode: [LinkedNode | LinkedConnection] = [new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth())];
+    headNode: LinkedNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
 
     cols: number = Math.floor(this.$Svg.width / this.nodeDimensions[0] / 2); //number of columns
     rows: number = Math.ceil(this.$Svg.height / this.nodeDimensions[1] / 2); //number of rows based on size and height of the canvas
@@ -120,9 +120,11 @@ export class LinkedListAnim extends Engine implements Collection {
 
         // Creates an invisible node to act as the head pointer
         if(this.linkedList.size === 1){
-            this.Svg.add(this.headNode[0]);
-            this.headNode[0].move(35,110);
-            this.headNode[0].opacity(0);
+            this.Svg.add(this.headNode);
+            this.headNode.move(35,150);
+            this.headNode.opacity(0);
+            const head = this.Svg.text("Head");
+            head.move(50, 140);
         }
 
         this.Svg.add(node);
@@ -141,9 +143,6 @@ export class LinkedListAnim extends Engine implements Collection {
         const connection = await this.makeConnections(node);
         if (connection) {
             this.highlight(connection, true);
-            if(this.linkedList.size === 1){
-                this.headNode.push(connection);
-            }
         }
 
 
@@ -280,16 +279,13 @@ export class LinkedListAnim extends Engine implements Collection {
                     index + 1
                 ][1] as LinkedConnection;
                 connection.remove();
-                if (index > 0) {
-                    // If the node is not the first one
-                    // Update the connection of the previous node to go to the next node
-                    const nextNode = this.nodeArray[index + 1][0];
-                    const prevConnection = this.nodeArray[
-                        index
-                    ][1] as LinkedConnection; // need to move this index + 1
-                    this.nodeArray[index + 1][1] = prevConnection;
-                    prevConnection.setEnd(nextNode, this.animationValue());
-                }
+                // Update the connection of the previous node to go to the next node
+                const nextNode = this.nodeArray[index + 1][0];
+                const prevConnection = this.nodeArray[
+                    index
+                ][1] as LinkedConnection; // need to move this index + 1
+                this.nodeArray[index + 1][1] = prevConnection;
+                prevConnection.setEnd(nextNode, this.animationValue());
             }
             await this.pause("delete.adjustPos");
             this.adjustNodes(index);
@@ -306,6 +302,8 @@ export class LinkedListAnim extends Engine implements Collection {
         if (index > 0) {
             prevNodePointerPos =
                 this.nodeArray[this.nodeArray.length - 1][0].getPointerPos(); // Get the pointer position of the previous node
+        } else {
+            prevNodePointerPos = this.headNode.getPointerPos();
         }
 
         for (const nodeCon of right) {
@@ -322,7 +320,7 @@ export class LinkedListAnim extends Engine implements Collection {
             );
 
             // Update the connection to the new position
-            if (connection && this.nodeArray.length > 0) {
+            if (connection) {
                 const startCoords = prevNodePointerPos!;
                 const endCoords: [number, number] = [coords[0], coords[1]];
                 connection.updateAll(
@@ -359,7 +357,7 @@ export class LinkedListAnim extends Engine implements Collection {
         // If there is only one node in the list, point from head
         if (this.linkedList.size === 1) {
             return new LinkedConnection(
-            this.headNode[0] as LinkedNode, 
+            this.headNode, 
             node,
             this.nodeDimensions,
             this.getStrokeWidth(),
