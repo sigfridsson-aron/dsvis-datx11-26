@@ -164,7 +164,6 @@ export class LinkedListAnim extends Engine implements Collection {
         // Add the node to the array and make connections
         this.nodeArray.push([node, connection]);
         
-        console.log(this.nodeArray);
     }
 
     // Visualization logic for inserting a node to the front
@@ -216,17 +215,15 @@ export class LinkedListAnim extends Engine implements Collection {
 
         // Add the node to the array and make connections
         this.nodeArray.unshift([node, connection]);
-        console.log(this.nodeArray);
-
+        
         await this.pause("delete.adjustPos");
-        this.adjustNodesInsertFront(0);
-
+        this.adjustNodes(0, 0);
+        
         this.highlight(node, false);
         if (connection) {
             this.highlight(connection, false);
         }
         
-        await this.pause(undefined);
     }
 
     // Visualization logic for inserting a node to a specific index
@@ -347,22 +344,19 @@ export class LinkedListAnim extends Engine implements Collection {
                 prevConnection.setEnd(nextNode, this.animationValue());
             }
             await this.pause("delete.adjustPos");
-            this.adjustNodes(index);
+            this.adjustNodes(index, index + 1);
         }
     }
 
-    adjustNodes(index: number): void {
-        const left = this.nodeArray.slice(0, index);
-        const right = this.nodeArray.slice(index + 1);
+    adjustNodes(startindex: number, endindex: number): void {
+        const left = this.nodeArray.slice(0, startindex);
+        const right = this.nodeArray.slice(endindex);
         
-        console.log(this.nodeArray);
-        console.log(left);
-        console.log(right);
 
         this.nodeArray = left;
 
         let prevNodePointerPos: [number, number];
-        if (index > 0) {
+        if (startindex > 0) {
             prevNodePointerPos =
                 this.nodeArray[this.nodeArray.length - 1][0].getPointerPos(); // Get the pointer position of the previous node
         } else {
@@ -391,10 +385,6 @@ export class LinkedListAnim extends Engine implements Collection {
                     endCoords,
                     this.animationValue()
                 );
-                
-                console.log(startCoords);
-                console.log([coords[0], coords[1]]);
-                console.log(connection.toString);
             }
 
             // Remember the previous node's pointer position for the next connection
@@ -414,95 +404,6 @@ export class LinkedListAnim extends Engine implements Collection {
 
             this.nodeArray.push([node, connection]);
         }
-        
-        console.log(this.nodeArray);
-    }
-
-    adjustNodesInsertFront(index: number): void {
-        let prevNodePointerPos: [number, number];
-    
-        const left = this.nodeArray.slice(0, index);
-        const right = this.nodeArray.slice(index);
-        
-        console.log(this.nodeArray);
-        console.log(left);
-        console.log(right);
-
-        this.nodeArray = left;
-
-        if (index > 0) {
-            prevNodePointerPos =
-                this.nodeArray[this.nodeArray.length - 1][0].getPointerPos(); // Get the pointer position of the previous node
-        } else {
-            prevNodePointerPos = this.headNode.getPointerPos();
-        }
-
-        for (const nodeCon of right) {
-            const node = nodeCon[0];
-            let connection: LinkedConnection;
-
-            if (this.nodeArray.length > 0) {
-                connection = new LinkedConnection(
-                    this.nodeArray[this.nodeArray.length - 1][0],
-                    node,
-                    this.nodeDimensions,
-                    this.getStrokeWidth(),
-                    this.Svg
-                );
-            } else {
-                connection = new LinkedConnection(
-                    this.headNode,
-                    node,
-                    this.nodeDimensions,
-                    this.getStrokeWidth(),
-                    this.Svg
-                );
-            }
-            nodeCon[1]?.remove();
-
-            const coords = this.newNodeCoords();
-            node.mirror(coords[2]);
-
-            // Move the node and link to the correct position with animation
-            this.animate(node, !this.state.isResetting()).move(
-                coords[0],
-                coords[1]
-            );
-            
-
-            // Update the connection to the new position
-            if (connection) {
-                const startCoords = prevNodePointerPos!;
-                const endCoords: [number, number] = [coords[0], coords[1]];
-                connection.updateAll(
-                    startCoords,
-                    endCoords,
-                    this.animationValue()
-                );
-                console.log(startCoords);
-                console.log([coords[0], coords[1]]);
-                console.log(connection.toString);
-            }
-
-            // Remember the previous node's pointer position for the next connection
-            if (!coords[2]) {
-                prevNodePointerPos = [
-                    coords[0] +
-                        node.elementRectWidth +
-                        node.nextNodeRectWidth / 2,
-                    coords[1] + this.nodeDimensions[1] / 2,
-                ];
-            } else {
-                prevNodePointerPos = [
-                    coords[0] + node.nextNodeRectWidth / 2,
-                    coords[1] + this.nodeDimensions[1] / 2,
-                ];
-            }
-                
-            this.nodeArray.push([node, connection]);
-        }
-        
-        console.log(this.nodeArray);
     }
 
     async print(): Promise<void> {}
