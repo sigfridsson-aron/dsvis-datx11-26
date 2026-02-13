@@ -36,15 +36,16 @@ export class Sort extends Engine implements Sorter {
         super.initialise();
     }
 
+    // Ändrade här så att det börjar med en ingen array
     async resetAlgorithm() {
         await super.resetAlgorithm();
         this.indexLength = 0;
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
-            new DSArray(1, this.getObjectSize())
-        ).init(1, xRoot, yRoot + this.$Svg.margin * 4);
+            new DSArray(0, this.getObjectSize()) // det stod new DSArray(1, this.getObjectSize())
+        ).init(0, xRoot, yRoot + this.$Svg.margin * 4); // det stod this.sortArray = new DSArray(1, this.getObjectSize());
         this.Svg.put(this.sortArray);
-        this.sortArray.setDisabled(0, false);
+        //this.sortArray.setDisabled(1, false);
         if (this.initialValues) {
             this.state.runWhileResetting(
                 async () => await this.insert(...this.initialValues)
@@ -73,21 +74,29 @@ export class Sort extends Engine implements Sorter {
         );
     }
 
+
+    // Kommenterade ut animeringeringen till arrayen.
     async insertOne(value: number | string) {
         value = String(value);
-        const arrayLabel = this.Svg.put(
-            new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
-        ).init(...this.getNodeStart());
-        await this.pause("insert.value", value);
-        const currentIndex = this.indexLength;
-        arrayLabel.setCenter(
-            this.sortArray.getCX(currentIndex),
-            this.sortArray.cy(),
-            this.getAnimationSpeed()
-        );
-        await this.pause(undefined);
+        /* detta är animationen vid inläggningen*/
+        // const arrayLabel = this.Svg.put(
+        //     new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
+        // ).init(...this.getNodeStart());
 
-        arrayLabel.remove();
+        /* denna awaiten behövs inte om inte peter vill ha en paus */
+        //await this.pause("insert.value", value);
+        const currentIndex = this.indexLength;
+        /* detta är animationen vid inläggningen*/
+        // arrayLabel.setCenter(
+        //     this.sortArray.getCX(currentIndex),
+        //     this.sortArray.cy(),
+        //     this.getAnimationSpeed()
+        // );
+
+        /* denna awaiten behövs inte om inte peter vill ha en paus */
+        //await this.pause(undefined);
+
+        // arrayLabel.remove();
         this.sortArray.setDisabled(currentIndex, false);
         this.sortArray.setValue(currentIndex, value);
         this.sortArray.setIndexHighlight(currentIndex, true);
