@@ -4,7 +4,7 @@ import { LinkedNode } from "~/objects/basic-structure-objects/linked-node";
 import { LinkedConnection } from "~/objects/basic-structure-objects/node-connection";
 import LinkedList from "./LinkedList";
 
-export const LinkedListMessages = {
+export const StackLinkedListMessages = {
     general: {
         empty: "List is empty!",
         full: "List is full!",
@@ -32,7 +32,7 @@ export const LinkedListMessages = {
             `List is empty, insert ${element} as head`,
     },
     delete: {
-        delete: (value: string) => `Deleting node ${value}`,
+        delete: (value: string) => `Dequeuing, removing head`,
         adjustLink: "Adjusting link",
         adjustPos: "Adjusting positions",
     },
@@ -42,11 +42,11 @@ export const LinkedListMessages = {
     },
 };
 
-export class LinkedListAnim extends Engine implements Collection {
+export class StackLinkedListAnim extends Engine implements Collection {
     private readonly TOP_MARGIN = 200;
     private readonly MIN_SIDE_MARGIN = 20;
 
-    messages: MessagesObject = LinkedListMessages;
+    messages: MessagesObject = StackLinkedListMessages;
     initialValues: string[] | null = null; // Only used for hard-coded values
     maxListSize: number = 0; // Limit the size of the list to maintain readability
     linkedList: LinkedList<string | number> = new LinkedList(); // Linked list instance
@@ -95,11 +95,11 @@ export class LinkedListAnim extends Engine implements Collection {
             if (this.linkedList.size === this.maxListSize) {
                 await this.pause("general.full");
             } else {
-                if(this.linkedList.size != 0){
-                    await this.findTail();
-                    await this.pause("Tail of linked list found.");
-                }
-                await this.insertBack(val);
+                // if(this.linkedList.size != 0){
+                //     await this.findTail();
+                //     await this.pause("Tail of linked list found.");
+                // }
+                await this.insertFront(val);
             }
         }
     }
@@ -310,8 +310,8 @@ export class LinkedListAnim extends Engine implements Collection {
 
     // Visualization logic for deleting a node
     async delete(value: string | number): Promise<void> {
-        const node = await this.findOne(value);
-        if (node) {
+        if (this.nodeArray.length > 0) {
+            const node = this.nodeArray[0][0];
             // If the node is found
             this.highlight(node, true);
             await this.pause("delete.delete", value);
