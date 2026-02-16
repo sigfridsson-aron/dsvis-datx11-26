@@ -8,6 +8,7 @@ import { BTreeAlgorithmControl } from "./algorithm-controls/BTree-algorithm-cont
 import { CollectionAlgorithmControl } from "./algorithm-controls/collection-algorithm-controls";
 import { LinkedListAnim } from "~/basic/LinkedListAnim";
 import { StackLinkedListAnim } from "~/basic/StackLinkedListAnim";
+import { DynamicArrayAnim } from "~/basic/DynamicArrayAnim";
 import { initialiseEngine, RecordOfEngines } from "./helpers";
 
 export interface Collection extends Engine {
@@ -26,6 +27,7 @@ const COLLECTIONS_CLASSES = {
     BTree: BTree,
     LinkedListAnim: LinkedListAnim,
     StackLinkedListAnim: StackLinkedListAnim,
+    DynamicArrayAnim: DynamicArrayAnim,
 } as const satisfies RecordOfEngines<Collection>;
 
 const { engine, isBaseEngine } = initialiseEngine<Collection>(
