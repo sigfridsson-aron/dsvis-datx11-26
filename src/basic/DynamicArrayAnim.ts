@@ -17,6 +17,10 @@ export const SortMessages = {
         compare: (a: string, b: string) => `Compare ${a} and ${b}`,
         swap: (a: string, b: string) => `Swap ${a} and ${b}`,
     },
+    copy: {
+        index: (index: number) => `Copying index: ${index}`,
+        newSize: (size: number) => `Creating new Dynamic Array of length:  ${size}`,
+    },
     find: {
         start: (element: string | number) => `Searching for ${element}`,
         found: (element: string | number) => `Found ${element}`,
@@ -29,9 +33,10 @@ export const SortMessages = {
             `Element ${element} does not exist`,
     },
     delete: {
-        delete: (value: string) => `Deleting value ${value}`,
+        delete: (value: string) => `Deleting value at head`,
+        removePointer: (value: string) => `Removing ${value} pointer`,
         movePointer: (value: string) => `Moving ${value} pointer`
-    }
+    },
 } as const satisfies MessagesObject;
 
 export class DynamicArrayAnim extends Engine implements Collection {
@@ -84,23 +89,64 @@ export class DynamicArrayAnim extends Engine implements Collection {
         );
     }
 
+    async resize(length: number){
+        const [xRoot, yRoot] = this.getTreeRoot();
+        let newArray = 
+        this.Svg.put(
+            new DSArray(this.sortArray.getSize(), this.getObjectSize())
+        ).init(0, xRoot, yRoot + this.$Svg.margin * 6);
+        newArray.setSize(length);
+        newArray.center(
+        this.getTreeRoot()[0],
+        this.getTreeRoot()[1] + this.$Svg.margin * 4 + this.getObjectSize() * 4
+        );
+            
+        await this.pause("copy.newSize", length);
+
+
+        await this.pause("Copy values to the new array");
+
+        for(let i = 0; i < this.indexLength; i++){
+            let val = this.sortArray.getValue(i)
+            const arrayLabel = this.Svg.put(
+                new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
+            ).init(this.sortArray.getCX(i), this.sortArray.cy());
+
+            await this.pause("copy.index", i);
+
+            arrayLabel.setCenter(
+            newArray.getCX(i),
+            newArray.cy(),
+            this.getAnimationSpeed()
+            );
+
+            await this.pause(undefined);
+
+            arrayLabel.remove();
+                
+            newArray.setValue(i, val);
+        }
+
+        if(length != 1){ //only resizes if it has an arrow
+            newArray.addArrow(this.indexLength - 1, "Head",  "#C00");
+
+            await this.pause("Copy Head pointer");
+        }
+
+        this.sortArray.remove();
+        this.sortArray = newArray;
+        this.animate(this.sortArray, !this.state.isResetting()).center(
+        this.getTreeRoot()[0],
+        this.getTreeRoot()[1] + this.$Svg.margin * 4
+        );
+
+        await this.pause(undefined);
+    }
+
     async insertOne(value: number | string) {
         if(this.indexLength >= this.sortArray.getSize()){
-            this.sortArray.setSize(this.sortArray.getSize() * 2);
-            this.sortArray.center(
-            this.getTreeRoot()[0],
-            this.getTreeRoot()[1] + this.$Svg.margin * 4
-            );
-            const [xRoot, yRoot] = [100, 100];
-            let newArray = 
-            this.Svg.put(
-                new DSArray(this.sortArray.getSize(), this.getObjectSize())
-            ).init(this.sortArray.getSize(), xRoot, yRoot + this.$Svg.margin * 6);
-            newArray.center(
-            this.getTreeRoot()[0],
-            this.getTreeRoot()[1] + this.$Svg.margin * 6
-            );
-            this.Svg.put(newArray);
+            await this.pause("Dynamic Array is full!");
+            await this.resize(this.indexLength * 2);
         }
         value = String(value);
         const arrayLabel = this.Svg.put(
@@ -117,14 +163,12 @@ export class DynamicArrayAnim extends Engine implements Collection {
         if(this.indexLength == 0){
             
             this.sortArray.addArrow(0, "Head", "#C00");
+            await this.pause("Creating Head pointer");
         }
         else{
             this.sortArray.moveArrow("Head", this.indexLength);
+            await this.pause("insert.movePointer", "Head");
         }
-
-
-        await this.pause("insert.movePointer", "Head");
-
 
         arrayLabel.remove();
         this.sortArray.setDisabled(currentIndex, false);
@@ -132,6 +176,8 @@ export class DynamicArrayAnim extends Engine implements Collection {
         this.sortArray.setIndexHighlight(currentIndex, true);
         this.indexLength++;
         this.sortArray.setIndexHighlight(currentIndex, false);
+
+        await this.pause(undefined);
     }
 
     async find(...values: (string | number)[]): Promise<void> {
@@ -163,19 +209,31 @@ export class DynamicArrayAnim extends Engine implements Collection {
         await this.pause("find.nonExistent", value);
         return null;
     }
-    
-     async delete(value: string | number): Promise<void> {
+
+    async delete(value: string | number): Promise<void> {
         const index = this.indexLength - 1;
-        if(index){
+        if(index >= 0){
+            await this.pause("delete.delete");
             this.sortArray.setIndexHighlight(index, true);
-            await this.pause("delete.delete", value);
             this.sortArray.setIndexHighlight(index, false);
             this.sortArray.setValue(index, "");
             this.indexLength--;
-            this.sortArray.moveArrow("Head", this.indexLength - 1);
-            await this.pause("delete.movePointer");
+            if(index != 0){
+                await this.pause("delete.movePointer", "Head");
+                this.sortArray.moveArrow("Head", this.indexLength - 1);
+            }
+            else{
+                await this.pause("delete.removePointer", "Head");
+                this.sortArray.removeArrow("Head");
+            }
+
+            if(this.indexLength != 0 && this.indexLength <= this.sortArray.getSize() / 4){
+                await this.pause("Array is less than 1/4 full!");
+                await this.resize(this.sortArray.getSize() / 2);
+            }
         }
         await this.pause(undefined);
+
     }
     
     async print() {
