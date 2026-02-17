@@ -91,6 +91,16 @@ export class DynamicArrayAnim extends Engine implements Collection {
             this.getTreeRoot()[0],
             this.getTreeRoot()[1] + this.$Svg.margin * 4
             );
+            const [xRoot, yRoot] = [100, 100];
+            let newArray = 
+            this.Svg.put(
+                new DSArray(this.sortArray.getSize(), this.getObjectSize())
+            ).init(this.sortArray.getSize(), xRoot, yRoot + this.$Svg.margin * 6);
+            newArray.center(
+            this.getTreeRoot()[0],
+            this.getTreeRoot()[1] + this.$Svg.margin * 6
+            );
+            this.Svg.put(newArray);
         }
         value = String(value);
         const arrayLabel = this.Svg.put(
