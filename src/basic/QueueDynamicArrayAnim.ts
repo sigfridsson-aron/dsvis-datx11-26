@@ -39,12 +39,14 @@ export const SortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class DynamicArrayAnim extends Engine implements Collection {
+export class QueueDynamicArrayAnim extends Engine implements Collection {
     initialValues: Array<string> = [];
     compensate: number = 0;
     sortArray: DSArray;
     indexLength: number = 0;
     baseSize: number = 28;
+    head: number = 0;
+    tail: number = 0;
     messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
@@ -106,7 +108,9 @@ export class DynamicArrayAnim extends Engine implements Collection {
 
         await this.pause("Copy values to the new array");
 
-        for(let i = 0; i < this.indexLength; i++){
+        let i = this.tail;
+        for(let ii = 0; ii < this.indexLength; ii++){
+            console.log(i);
             let val = this.sortArray.getValue(i)
             const arrayLabel = this.Svg.put(
                 new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
@@ -115,7 +119,7 @@ export class DynamicArrayAnim extends Engine implements Collection {
             await this.pause("copy.index", i);
 
             arrayLabel.setCenter(
-            newArray.getCX(i),
+            newArray.getCX(ii),
             newArray.cy(),
             this.getAnimationSpeed()
             );
@@ -124,13 +128,18 @@ export class DynamicArrayAnim extends Engine implements Collection {
 
             arrayLabel.remove();
                 
-            newArray.setValue(i, val);
+            newArray.setValue(ii, val);
+            i = (i + 1) % this.sortArray.getSize();
         }
 
         if(length != 1){ //only resizes if it has an arrow
             newArray.addArrow(this.indexLength - 1, "Head",  "#C00");
-
+            this.head = this.indexLength - 1;
             await this.pause("Copy Head pointer");
+
+            newArray.addArrow(0, "Tail",  "#4C0");
+            this.tail = 0;
+            await this.pause("Copy Tail pointer");
         }
 
         this.sortArray.remove();
@@ -144,6 +153,7 @@ export class DynamicArrayAnim extends Engine implements Collection {
     }
 
     async insertOne(value: number | string) {
+        console.log("indexLength = " + this.indexLength);
         if(this.indexLength >= this.sortArray.getSize()){
             await this.pause("Dynamic Array is full!");
             await this.resize(this.indexLength * 2);
@@ -153,7 +163,10 @@ export class DynamicArrayAnim extends Engine implements Collection {
             new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
         ).init(...this.getNodeStart());
         await this.pause("insert.value", value);
-        const currentIndex = this.indexLength;
+        let currentIndex = (this.head + 1) % this.sortArray.getSize()
+        if(this.indexLength == 0){
+            currentIndex = 0;
+        }
         arrayLabel.setCenter(
             this.sortArray.getCX(currentIndex),
             this.sortArray.cy(),
@@ -163,10 +176,15 @@ export class DynamicArrayAnim extends Engine implements Collection {
         if(this.indexLength == 0){
             
             this.sortArray.addArrow(0, "Head", "#C00");
+            this.head = 0;
+            await this.pause("Creating Head pointer");
+            this.sortArray.addArrow(0, "Tail", "#4F0");
+            this.tail = 0;
             await this.pause("Creating Head pointer");
         }
         else{
-            this.sortArray.moveArrow("Head", this.indexLength);
+            this.head = currentIndex;
+            this.sortArray.moveArrow("Head", currentIndex);
             await this.pause("insert.movePointer", "Head");
         }
 
@@ -211,22 +229,27 @@ export class DynamicArrayAnim extends Engine implements Collection {
     }
 
     async delete(value: string | number): Promise<void> {
-        const index = this.indexLength - 1;
+        const index = this.tail;
         if(index >= 0){
             await this.pause("delete.delete");
             this.sortArray.setIndexHighlight(index, true);
             this.sortArray.setIndexHighlight(index, false);
             this.sortArray.setValue(index, "");
             this.indexLength--;
-            if(index != 0){
-                await this.pause("delete.movePointer", "Head");
-                this.sortArray.moveArrow("Head", this.indexLength - 1);
+            if(this.indexLength != 0){
+                await this.pause("delete.movePointer", "Tail");
+                this.sortArray.moveArrow("Tail", (index + 1) % this.sortArray.getSize());
             }
             else{
                 await this.pause("delete.removePointer", "Head");
+                this.head = 0;
                 this.sortArray.removeArrow("Head");
+                await this.pause("delete.removePointer", "Tail");
+                this.tail = 0;
+                this.sortArray.removeArrow("Tail");
             }
-
+            
+            this.tail = (this.tail + 1) % this.sortArray.getSize();
             if(this.indexLength != 0 && this.indexLength <= this.sortArray.getSize() / 4){
                 await this.pause("Array is less than 1/4 full!");
                 await this.resize(this.sortArray.getSize() / 2);
