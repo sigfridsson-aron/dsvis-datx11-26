@@ -18,7 +18,7 @@ export const SortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class Sort extends Engine implements Sorter {
+export class BaseSorter extends Engine implements Sorter {
     initialValues: Array<string> = [];
     compensate: number = 0;
     sortArray: DSArray;

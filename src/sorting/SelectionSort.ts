@@ -1,7 +1,7 @@
 import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
-import { Sort, SortMessages } from "./sort";
+import { BaseSorter, SortMessages } from "./sort";
 
 export const SelectionSortMessages = {
     sort: {
@@ -9,7 +9,7 @@ export const SelectionSortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class SelectionSort extends Sort implements Sorter {
+export class SelectionSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(
         SelectionSortMessages,
         SortMessages
