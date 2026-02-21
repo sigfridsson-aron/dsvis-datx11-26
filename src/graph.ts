@@ -9,6 +9,10 @@ export interface Graph extends Engine {
     //define buttons that can be used for all graphs
     //these will be at the top of the screen like
     //insert for collections or deleteMin for prioqueues
+    //the name of SubmitFunctions will be put along
+    //messages when clicked
+    //to have buttons at the bottom of the screen look
+    //at general-controls
 }
 
 const GRAPH_CLASSES = {

@@ -13,14 +13,18 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
         this.engine = engine
 
         this.start = querySelector<HTMLInputElement> (
-            "input.start",
+            "input.start", //this needs to be the input.(name of class in HTML doc)
             container
-        )
+        );
+
+        this.initialize();
     }
 
     initialize() {
-        this.start.addEventListener("click", () => 
+        //this.engine.(name of SubmitFunction) needs a defined function in
+        //the implementation of your engine with the same name as SubmitFunction
+        this.start.addEventListener("click", () => {
             this.engine.submit(this.engine.start, null)
-        )
+        });
     }
 }
