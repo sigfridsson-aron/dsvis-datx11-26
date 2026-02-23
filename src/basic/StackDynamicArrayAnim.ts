@@ -1,5 +1,5 @@
 import { Engine, MessagesObject } from "~/engine";
-import { DSArray } from "~/objects/dsarray";
+import { DynamicArray } from "~/basic/dynamicArray";
 import { TextCircle } from "~/objects/text-circle";
 import { Collection } from "~/collections";
 
@@ -42,14 +42,14 @@ export const SortMessages = {
 export class StackDynamicArrayAnim extends Engine implements Collection {
     initialValues: Array<string> = [];
     compensate: number = 0;
-    sortArray: DSArray;
+    sortArray: DynamicArray;
     indexLength: number = 0;
     baseSize: number = 28;
     messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
         super(containerSelector);
-        this.sortArray = new DSArray(0, this.getObjectSize()); // Only added to make sure that sortArray never is null
+        this.sortArray = new DynamicArray(0, this.getObjectSize()); // Only added to make sure that sortArray never is null
     }
 
     initialise(initialValues = []) {
@@ -62,7 +62,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         this.indexLength = 0;
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
-            new DSArray(1, this.getObjectSize())
+            new DynamicArray(1, this.getObjectSize())
         ).init(1, xRoot, yRoot + this.$Svg.margin * 4);
         this.Svg.put(this.sortArray);
         this.sortArray.setDisabled(0, false);
@@ -79,7 +79,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         }
     }
 
-    async swap(arr: DSArray, j: number, k: number) {
+    async swap(arr: DynamicArray, j: number, k: number) {
         arr.swap(j, k, true);
         arr.setIndexHighlight(j, true);
         await this.pause(
@@ -93,7 +93,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         const [xRoot, yRoot] = this.getTreeRoot();
         let newArray = 
         this.Svg.put(
-            new DSArray(this.sortArray.getSize(), this.getObjectSize())
+            new DynamicArray(this.sortArray.getSize(), this.getObjectSize())
         ).init(0, xRoot, yRoot + this.$Svg.margin * 6);
         newArray.setSize(length);
         newArray.center(
