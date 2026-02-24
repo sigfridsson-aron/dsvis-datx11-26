@@ -20,19 +20,19 @@ export const SortMessages = {
 } as const satisfies MessagesObject;
 
 export class BaseSorter extends Engine implements Sorter {
-    initialValues: Array<string> = [];
-    compensate: number = 0;
-    sortArray: DSArray;
-    indexLength: number = 0;
-    baseSize: number = 28;
+    initialValues: number[] = [];
+    // compensate: number = 0; // TODO: remove?
+    sortArray: StapleArray;
+    // indexLength: number = 0; // TODO: remove
+    // baseSize: number = 28;
     messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
         super(containerSelector);
-        this.sortArray = new DSArray(0, this.getObjectSize()); // Only added to make sure that sortArray never is null
+        this.sortArray = new StapleArray([], this.getObjectSize()); // Only added to make sure that sortArray never is null
     }
 
-    initialise(initialValues = []) {
+    initialise(initialValues: number[] = []) {
         this.initialValues = initialValues;
         super.initialise();
     }
@@ -40,22 +40,23 @@ export class BaseSorter extends Engine implements Sorter {
     // Ändrade här så att det börjar med en ingen array
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.indexLength = 0;
+        // this.indexLength = 0; // TODO: Remove
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
-            new DSArray(0, this.getObjectSize()) // det stod new DSArray(1, this.getObjectSize())
-        ).init(0, xRoot, yRoot + this.$Svg.margin * 4); // det stod this.sortArray = new DSArray(1, this.getObjectSize());
-        this.Svg.put(this.sortArray);
+            new StapleArray(this.initialValues, this.getObjectSize()) // det stod new DSArray(1, this.getObjectSize())
+        ).init(xRoot, yRoot + this.$Svg.margin * 4); // det stod this.sortArray = new DSArray(1, this.getObjectSize());
+
         //this.sortArray.setDisabled(1, false);
-        if (this.initialValues) {
-            this.state.runWhileResetting(
-                async () => await this.insert(...this.initialValues)
-            );
-        }
+
+        // TODO: remove (replaced by adding initial values when creating the array)
+        // if (this.initialValues) {
+        //     this.state.runWhileResetting(
+        //         async () => await this.insert(...this.initialValues)
+        //     );
+        // }
     }
 
     async insert(...values: Array<number | string>) {
-        this.sortArray.setSize(this.sortArray.getSize() + values.length);
         this.sortArray.center(
             this.getTreeRoot()[0],
             this.getTreeRoot()[1] + this.$Svg.margin * 4
@@ -86,7 +87,7 @@ export class BaseSorter extends Engine implements Sorter {
 
         /* denna awaiten behövs inte om inte peter vill ha en paus */
         //await this.pause("insert.value", value);
-        const currentIndex = this.indexLength;
+        // const currentIndex = this.indexLength; // TODO remove this?
         /* detta är animationen vid inläggningen*/
         // arrayLabel.setCenter(
         //     this.sortArray.getCX(currentIndex),
@@ -98,11 +99,13 @@ export class BaseSorter extends Engine implements Sorter {
         //await this.pause(undefined);
 
         // arrayLabel.remove();
-        this.sortArray.setDisabled(currentIndex, false);
-        this.sortArray.setValue(currentIndex, value);
-        this.sortArray.setIndexHighlight(currentIndex, true);
-        this.indexLength++;
-        this.sortArray.setIndexHighlight(currentIndex, false);
+
+        // TODO: remove this?
+        // this.sortArray.setDisabled(currentIndex, false);
+        // this.sortArray.setValue(currentIndex, value);
+        // this.sortArray.setIndexHighlight(currentIndex, true);
+        // this.indexLength++;
+        // this.sortArray.setIndexHighlight(currentIndex, false);
     }
 
     async sort() {
