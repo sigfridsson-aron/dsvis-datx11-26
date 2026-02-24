@@ -3,7 +3,7 @@ import { compare, updateDefault } from "~/helpers";
 import { DSArray } from "~/objects/dsarray";
 import { TextCircle } from "~/objects/text-circle";
 import { Sorter } from "~/sorting";
-import { BaseSorter, SortMessages } from "./sort";
+import { BaseSorter, SortMessages } from "./BaseSorter";
 
 export const MergeSortMessages = {
     sort: {
