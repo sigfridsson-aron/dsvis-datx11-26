@@ -92,15 +92,20 @@ export class LinkedListAnim extends Engine implements Collection {
     // Insert initial values into the linked list
     async insert(...values: (string | number)[]): Promise<void> {
         for (const val of values) {
-            if (this.linkedList.size === this.maxListSize) {
-                await this.pause("general.full");
-            } else {
-                if(this.linkedList.size != 0){
-                    await this.findTail();
-                    await this.pause("Tail of linked list found.");
-                }
-                await this.insertBack(val);
+            // if (this.linkedList.size === this.maxListSize) {
+            //     await this.pause("general.full");
+            // } else {
+            //     if(this.linkedList.size != 0){
+            //         await this.findTail();
+            //         await this.pause("Tail of linked list found.");
+            //     }
+            //     await this.insertBack(val);
+            // }
+            if(this.linkedList.size != 0){
+                await this.findTail();
+                await this.pause("Tail of linked list found.");
             }
+            await this.insertBack(val);
         }
     }
 

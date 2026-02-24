@@ -27,12 +27,12 @@ export const StackLinkedListMessages = {
         notfound: (element: string | number) => `Node ${element} has child`,
     },
     insert: {
-        element: (element: string | number) => `Insert element: ${element}`,
+        element: (element: string | number) => `Pushing element: ${element}`,
         head: (element: string | number) =>
-            `List is empty, insert ${element} as head`,
+            `List is empty, pushing ${element} as head`,
     },
     delete: {
-        delete: (value: string) => `Dequeuing, removing head`,
+        delete: `Popping, removing head`,
         adjustLink: "Adjusting link",
         adjustPos: "Adjusting positions",
     },
@@ -92,15 +92,12 @@ export class StackLinkedListAnim extends Engine implements Collection {
     // Insert initial values into the linked list
     async insert(...values: (string | number)[]): Promise<void> {
         for (const val of values) {
-            if (this.linkedList.size === this.maxListSize) {
-                await this.pause("general.full");
-            } else {
-                // if(this.linkedList.size != 0){
-                //     await this.findTail();
-                //     await this.pause("Tail of linked list found.");
-                // }
-                await this.insertFront(val);
-            }
+            // if (this.linkedList.size === this.maxListSize) {
+            //     await this.pause("general.full");
+            // } else {
+            //     await this.insertFront(val);
+            // }
+            await this.insertFront(val);
         }
     }
 
@@ -448,7 +445,7 @@ export class StackLinkedListAnim extends Engine implements Collection {
             (this.$Svg.height - this.TOP_MARGIN - this.MIN_SIDE_MARGIN) /
                 (nodeHeight + this.getNodeSpacing())
         );
-        return maxNodesPerRow * maxRows;
+        return maxNodesPerRow * maxRows + 100;
     }
 
     // Calculates the next position for a node in a zigzag layout pattern and if it should be mirrored
@@ -489,11 +486,11 @@ export class StackLinkedListAnim extends Engine implements Collection {
             mirrored = true;
         }
 
-        if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
-            throw new Error(
-                "Cannot add more nodes: Exceeded bottom margin of canvas"
-            );
-        }
+        // if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
+        //     throw new Error(
+        //         "Cannot add more nodes: Exceeded bottom margin of canvas"
+        //     );
+        // }
 
         return [x, y, mirrored];
     }

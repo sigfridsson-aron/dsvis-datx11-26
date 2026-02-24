@@ -6,6 +6,7 @@ import { RedBlack } from "~/trees/RedBlack";
 import { SplayTree } from "~/trees/SplayTree";
 import { BTreeAlgorithmControl } from "./algorithm-controls/BTree-algorithm-controls";
 import { CollectionAlgorithmControl } from "./algorithm-controls/collection-algorithm-controls";
+import { StackAlgorithmControl } from "./algorithm-controls/Stack-algorithm-controls";
 import { LinkedListAnim } from "~/basic/LinkedListAnim";
 import { StackLinkedListAnim } from "~/basic/StackLinkedListAnim";
 import { StackDynamicArrayAnim } from "~/basic/StackDynamicArrayAnim";
@@ -40,6 +41,12 @@ const { engine, isBaseEngine } = initialiseEngine<Collection>(
 if (!isBaseEngine) {
     if (engine instanceof BTree) {
         engine.algorithmControls = new BTreeAlgorithmControl(
+            engine.container,
+            engine
+        );
+    } 
+    else if(engine instanceof StackDynamicArrayAnim || engine instanceof StackLinkedListAnim){
+        engine.algorithmControls = new StackAlgorithmControl(
             engine.container,
             engine
         );

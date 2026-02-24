@@ -10,30 +10,15 @@ export const SortMessages = {
         finished: "Finished",
     },
     insert: {
-        value: (value: string) => `Insert value: ${value}`,
+        value: (value: string) => `Pushing value: ${value}`,
         movePointer: (value: string) => `Moving ${value} pointer`
-    },
-    sort: {
-        compare: (a: string, b: string) => `Compare ${a} and ${b}`,
-        swap: (a: string, b: string) => `Swap ${a} and ${b}`,
     },
     copy: {
         index: (index: number) => `Copying index: ${index}`,
         newSize: (size: number) => `Creating new Dynamic Array of length:  ${size}`,
     },
-    find: {
-        start: (element: string | number) => `Searching for ${element}`,
-        found: (element: string | number) => `Found ${element}`,
-        notfound: (element: string | number) => `Did not find ${element}`,
-        look: (index: number) =>
-            `Looking into the next index: ${index}`,
-        read: (element: string | number) =>
-            `Reading the value of the index: ${element}`,
-        nonExistent: (element: string | number) =>
-            `Element ${element} does not exist`,
-    },
     delete: {
-        delete: (value: string) => `Deleting value at head`,
+        delete: `Popping value at head`,
         removePointer: (value: string) => `Removing ${value} pointer`,
         movePointer: (value: string) => `Moving ${value} pointer`
     },
