@@ -7,6 +7,10 @@ export default class Queue<T>{
         return this.list.insertBack(element);
     }
 
+    size(){
+        return this.list.size;
+    }
+
     dequeue(){
         let head = this.list.get(0);
         if (this.list.removeAt(0) === true){
