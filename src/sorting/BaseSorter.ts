@@ -1,5 +1,6 @@
 import { Engine, MessagesObject } from "~/engine";
 import { DSArray } from "~/objects/dsarray";
+import { StapleArray } from "~/objects/staple-array";
 import { TextCircle } from "~/objects/text-circle";
 import { Sorter } from "~/sorting";
 

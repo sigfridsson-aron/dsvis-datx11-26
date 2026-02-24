@@ -1,7 +1,7 @@
 import { G } from "@svgdotjs/svg.js";
-import ValueStaple from "~/objects/value-staple";
+import { ValueStaple } from "~/objects/value-staple";
 
-export default class StapleArray extends G {
+export class StapleArray extends G {
     STAPLE_GAP: number = 1;
 
     $staples: ValueStaple[] = [];

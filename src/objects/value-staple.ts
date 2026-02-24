@@ -1,6 +1,6 @@
 import { G, Rect, Text } from "@svgdotjs/svg.js";
 
-export default class ValueStaple extends G {
+export class ValueStaple extends G {
     $stapleMaxHeight: number = 100;
     $stapleWidth: number = 20;
     $textGap: number = 5;
