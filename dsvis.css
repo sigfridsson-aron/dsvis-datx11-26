@@ -194,6 +194,14 @@ circle, rect, polygon {
     fill: lemonchiffon;
 }
 
+
+
+.edge-table rect {
+    fill: #ffff;
+    stroke: #000;
+    stroke-width: 1;
+}
+
 path, line, polyline {
     stroke: black;
     fill: none;

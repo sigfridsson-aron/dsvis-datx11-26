@@ -3,6 +3,9 @@ import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { GraphNode } from "~/objects/graph-node";
+import { G } from "@svgdotjs/svg.js";
+import { Rect } from "@svgdotjs/svg.js";
+
 
 /********************code to understand Path type**********************/
 // const pathString = `M 0,0 L ${
@@ -43,6 +46,8 @@ export const DepthMessages = {
 } as const satisfies MessagesObject
 
 export class Depth extends Engine implements Graph {
+   
+    edgeTableGroup: G 
     graph: GraphNode | null = null;
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
@@ -53,28 +58,15 @@ export class Depth extends Engine implements Graph {
         //general controls are the buttons on the bottom
         //so we create our own general if we want to change those
         this.generalControls = new EngineGeneralControls(this.container, this)
+        this.edgeTableGroup = this.Svg.group()
+        this.edgeTableGroup.addClass("edge-table")
+        
     }
 
     async start() {
-        await this.pause("example.here")
-        this.graph = this.newNode("K")
-        this.graph.center(this.$Svg.width/2, this.$Svg.height/2)
-        const test = this.newNode("A")
-        //setPredecessor adds an arrow from the predecessor to the node
-        //it was called from
-        //setSuccessor adds an arrow from the node it was called
-        //to the successor
-        //The first 2 variables you call with setSuccessor stand for
-        //first variable, outkey which will structure like (outkey, successor)
-        //in a the outgoing record, so if 2 successors have the same outkey 
-        //they will delete the old one.
-        //second, inkey which is structured like (inkey, node you called from)
-        //in the record for incoming in the successor(which is the third
-        //variable), so if the successor already has an incomming with
-        //the same key it will delete it.
-        this.graph.setPredecessor("1", "1", test, this.getStrokeWidth())
-        this.graph.setSuccessor("1", "1", test, this.getStrokeWidth())
-        this.graph.getSuccessor("1")?.setCenter(this.$Svg.width/2-100, this.$Svg.height/2-100, 1)
+        
+        
+        this.updateEdgeTable()
     }
 
     initialise(initialValues: string[] | null = null): this {
@@ -99,8 +91,68 @@ export class Depth extends Engine implements Graph {
     //defines a new Node object and puts it under where messages
     //are, will not define connections to different nodes.
     newNode(text: string): GraphNode {
+        console.log("test")
         return this.Svg.put(
             new GraphNode(text, this.getObjectSize(), this.getStrokeWidth())
         ).init(...this.getNodeStart());
     }
+
+    
+
+    //Want the eventual algorithm to call this every it takes a "step"
+    updateEdgeTable() {
+    console.log("TEST METHOD RUNNING");
+
+    const columns = ["From", "To", "Weight"];
+    const rows = 4; // including header
+    const cellHeight = 40;
+    const cellWidth = 80;
+
+    const startX = this.$Svg.width-cellWidth*columns.length;
+    const startY = 0;
+    
+    // Clear previous content
+    this.edgeTableGroup.clear();
+   
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < columns.length; col++) {
+
+            const x = startX + col * cellWidth;
+            const y = startY + row * cellHeight;
+
+            // Draw cell rectangle
+
+
+            this.edgeTableGroup
+                .rect(cellWidth, cellHeight)
+                .move(x, y)
+            
+               
+                
+
+            // Add text
+            let textContent = "";
+
+            if (row === 0) {
+                // Header row
+                textContent = columns[col];
+            } else {
+                // Example placeholder data
+                textContent = `R${row}C${col}`;
+            }
+
+            this.edgeTableGroup
+                .text(textContent)
+                .move(startX, startY)
+                .font({
+                    anchor: 'middle',
+                    leading: '1em',
+                    size: 14
+                })
+                .center(x + cellWidth / 2, y + cellHeight / 2);
+        }
+    }
+    this.Svg.add(this.edgeTableGroup)
+}
 }
