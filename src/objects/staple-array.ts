@@ -2,13 +2,12 @@ import { G } from "@svgdotjs/svg.js";
 import { ValueStaple } from "~/objects/value-staple";
 
 export class StapleArray extends G {
-    STAPLE_GAP: number = 1;
+    STAPLE_GAP: number = 3;
 
     $staples: ValueStaple[] = [];
     $stapleMaxHeight: number;
     $stapleWidth: number;
     $maxValue: number;
-    $stapleSize: number;
 
     /**
      * Also call {@link init()} to finalize initialization
