@@ -1,35 +1,37 @@
 import { G, Rect, Text } from "@svgdotjs/svg.js";
 
 export class ValueStaple extends G {
-    $stapleMaxHeight: number = 100;
-    $stapleWidth: number = 20;
     $textGap: number = 5;
 
     $rect: Rect;
     $text: Text;
-    $hideText: boolean;
     $value: number;
-    $heightPercentage: number;
+
+    // stapleWidth and hideText is always set by the setStapleWidth method,
+    // hence the assertion that the property is initialized
+    $stapleWidth!: number;
+    $hideText!: boolean;
+
+    $stapleHeight: number;
 
     /**
      * Also call {@link init()} to finalize initialization
      */
-    constructor(value: number, heightPercentage: number, hideText: boolean = false) {
-        if (heightPercentage < 0 || heightPercentage > 1) {
-            throw Error(`heightPercentage must be between 0 and 1, inclusive, but was ${heightPercentage}`)
-        }
+    constructor(value: number, stapleWidth: number, stapleHeight: number) {
         super();
         this.$value = value;
-        this.$heightPercentage = heightPercentage; // TODO: Make height percentage logic part of the array (single staple shouldn't have max height/percentage)
         this.$text = this.text(String(value));
-        this.$hideText = hideText;
-
-        this.$rect = this.rect(this.$stapleWidth, this.$stapleMaxHeight * heightPercentage).fill('#32a852');
+        
+        this.$rect = this.rect(stapleWidth, stapleHeight).fill('#32a852');
+        this.$stapleHeight = stapleHeight; // TODO: Make height percentage logic part of the array (single staple shouldn't have max height/percentage)
+        this.setStapleWidth(stapleWidth);
     }
 
     /**
      * To finish initialization you should call the init method after the element
      * has been added to the DOM.
+     * This method should also be called each time the size of the staples change,
+     * to make sure that the text and rectangle are properly aligned.
      *
      * Positioning the group before it has finished initializing is not possible,
      * which is why this separate method is needed.
@@ -44,7 +46,7 @@ export class ValueStaple extends G {
         this.$text.node.style.transformBox = 'border-box';
         this.$text.node.style.transform = 'translateY(50%)';
 
-        this.$rect.center(0, 0).dy(-(this.$stapleMaxHeight * this.$heightPercentage) / 2);
+        this.$rect.center(0, 0).dy(-(this.$stapleHeight) / 2);
 
         return this;
     }
@@ -54,7 +56,6 @@ export class ValueStaple extends G {
     }
 
     getStapleWidth(): number {
-      console.log(this.$stapleWidth)
         return this.$stapleWidth;
     }
 
