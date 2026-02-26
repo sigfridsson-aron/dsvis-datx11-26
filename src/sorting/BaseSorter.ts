@@ -1,4 +1,4 @@
-import { Engine, MessagesObject } from "~/engine";
+import { Engine, MessagesObject, SubmitFunction } from "~/engine";
 import { DSArray } from "~/objects/dsarray";
 import { StapleArray } from "~/objects/staple-array";
 import { TextCircle } from "~/objects/text-circle";
@@ -108,6 +108,29 @@ export class BaseSorter extends Engine implements Sorter {
         // this.sortArray.setIndexHighlight(currentIndex, true);
         // this.indexLength++;
         // this.sortArray.setIndexHighlight(currentIndex, false);
+    }
+
+    async submit(
+        method: SubmitFunction,
+        field: HTMLInputElement | null
+    ): Promise<boolean> {
+        let rawValue: string = "";
+        try {
+            if (field !== null) {
+                rawValue = field.value;
+                field.value = "";
+            }
+            const inputNumbers = rawValue
+                .split(" ")
+                .filter((value) => !isNaN(Number(value)) && !isNaN(parseInt(value)))
+                .map((value) => parseInt(value))
+            console.debug(`executing this with the followig ${inputNumbers}`)
+            await this.execute(method, inputNumbers);
+            return true;
+        } catch (e: any) {
+            console.error(e);
+            return false;
+        }
     }
 
     async sort() {
