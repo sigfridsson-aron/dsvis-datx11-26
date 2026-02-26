@@ -65,12 +65,16 @@ export class WeightedGraphNode extends GraphNode {
                 }
                 inEdge.remove();
             }
-
+            var bend = 0
+            if(theirNode.$outgoing[ourKey]) {
+                bend = 0.3
+                theirNode.$outgoing[ourKey].$bend = bend
+            }
             const edge = this.root()
                 .put(new WeightedConnection(this, theirNode, weight))
                 .init(
                     strokeWidth,
-                    this.getBend(theirKey),
+                    this.getBend(theirKey) + bend,
                     this.getDirected(theirKey)
                 );
 

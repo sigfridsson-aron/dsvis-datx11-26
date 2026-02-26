@@ -49,14 +49,19 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
     // Creates a text object that contains the weight value
     // of this connection
     _createWeight(): void {
+        const C = this.$coords
+        var [offx, offy] = [0, 0]
+        if (this.$bend > 0) {
+            [offx, offy] = this._offset()
+        }
         this.$textObj = this.root()
         .text(this.$weight.toString())
         .font({ size: 25 })
         .fill("#000000")
         .stroke({ color: "#b01a1a", width: 1 })
         .center(
-            (this.$coords.x1 + this.$coords.x2) / 2 + 5,
-            (this.$coords.y1 + this.$coords.y2) / 2 + 5
+            (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*17,
+            (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*17
         );
     }
 
@@ -69,16 +74,33 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
                                        r2: number; 
                                     }>,
                   animationDuration: number = 0): void {
+        const C = this.$coords
 
         const x1 = newCoords.x1 ? newCoords.x1 : this.$coords.x1
         const x2 = newCoords.x2 ? newCoords.x2 : this.$coords.x2
         const y1 = newCoords.y1 ? newCoords.y1 : this.$coords.y1
         const y2 = newCoords.y2 ? newCoords.y2 : this.$coords.y2
 
+        var [offx, offy] = [0, 0]
+        if (this.$bend > 0) {
+            [offx, offy] = this._offset()
+        }
+
         this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
         .center(
-            (x1 + x2)/2,
-            (y1 + y2)/2
+            (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*5,
+            (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*5
         )
+    }
+
+    _offset(): [number, number] {
+        const preX1 = (this.$coords.x2 - this.$coords.x1)
+        const preY1 = (this.$coords.y2 - this.$coords.y1)
+        const norm  = Math.sqrt(preX1*preX1 + preY1*preY1)
+        const x1    = preX1/norm
+        const y1    = preY1/norm
+        const siny1 = y1*Math.cos(Math.PI/2) + x1*Math.sin(Math.PI/2)
+        const cosx1 = x1*Math.cos(Math.PI/2) - y1*Math.sin(Math.PI/2)
+        return [cosx1, siny1]
     }
 }
