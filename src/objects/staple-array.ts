@@ -10,6 +10,9 @@ export class StapleArray extends G {
     $maxValue: number;
     $stapleSize: number;
 
+    /**
+     * Also call {@link init()} to finalize initialization
+     */
     constructor(items: number[], stapleMaxHeight: number, stapleWidth: number = 25) {
         super();
         this.$stapleMaxHeight = stapleMaxHeight;
