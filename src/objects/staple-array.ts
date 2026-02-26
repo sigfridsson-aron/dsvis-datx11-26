@@ -5,12 +5,15 @@ export class StapleArray extends G {
     STAPLE_GAP: number = 1;
 
     $staples: ValueStaple[] = [];
+    $stapleMaxHeight: number;
+    $stapleWidth: number;
     $maxValue: number;
     $stapleSize: number;
 
-    constructor(items: number[], stapleSize: number) {
+    constructor(items: number[], stapleMaxHeight: number, stapleWidth: number = 25) {
         super();
-        this.$stapleSize = stapleSize;
+        this.$stapleMaxHeight = stapleMaxHeight;
+        this.$stapleWidth = stapleWidth;
         this.$maxValue = Math.max(...items);
         this.createStaples(items).forEach((item: ValueStaple) => {
             this.add(item);
@@ -69,21 +72,21 @@ export class StapleArray extends G {
     }
 
     addValues(...values: number[]) {
-        let needsResize: boolean = true;
+        const currentCenter = { x: this.cx(), y: this.cy() }
+        let hasNewMaxValue: boolean = true;
         for (const value of values) {
             if (value > this.$maxValue) {
-                needsResize = true;
+                hasNewMaxValue = true;
+                this.$maxValue = value;
             }
-            this.$staples.push(
-                new ValueStaple(
-                    value,
-                    value / this.$maxValue
-                )
-            );
+            const staple = new ValueStaple(value, this.$stapleWidth, this.$stapleMaxHeight * (value / this.$maxValue));
+            this.$staples.push(staple);
+            this.add(staple)
         }
-        if (needsResize) {
-            this.$staples = this.createStaples(this.$staples.map(item => item.getValue()));
-            this.init(this.cx(), this.cy());
+        console.debug(this.$staples);
+        console.debug(hasNewMaxValue);
+        if (hasNewMaxValue) {
+            this.init(currentCenter.x, currentCenter.y);
         }
     }
 
@@ -95,17 +98,18 @@ export class StapleArray extends G {
         return this.$staples[index].getValue();
     }
 
-    private createStaples(items: number[]): ValueStaple[] {
-        const newStaples: ValueStaple[] = []
-        this.$maxValue = Math.max(...items);
-        items.forEach((item: number, i: number) => {
+    private createStaples(values: number[]): ValueStaple[] {
+        const staples: ValueStaple[] = [];
+        this.$maxValue = Math.max(...values);
+        values.forEach((value: number) => {
             const staple: ValueStaple = new ValueStaple(
-                item,
-                item / this.$maxValue
-            ).stapleSize(this.$stapleSize);
-            newStaples.push(staple);
+                value,
+                this.$stapleWidth,
+                (value / this.$maxValue) * this.$stapleMaxHeight
+            );
+            staples.push(staple);
         });
-        return newStaples;
+        return staples;
     }
 
     setStapleHighlight(i: number) {
