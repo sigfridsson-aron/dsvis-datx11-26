@@ -114,13 +114,13 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
             let val = this.sortArray.getValue(i)
             const arrayLabel = this.Svg.put(
                 new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
-            ).init(this.sortArray.getCX(i), this.sortArray.cy());
+            ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
 
             await this.pause("copy.index", i);
 
             arrayLabel.setCenter(
             newArray.getCX(ii),
-            newArray.cy(),
+            newArray.getCY(ii),
             this.getAnimationSpeed()
             );
 
@@ -146,7 +146,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         this.sortArray = newArray;
         this.animate(this.sortArray, !this.state.isResetting()).center(
         this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin * 4
+        this.getTreeRoot()[1] + this.$Svg.margin + Number(this.sortArray.height()) / 2
         );
 
         await this.pause(undefined);
@@ -169,7 +169,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         }
         arrayLabel.setCenter(
             this.sortArray.getCX(currentIndex),
-            this.sortArray.cy(),
+            this.sortArray.getCY(currentIndex),
             this.getAnimationSpeed()
         );
         await this.pause(undefined);

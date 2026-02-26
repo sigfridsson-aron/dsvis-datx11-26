@@ -494,11 +494,11 @@ export class LinkedListAnim extends Engine implements Collection {
             mirrored = true;
         }
 
-        if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
-            throw new Error(
-                "Cannot add more nodes: Exceeded bottom margin of canvas"
-            );
-        }
+        // if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
+        //     throw new Error(
+        //         "Cannot add more nodes: Exceeded bottom margin of canvas"
+        //     );
+        // }
 
         return [x, y, mirrored];
     }

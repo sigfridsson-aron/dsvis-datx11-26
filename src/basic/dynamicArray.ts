@@ -25,10 +25,21 @@ export class DynamicArray extends G {
         return this;
     }
 
+    getRowWidth() : number {
+        return Math.floor((1000 - 200) / this.engine().getObjectSize());
+    }
+
     getCX(i: number): number {
         return (
             this.cx() +
-            this.engine().getObjectSize() * (i % 16 - Math.min(16, this.getSize()) / 2 + 0.5)
+            this.engine().getObjectSize() * (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
+        );
+    }
+
+    getCY(i: number): number {
+        return (
+            Number(this.y()) + this.engine().getObjectSize() * 1.5 + 
+            this.engine().getObjectSize() * 2 * (Math.floor((i / this.getRowWidth()))) 
         );
     }
 
@@ -44,9 +55,9 @@ export class DynamicArray extends G {
         }
         const w0 = this.engine().getObjectSize();
         const h = this.engine().getObjectSize();
-        const rowWidth = Math.min(size, 16);
+        const rowWidth = Math.min(size, this.getRowWidth());
         const stroke = this.engine().getStrokeWidth();
-        if(size <= 16){
+        if(size <= this.getRowWidth()){
             this.$rect.width(w0 * size);
         }
         else{
@@ -55,7 +66,7 @@ export class DynamicArray extends G {
         const cx = this.$rect.cx()
         let cy = this.$rect.cy();
         for (let i = 0; i < size; i++) {
-            if(i == 16){
+            if(i % this.getRowWidth() == 0 && i != 0){
                 cy = cy + this.engine().getObjectSize() * 2; 
             }
             if (!this.$backgrounds[i]) {
@@ -63,18 +74,18 @@ export class DynamicArray extends G {
                     .stroke({ width: stroke })
                     .addClass("background");
             }
-            this.$backgrounds[i].center(cx + w0 * (i % 16 - rowWidth / 2 + 0.5), cy);
+            this.$backgrounds[i].center(cx + w0 * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
             if (!this.$values[i]) {
                 this.$values[i] = this.text(NBSP);
             }
-            this.$values[i].center(cx + w0 * (i % 16 - rowWidth / 2 + 0.5), cy);
+            this.$values[i].center(cx + w0 * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
             if (!this.$indices[i]) {
                 this.$indices[i] = this.text(i.toString()).addClass(
                     "arrayindex"
                 );
             }
             this.$indices[i].center(
-                cx + w0 * (i % 16 - rowWidth / 2 + 0.5),
+                cx + w0 * (i % this.getRowWidth() - rowWidth / 2 + 0.5),
                 cy + h * 0.8
             );
         }
@@ -176,7 +187,7 @@ export class DynamicArray extends G {
         const arrowOffset = 10;
 
         const x = this.getCX(index);
-        const y = this.cy() - this.engine().getObjectSize() / 2 - arrowOffset;
+        const y = this.getCY(index) - this.engine().getObjectSize() / 2 - arrowOffset;
 
         const arrow = this.polyline([
             [x, y],
@@ -200,11 +211,15 @@ export class DynamicArray extends G {
     }
 
     moveArrow(arrowId: string, indexTo: number) {
+        const arrowSize = 10;
+        const arrowOffset = 10;
         const arrow = this.findOne(`#${arrowId}`) as Polyline | null;
         const x = this.getCX(indexTo);
+        const y = this.getCY(indexTo) - this.engine().getObjectSize() / 2 - arrowOffset - arrowSize / 2;
 
         if (arrow) {
             this.engine().animate(arrow, true).cx(x);
+            this.engine().animate(arrow, true).cy(y);
         }
     }
 }
