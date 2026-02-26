@@ -68,10 +68,10 @@ export class ValueStaple extends G {
         this.$text.show();
     }
 
-    stapleSize(size: number) {
-        this.$stapleWidth = size;
-        this.$hideText = size < 20
-        this.$rect.width(this.$stapleWidth);
+    setStapleWidth(width: number): this {
+        this.$stapleWidth = width;
+        this.$hideText = width < 25
+        this.$rect.width(width);
         return this;
     }
 }
