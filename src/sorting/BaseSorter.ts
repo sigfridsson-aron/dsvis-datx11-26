@@ -76,10 +76,12 @@ export class BaseSorter extends Engine implements Sorter {
         );
     }
 
-
     // Kommenterade ut animeringeringen till arrayen.
     async insertOne(value: number | string) {
-        value = String(value);
+        if (typeof value === 'number') {
+            this.sortArray.addValues(value)
+        }
+
         /* detta är animationen vid inläggningen*/
         // const arrayLabel = this.Svg.put(
         //     new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
