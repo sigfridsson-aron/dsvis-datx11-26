@@ -29,7 +29,7 @@ export class BaseSorter extends Engine implements Sorter {
 
     constructor(containerSelector: string) {
         super(containerSelector);
-        this.sortArray = new StapleArray([], this.getObjectSize()); // Only added to make sure that sortArray never is null
+        this.sortArray = new StapleArray([], this.STAPLE_MAX_HEIGHT, this.STAPLE_WIDTH); // Only added to make sure that sortArray never is null
     }
 
     initialise(initialValues: number[] = []) {
@@ -43,7 +43,7 @@ export class BaseSorter extends Engine implements Sorter {
         // this.indexLength = 0; // TODO: Remove
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
-            new StapleArray(this.initialValues, this.getObjectSize()) // det stod new DSArray(1, this.getObjectSize())
+            new StapleArray(this.initialValues, this.STAPLE_MAX_HEIGHT, this.STAPLE_WIDTH) // det stod new DSArray(1, this.getObjectSize())
         ).init(xRoot, yRoot + this.$Svg.margin * 4); // det stod this.sortArray = new DSArray(1, this.getObjectSize());
 
         //this.sortArray.setDisabled(1, false);
