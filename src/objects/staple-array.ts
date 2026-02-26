@@ -31,8 +31,8 @@ export class StapleArray extends G {
     init(centerX: number, centerY: number): this {
         this.$staples.forEach((staple, i) => {
             staple.init();
-            staple.dx((this.STAPLE_GAP + staple.getStapleWidth()) * i);
         });
+        this.positionStaples();
         this.center(centerX, centerY);
 
         // setTimeout(() => {
@@ -98,6 +98,29 @@ export class StapleArray extends G {
         return this.$staples[index].getValue();
     }
 
+    resizeAndPositionStaples() {
+        this.resizeStaples();
+        this.positionStaples();
+    }
+
+    private resizeStaples() {
+        this.$staples.forEach((staple) => {
+            staple.width(this.$stapleWidth);
+            staple.height(
+                this.$stapleMaxHeight * (staple.getValue() / this.$maxValue)
+            );
+            staple.init();
+        });
+    }
+
+    private positionStaples() {
+        this.$staples.forEach((staple, i) => {
+            // staple.center(0, 0);
+            staple.dx((this.$stapleWidth + this.STAPLE_GAP) * i);
+        });
+        this.center
+    }
+
     private createStaples(values: number[]): ValueStaple[] {
         const staples: ValueStaple[] = [];
         this.$maxValue = Math.max(...values);
@@ -118,5 +141,33 @@ export class StapleArray extends G {
 
     clearStapleHighlight(i: number) {
         this.$staples[i].setHighlight(false);
+    }
+
+    /**
+     * Note that this method only sets the new max height, and doesn't 
+     * resize or position the staples accordingly. To make sure the staples 
+     * get their correct position and size, always call 
+     * {@link resizeAndPositionStaples()} afterwards.
+     * 
+     * @param maxHeight height of the staple with the largest value
+     * @returns itself
+     */
+    setStapleMaxHeight(maxHeight: number) {
+        this.$stapleMaxHeight = maxHeight;
+        return this;
+    }
+
+    /**
+     * Note that this method only sets the new staple width, and doesn't 
+     * resize or position the staples accordingly. To make sure the staples 
+     * get their correct position and size, always call 
+     * {@link resizeAndPositionStaples()} afterwards.
+     * 
+     * @param maxHeight height of the staple with the largest value
+     * @returns itself
+     */
+    setStapleWidth(stapleWidth: number) {
+        this.$stapleWidth = stapleWidth;
+        return this;
     }
 }
