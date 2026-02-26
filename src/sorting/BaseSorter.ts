@@ -20,6 +20,10 @@ export const SortMessages = {
 } as const satisfies MessagesObject;
 
 export class BaseSorter extends Engine implements Sorter {
+
+    STAPLE_MAX_HEIGHT: number = 100;
+    STAPLE_WIDTH: number = 25; // TODO: replace these with dynamic sizes depending on the chosen "nodeSize"
+
     initialValues: number[] = [];
     // compensate: number = 0; // TODO: remove?
     sortArray: StapleArray;
