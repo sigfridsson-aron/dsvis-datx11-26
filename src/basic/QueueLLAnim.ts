@@ -34,7 +34,7 @@ export const QueueLLMessages = {
             `Queue is empty, insert ${element} as head`,
     },
     delete: {
-        delete: (value: string) => `Deleting node ${value}`,
+        delete: (value: string) => `Popping head node`,
         adjustLink: "Adjusting link",
         adjustPos: "Adjusting positions",
     },
@@ -95,7 +95,7 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         });
     }
 
-    
+    // Enqueue
     async insert(...values: (string | number)[]): Promise<void>{
         for (const val of values) {
             if (this.queue.size() === this.maxListSize) {
@@ -110,7 +110,7 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         }
     }
 
-    // Enqueue
+   
     async insertBack(value: string | number): Promise<void> {
         this.queue.enqueue(value);
 
@@ -208,14 +208,14 @@ export class QueueLLAnim<T> extends Engine implements Collection{
     }
 
     async delete(value: string | number): Promise<void> {
-        await this.pop();
+        //await this.pop();
 
-        /*const node = await this.findOne(value);
+        const node = this.nodeArray[0][0];
         if (node) {
             // If the node is found
             this.highlight(node, true);
             await this.pause("delete.delete", value);
-            this.linkedList.removeElement(value);
+            this.queue.dequeue();
             node.remove(); // Remove the node from the SVG
 
             await this.pause("delete.adjustLink");
@@ -223,30 +223,45 @@ export class QueueLLAnim<T> extends Engine implements Collection{
             // If the node is the first one, remove the link to the next node
             if (index === this.nodeArray.length - 1) {
                 // If the node is the last one, remove the connection to the previous node
-                const prevConnection = this.nodeArray[
-                    index
-                ][1] as LinkedConnection;
+                const prevConnection = this.nodeArray[index][1] as LinkedConnection;
                 prevConnection.remove();
                 this.nodeArray[index][1] = null; // Set the connection to null
             } else {
                 // If the node is not the last one
                 // Remove the connection to the next node
-                const connection = this.nodeArray[
-                    index + 1
-                ][1] as LinkedConnection;
+                const connection = this.nodeArray[index + 1][1] as LinkedConnection;
                 connection.remove();
+                
                 // Update the connection of the previous node to go to the next node
                 const nextNode = this.nodeArray[index + 1][0];
-                const prevConnection = this.nodeArray[
-                    index
-                ][1] as LinkedConnection; // need to move this index + 1
+                const prevConnection = this.nodeArray[index][1] as LinkedConnection; // need to move this index + 1
                 this.nodeArray[index + 1][1] = prevConnection;
                 prevConnection.setEnd(nextNode, this.animationValue());
             }
             await this.pause("delete.adjustPos");
             this.adjustNodes(index, index + 1);
+
+            
+            if (!this.queue.isEmpty()){
+                console.log("Works?",this.nodeArray[this.nodeArray.length -1][0]);
+                const coords = this.nodeArray[this.queue.size() -1][0].getCenterPos();
+
+                this.tailNode.move(coords[0], coords[1] + 75);
+
+                this.animate(this.tailText, !this.state.isResetting()).move(
+                    coords[0],
+                    coords[1] + 75
+                );
+
+                this.tailConnection?.updateAll(
+                    [coords[0], coords[1] + 75], 
+                    [coords[0], coords[1]],
+                    this.animationValue()
+                );
+            }
         }
-        */
+
+        
     }
 
     adjustNodes(startindex: number, endindex: number): void {
@@ -302,9 +317,11 @@ export class QueueLLAnim<T> extends Engine implements Collection{
                     coords[1] + this.nodeDimensions[1] / 2,
                 ];
             }
+        
 
             this.nodeArray.push([node, connection]);
         }
+
     }
 
 
