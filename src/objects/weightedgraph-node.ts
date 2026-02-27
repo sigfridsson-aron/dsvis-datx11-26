@@ -5,6 +5,8 @@ export class WeightedGraphNode extends GraphNode {
     $outgoing: Record<string, WeightedConnection<this> | null> = {};
     $incoming: Record<string, WeightedConnection<this> | null> = {};
     $weights: Record<string, number | null> = {};
+    $outGoingKeys: string[] = []
+
 
     constructor(text: string, size: number, strokeWidth: number) {
         super(text, size, strokeWidth);
@@ -34,6 +36,7 @@ export class WeightedGraphNode extends GraphNode {
         weight: number,
         dir: string
     ): this {
+        this.$outGoingKeys.push(theirKey)
         if (dir === "from" && theirNode) {
             theirNode.connect(ourKey, theirKey, this, strokeWidth, weight, "to")
             return this
@@ -43,6 +46,7 @@ export class WeightedGraphNode extends GraphNode {
             throw new Error ("connect only has the directions to, from and both defined")
         }
         const outEdge = this.$outgoing[theirKey];
+        
         if (outEdge) {
             const oldSuccessor = outEdge.getEnd();
             const oldIncoming = oldSuccessor.$incoming;

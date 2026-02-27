@@ -6,6 +6,7 @@ import { GraphNode } from "~/objects/graph-node";
 import { G } from "@svgdotjs/svg.js";
 import { Rect } from "@svgdotjs/svg.js";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
+import { WeightedConnection } from "~/objects/weigted-connection";
 
 
 /********************code to understand Path type**********************/
@@ -51,8 +52,8 @@ export class Depth extends Engine implements Graph {
     edgeTableGroup: G 
     createdNodes: WeightedGraphNode[] = []
 
-    graph: WeightedGraphNode | null = null
-    
+
+
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
@@ -70,8 +71,20 @@ export class Depth extends Engine implements Graph {
     async start() {
         
         
-        this.updateEdgeTable()
-        this.newNode("test213").center(60,60)
+         const testNode1 = this.newNode("testHEJHEJ").setCenter(this.$Svg.width/2,this.$Svg.height/2)
+        const testNode2 = this.newNode("test213").setCenter(this.$Svg.width/2 -100,this.$Svg.height/2 - 100)
+        const testNode3 = this.newNode("senasteNoden").setCenter(this.$Svg.width/2 + 100,this.$Svg.height/2 + 100)
+        testNode3.connect("1","3",testNode1,this.getStrokeWidth(),13,"to")
+        testNode1.connect("1","1",testNode2,this.getStrokeWidth(),10,"both")
+        
+
+        this.updateEdgeTable([testNode1,testNode2,testNode3])
+
+
+        
+        
+       
+       
 
     }
 
@@ -96,7 +109,7 @@ export class Depth extends Engine implements Graph {
 
     //defines a new Node object and puts it under where messages
     //are, will not define connections to different nodes.
-    newNode(text: string): GraphNode {
+    newNode(text: string): WeightedGraphNode {
         const newNode = new WeightedGraphNode(text, this.getObjectSize(), this.getStrokeWidth())
         this.createdNodes.push(newNode)
         return this.Svg.put(
@@ -104,14 +117,18 @@ export class Depth extends Engine implements Graph {
         ).init(...this.getNodeStart());
     }
 
+
+
     
 
     //Want the eventual algorithm to call this every it takes a "step"
-    updateEdgeTable() {
+    updateEdgeTable(createdNodes:WeightedGraphNode[]) {
     
 
     const columns = ["From", "To", "Weight"];
-    const rows = 4; // including header
+    const edges = this.getAllEdges(createdNodes)
+    const rows = edges.length + 1; // including header
+    
     const cellHeight = 40;
     const cellWidth = 80;
 
@@ -120,46 +137,72 @@ export class Depth extends Engine implements Graph {
     
     // Clear previous content
     this.edgeTableGroup.clear();
-   
 
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < columns.length; col++) {
+    this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
+     for (let i = 0; i < edges.length; i++) {
+        const currEdge = edges[i]
+        const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
+    
 
-            const x = startX + col * cellWidth;
-            const y = startY + row * cellHeight;
+        this.drawRow(
+            rowData,
+            i + 1,
+            startX,
+            startY,
+            cellWidth,
+            cellHeight
+        );
+    }           
 
-            // Draw cell rectangle
 
-
-            this.edgeTableGroup
-                .rect(cellWidth, cellHeight)
-                .move(x, y)
-            
-               
-                
-
-            // Add text
-            let textContent = "";
-
-            if (row === 0) {
-                // Header row
-                textContent = columns[col];
-            } else {
-                // Example placeholder data
-                textContent = `R${row}C${col}`;
-            }
-
-            this.edgeTableGroup
-                .text(textContent)
-                .move(startX, startY)
-                .font({
-                    anchor: 'middle',
-                    leading: '1em',
-                    size: 14
-                })
-                .center(x + cellWidth / 2, y + cellHeight / 2);
-        }
-    }
+    
     this.Svg.add(this.edgeTableGroup)
 }
+
+private getAllEdges(createdNodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
+    const edges:WeightedConnection<WeightedGraphNode>[] = []
+    for (const node of createdNodes) {
+        for (const key of node.$outGoingKeys) {
+
+            const edge = node.$outgoing[key];
+            console.log(key)
+            if (!edge) continue;
+
+            edges.push(edge);
+        }
+    }
+    return edges
+
+}
+
+private drawRow(
+    rowData: string[],
+    rowIndex: number,
+    startX: number,
+    startY: number,
+    cellWidth: number,
+    cellHeight: number
+) {
+    for (let col = 0; col < rowData.length; col++) {
+
+        const x = startX + col * cellWidth;
+        const y = startY + rowIndex * cellHeight;
+
+        this.edgeTableGroup
+            .rect(cellWidth, cellHeight)
+            .move(x, y);
+
+        this.edgeTableGroup
+            .text(rowData[col])
+            .font({
+                anchor: 'middle',
+                leading: '1em',
+                size: 14
+            })
+            .center(x + cellWidth / 2, y + cellHeight / 2);
+    }
+}
+
+
+
 }
