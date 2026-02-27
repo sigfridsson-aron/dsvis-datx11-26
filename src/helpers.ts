@@ -212,6 +212,7 @@ export function querySelector<T extends Element = Element>(
     selector: string,
     container: HTMLElement = document.documentElement
 ) {
+    
     const element = container.querySelector<T>(selector);
 
     if (!element) {
