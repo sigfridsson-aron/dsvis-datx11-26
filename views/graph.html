@@ -30,6 +30,13 @@
 
       <fieldset class="algorithmControls">
         <span class="formgroup">
+          <select class="chooseGraphI disableWhenRunning">
+            <option value="" selected>Choose a graph</option>
+            <option value="Directed">Directed graph</option>
+            <option value="Undirected">Undirected graph</option>
+            <option value="Take The L">Am i right?</option>
+          </select>
+          <input class="chosengraph disableWhenRunning" type="hidden">
           <label>Start:
             <input class="start disableWhenRunning" type="submit" value="start" />
           </label>

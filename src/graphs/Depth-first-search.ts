@@ -2,35 +2,7 @@ import { parseValues } from "~/helpers";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
-import { GraphNode } from "~/objects/graph-node";
-
-/********************code to understand Path type**********************/
-// const pathString = `M 0,0 L ${
-//     s * nX
-// },${nY} m ${nR},0 a ${nR},${nR} 0 1,0 ${
-//     -2 * nR
-// },0 a ${nR},${nR} 0 1,0 ${2 * nR},0`;
-// explanation of pathString
-// M 0,0 move to 0,0 (start at node)
-// L ${s'nX},${nY} draw a line from 0,0 to s*nX,nY
-// m ${nR},0 move (relative to where you left) 
-// to nR,0 i.e +nR in the x-axis
-// a ${nR},{nR} 0(rotation) 1(large arc),0(counterclock) ${-2*nR},0 
-// this command is draw an arc of a circle with x radius nR
-// and y-radius nR(the circle would be an elipse if y and x differ)
-// this arc should not be rotated, take the long way there(i don't
-// fully understand this) and go counterclockwise. Draw from where
-// you are to 2*nR,0
-
-//other commands
-//l (dx, dy)-draw a line from where you were(x, y) to (x+dx, y+dy)
-//H, h- draws line only using x
-//V, v- draws line only using y
-//C, c, S, s - draws cubic bezier curves (I doubt we'll use this)
-//Q, q, T, t - draws quadratic bezier curves (doubt we'll use this too)
-//A - same as a but from current point to set coordinates
-//Z, z - goes from current point to initial point (fills in gaps too i think)
-/********************code to understand Path type**********************/
+import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 
 export const DepthMessages = {
     example: {
@@ -43,7 +15,7 @@ export const DepthMessages = {
 } as const satisfies MessagesObject
 
 export class Depth extends Engine implements Graph {
-    graph: GraphNode | null = null;
+    graph: WeightedGraphNode | null = null;
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
@@ -56,25 +28,20 @@ export class Depth extends Engine implements Graph {
     }
 
     async start() {
-        await this.pause("example.here")
-        this.graph = this.newNode("K")
-        this.graph.center(this.$Svg.width/2, this.$Svg.height/2)
-        const test = this.newNode("A")
-        //setPredecessor adds an arrow from the predecessor to the node
-        //it was called from
-        //setSuccessor adds an arrow from the node it was called
-        //to the successor
-        //The first 2 variables you call with setSuccessor stand for
-        //first variable, outkey which will structure like (outkey, successor)
-        //in a the outgoing record, so if 2 successors have the same outkey 
-        //they will delete the old one.
-        //second, inkey which is structured like (inkey, node you called from)
-        //in the record for incoming in the successor(which is the third
-        //variable), so if the successor already has an incomming with
-        //the same key it will delete it.
-        this.graph.setPredecessor("1", "1", test, this.getStrokeWidth())
-        this.graph.setSuccessor("1", "1", test, this.getStrokeWidth())
-        this.graph.getSuccessor("1")?.setCenter(this.$Svg.width/2-100, this.$Svg.height/2-100, 1)
+        this.directedGraph()
+    }
+
+    async chosenGraph(graf: string | number) {
+        if (graf === "Undirected") {
+            this.undirectedGraph()
+        } else if (graf === "Directed") {
+            this.directedGraph()
+        } else {
+            this.Svg.text("You are WRONG!")
+            .center(this.$Svg.width/10, this.$Svg.height/2)
+            .font({ size: 100 })
+            .stroke({ color: "#f44444", width: 5 })
+        }
     }
 
     initialise(initialValues: string[] | null = null): this {
@@ -98,9 +65,158 @@ export class Depth extends Engine implements Graph {
 
     //defines a new Node object and puts it under where messages
     //are, will not define connections to different nodes.
-    newNode(text: string): GraphNode {
+    newNode(text: string): WeightedGraphNode {
         return this.Svg.put(
-            new GraphNode(text, this.getObjectSize(), this.getStrokeWidth())
+            new WeightedGraphNode(text, this.getObjectSize(), this.getStrokeWidth())
         ).init(...this.getNodeStart());
+    }
+
+    //This is just the connect function but i didn't wanna bother with
+    //sending along a unique key to every node.
+    link(
+        ourNode: WeightedGraphNode, 
+        theirNode: WeightedGraphNode,
+        weight: number,
+        dir: string
+    ): void {
+        ourNode.connect(theirNode.getText(), 
+                        ourNode.getText(), 
+                        theirNode, 
+                        this.getStrokeWidth(), 
+                        weight, 
+                        dir)
+    }
+
+    //Puts a Node a 100(px not sure what unit we have) away from
+    //another node at a degree(not radians!)
+    //does not have animation implemented
+    putAtDeg(
+        putNode: WeightedGraphNode,
+        relativNode: WeightedGraphNode,
+        degree: number
+    ): void {
+        const degreé = Math.PI/180 * degree * (-1)
+        const [relativX, relativY] = relativNode.getCenter()
+        putNode.setCenter(
+            relativX + 125*Math.cos(degreé),
+            relativY + 125*Math.sin(degreé)
+        )
+    }
+
+    //Implement default graphs below
+
+    //TODO immplement mixed(both directed and undirected),
+    // cyclic, acyclic, DAG (directed acyclic), connected (strongly, weakly), 
+    // disconnected, tournament, eulerian, hamiltonian, chordal and complete
+    // directed graphs
+
+    //If we ever want to animate adding to graphs we would need to
+    //adress this bug, run the code to se it.
+    bugExample(): void {
+        const midW = this.$Svg.width/2
+        const midH = this.$Svg.height/2
+        const A = this.newNode("A")
+        A.setCenter(midW, midH, this.getAnimationSpeed())
+        const B = this.newNode("B")
+        this.pause("")
+        this.graph = A
+        this.putAtDeg(B, A, 135)
+        this.link(A, B, 2, "both")
+        this.pause("")
+    }
+
+    undirectedGraph():void { // i am happy with this but feel free to add to it
+        const midW = this.$Svg.width/2
+        const midH = this.$Svg.height/2
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+        this.link(A, B, 1, "both")
+        this.putAtDeg(B, A, 135)
+
+        this.link(A, C, 666, "both")
+        this.putAtDeg(C, A, 0)
+        this.link(C, D, 30, "both")
+
+        this.link(B, D, 4, "both")
+        this.putAtDeg(D, B, 45)
+        this.link(A, D, 3, "both")
+
+        this.putAtDeg(E, A, 225)
+        this.link(E, A, 5, "both")
+
+        this.putAtDeg(F, C, 45)
+        this.link(F, C, 2, "both")
+
+        this.putAtDeg(G, C, -45)
+        this.link(G, C, 1, "both")
+        this.link(G, F, 5, "both")
+    }
+
+    directedGraph():void { //copied the undirected graph and made it directed
+        const midW = this.$Svg.width/2
+        const midH = this.$Svg.height/2
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+        this.link(A, B, 1, "from")
+        this.putAtDeg(B, A, 135)
+
+        this.link(A, C, 666, "from")
+        this.putAtDeg(C, A, 0)
+        this.link(C, D, 30, "to")
+
+        this.link(B, D, 4, "to")
+        this.putAtDeg(D, B, 45)
+        this.link(A, D, 3, "from")
+
+        this.putAtDeg(E, A, 225)
+        this.link(E, A, 5, "to")
+
+        this.putAtDeg(F, C, 45)
+        this.link(F, C, 2, "to")
+
+        this.putAtDeg(G, C, -45)
+        this.link(G, C, 1, "from")
+        this.link(G, F, 5, "to")
+    }
+
+    mixedGraph(): void { //unfinished
+        const midW = this.$Svg.width/2
+        const midH = this.$Svg.height/2
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+
+        this.graph = A
+        this.link(A, B, 4, "to")
+        A.setCenter(midW, midH)
+        this.link(A, B, 3, "from")
+        B.setCenter(midW + 100, midH)
+        this.link(A, C, 5, "to")
+        C.setCenter(midW - 100, midH)
+        this.link(A, D, 11, "from")
+        D.setCenter(midW, midH + 100)
+        this.link(A, E, 1, "both")
+        E.setCenter(midW, midH - 100)
     }
 }

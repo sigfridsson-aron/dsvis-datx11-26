@@ -76,10 +76,10 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
                   animationDuration: number = 0): void {
         const C = this.$coords
 
-        const x1 = newCoords.x1 ? newCoords.x1 : this.$coords.x1
-        const x2 = newCoords.x2 ? newCoords.x2 : this.$coords.x2
-        const y1 = newCoords.y1 ? newCoords.y1 : this.$coords.y1
-        const y2 = newCoords.y2 ? newCoords.y2 : this.$coords.y2
+        const x1 = newCoords.x1 ? newCoords.x1 : C.x1
+        const x2 = newCoords.x2 ? newCoords.x2 : C.x2
+        const y1 = newCoords.y1 ? newCoords.y1 : C.y1
+        const y2 = newCoords.y2 ? newCoords.y2 : C.y2
 
         var [offx, offy] = [0, 0]
         if (this.$bend > 0) {
@@ -88,8 +88,8 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
 
         this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
         .center(
-            (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*5,
-            (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*5
+            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*5,
+            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*5
         )
     }
 

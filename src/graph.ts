@@ -6,6 +6,7 @@ import { GraphAlgorithmControl } from "./algorithm-controls/graph-algorithmcontr
 
 export interface Graph extends Engine {
     start: SubmitFunction;
+    chosenGraph: SubmitFunction;
     //define buttons that can be used for all graphs
     //these will be at the top of the screen like
     //insert for collections or deleteMin for prioqueues
