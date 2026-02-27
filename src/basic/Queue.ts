@@ -25,6 +25,6 @@ export default class Queue<T>{
     }
 
     isEmpty(){
-        return this.list.isEmpty;
+        return this.list.isEmpty();
     }
 }
