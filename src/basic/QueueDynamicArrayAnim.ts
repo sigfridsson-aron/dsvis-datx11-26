@@ -65,7 +65,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
             new DynamicArray(1, this.getObjectSize())
-        ).init(1, xRoot, yRoot + this.$Svg.margin * 4);
+        ).init(1, xRoot, yRoot + this.$Svg.margin * 1.5);
         this.Svg.put(this.sortArray);
         this.sortArray.setDisabled(0, false);
         if (this.initialValues) {
@@ -102,6 +102,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         this.getTreeRoot()[0],
         this.getTreeRoot()[1] + this.$Svg.margin * 4 + this.getObjectSize() * 4
         );
+        newArray.y(this.getTreeRoot()[1] + this.$Svg.margin * 1.5 + this.getObjectSize() + Number(this.sortArray.height()));
             
         await this.pause("copy.newSize", length);
 
@@ -146,7 +147,10 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         this.sortArray = newArray;
         this.animate(this.sortArray, !this.state.isResetting()).center(
         this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin + Number(this.sortArray.height()) / 2
+        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
+        );
+        this.animate(this.sortArray, !this.state.isResetting()).y(
+        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
         );
 
         await this.pause(undefined);

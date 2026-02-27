@@ -7,6 +7,7 @@ export class StackAlgorithmControl extends EngineAlgorithmControl {
     insertField: HTMLInputElement;
     insertSubmit: HTMLInputElement;
     deleteSubmit: HTMLInputElement;
+    clearSubmit: HTMLInputElement;
     engine: Collection;
 
     constructor(container: HTMLElement, engine: Collection) {
@@ -26,6 +27,11 @@ export class StackAlgorithmControl extends EngineAlgorithmControl {
             "input.insertSubmit",
             container
         );
+        this.clearSubmit = querySelector<HTMLInputElement>(
+            "input.clearSubmit",
+            container
+        );
+
         this.insertSubmit.value = "Push";
         querySelector<HTMLSelectElement>(
             "input.findField",
@@ -68,6 +74,10 @@ export class StackAlgorithmControl extends EngineAlgorithmControl {
 
         this.deleteSubmit.addEventListener("click", () =>
             this.engine.submit(this.engine.delete, null)
+        );
+        
+        this.clearSubmit.addEventListener("click", () =>
+            this.engine.confirmResetAll()
         );
     }
 }

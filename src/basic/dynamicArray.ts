@@ -22,6 +22,7 @@ export class DynamicArray extends G {
         this.setSize(size);
         this.clear();
         this.center(x, y);
+        this.y(y);
         return this;
     }
 
@@ -183,11 +184,11 @@ export class DynamicArray extends G {
     }
 
     addArrow(index: number, arrowId: string = "arrow", color: string = "#000") {
-        const arrowSize = 10;
+        const arrowSize = this.engine().getObjectSize() / 3.5;
         const arrowOffset = 10;
 
         const x = this.getCX(index);
-        const y = this.getCY(index) - this.engine().getObjectSize() / 2 - arrowOffset;
+        const y = this.getCY(index) - this.engine().getObjectSize() / 2 - arrowOffset / 2;
 
         const arrow = this.polyline([
             [x, y],
@@ -211,11 +212,11 @@ export class DynamicArray extends G {
     }
 
     moveArrow(arrowId: string, indexTo: number) {
-        const arrowSize = 10;
+        const arrowSize = this.engine().getObjectSize() / 3.5;
         const arrowOffset = 10;
         const arrow = this.findOne(`#${arrowId}`) as Polyline | null;
         const x = this.getCX(indexTo);
-        const y = this.getCY(indexTo) - this.engine().getObjectSize() / 2 - arrowOffset - arrowSize / 2;
+        const y = this.getCY(indexTo) - this.engine().getObjectSize() / 2 - arrowOffset / 2- arrowSize / 2;
 
         if (arrow) {
             this.engine().animate(arrow, true).cx(x);

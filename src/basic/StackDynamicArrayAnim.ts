@@ -48,7 +48,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
             new DynamicArray(1, this.getObjectSize())
-        ).init(1, xRoot, yRoot + this.$Svg.margin * 4);
+        ).init(1, xRoot, yRoot + this.$Svg.margin * 1.5);
         this.Svg.put(this.sortArray);
         this.sortArray.setDisabled(0, false);
         if (this.initialValues) {
@@ -85,6 +85,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         this.getTreeRoot()[0],
         this.getTreeRoot()[1] + this.$Svg.margin * 4 + this.getObjectSize() * 4
         );
+        newArray.y(this.getTreeRoot()[1] + this.$Svg.margin * 1.5 + this.getObjectSize() + Number(this.sortArray.height()));
             
         await this.pause("copy.newSize", length);
 
@@ -95,13 +96,13 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
             let val = this.sortArray.getValue(i)
             const arrayLabel = this.Svg.put(
                 new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
-            ).init(this.sortArray.getCX(i), this.sortArray.cy());
+            ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
 
             await this.pause("copy.index", i);
 
             arrayLabel.setCenter(
             newArray.getCX(i),
-            newArray.cy(),
+            newArray.getCY(i),
             this.getAnimationSpeed()
             );
 
@@ -122,8 +123,12 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         this.sortArray = newArray;
         this.animate(this.sortArray, !this.state.isResetting()).center(
         this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin * 4
+        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
         );
+        this.animate(this.sortArray, !this.state.isResetting()).y(
+        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
+        );
+
 
         await this.pause(undefined);
     }
@@ -141,7 +146,7 @@ export class StackDynamicArrayAnim extends Engine implements Collection {
         const currentIndex = this.indexLength;
         arrayLabel.setCenter(
             this.sortArray.getCX(currentIndex),
-            this.sortArray.cy(),
+            this.sortArray.getCY(currentIndex),
             this.getAnimationSpeed()
         );
         await this.pause(undefined);
