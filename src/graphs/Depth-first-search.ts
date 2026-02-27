@@ -2,40 +2,9 @@ import { parseValues } from "~/helpers";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
-import { GraphNode } from "~/objects/graph-node";
 import { G } from "@svgdotjs/svg.js";
-import { Rect } from "@svgdotjs/svg.js";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
-
-
-/********************code to understand Path type**********************/
-// const pathString = `M 0,0 L ${
-//     s * nX
-// },${nY} m ${nR},0 a ${nR},${nR} 0 1,0 ${
-//     -2 * nR
-// },0 a ${nR},${nR} 0 1,0 ${2 * nR},0`;
-// explanation of pathString
-// M 0,0 move to 0,0 (start at node)
-// L ${s'nX},${nY} draw a line from 0,0 to s*nX,nY
-// m ${nR},0 move (relative to where you left) 
-// to nR,0 i.e +nR in the x-axis
-// a ${nR},{nR} 0(rotation) 1(large arc),0(counterclock) ${-2*nR},0 
-// this command is draw an arc of a circle with x radius nR
-// and y-radius nR(the circle would be an elipse if y and x differ)
-// this arc should not be rotated, take the long way there(i don't
-// fully understand this) and go counterclockwise. Draw from where
-// you are to 2*nR,0
-
-//other commands
-//l (dx, dy)-draw a line from where you were(x, y) to (x+dx, y+dy)
-//H, h- draws line only using x
-//V, v- draws line only using y
-//C, c, S, s - draws cubic bezier curves (I doubt we'll use this)
-//Q, q, T, t - draws quadratic bezier curves (doubt we'll use this too)
-//A - same as a but from current point to set coordinates
-//Z, z - goes from current point to initial point (fills in gaps too i think)
-/********************code to understand Path type**********************/
 
 export const DepthMessages = {
     example: {
@@ -44,11 +13,10 @@ export const DepthMessages = {
     //the messages we put somewhere on the canvas
     //to be implemented I think this is in the form of json file
     //seems to be used when you put "this.pause(example.here)"
-    //current start uses the example
 } as const satisfies MessagesObject
 
 export class Depth extends Engine implements Graph {
-    graph: GraphNode | null = null;
+    graph: WeightedGraphNode | null = null;
     edgeTableGroup: G 
     createdNodes: WeightedGraphNode[] = []
     initialValues: (String | Number)[] = [];
