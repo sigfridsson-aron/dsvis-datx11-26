@@ -5,6 +5,7 @@ import { Graph } from "~/graph";
 import { GraphNode } from "~/objects/graph-node";
 import { G } from "@svgdotjs/svg.js";
 import { Rect } from "@svgdotjs/svg.js";
+import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 
 
 /********************code to understand Path type**********************/
@@ -48,7 +49,10 @@ export const DepthMessages = {
 export class Depth extends Engine implements Graph {
    
     edgeTableGroup: G 
-    graph: GraphNode | null = null;
+    createdNodes: WeightedGraphNode[] = []
+
+    graph: WeightedGraphNode | null = null
+    
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
@@ -67,6 +71,8 @@ export class Depth extends Engine implements Graph {
         
         
         this.updateEdgeTable()
+        this.newNode("test213").center(60,60)
+
     }
 
     initialise(initialValues: string[] | null = null): this {
@@ -91,9 +97,10 @@ export class Depth extends Engine implements Graph {
     //defines a new Node object and puts it under where messages
     //are, will not define connections to different nodes.
     newNode(text: string): GraphNode {
-        console.log("test")
+        const newNode = new WeightedGraphNode(text, this.getObjectSize(), this.getStrokeWidth())
+        this.createdNodes.push(newNode)
         return this.Svg.put(
-            new GraphNode(text, this.getObjectSize(), this.getStrokeWidth())
+            newNode
         ).init(...this.getNodeStart());
     }
 
@@ -101,7 +108,7 @@ export class Depth extends Engine implements Graph {
 
     //Want the eventual algorithm to call this every it takes a "step"
     updateEdgeTable() {
-    console.log("TEST METHOD RUNNING");
+    
 
     const columns = ["From", "To", "Weight"];
     const rows = 4; // including header
