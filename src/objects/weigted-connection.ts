@@ -6,7 +6,7 @@ import { GraphNode } from "./graph-node";
 
 export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> extends Connection<T> {
     $weight: number
-    private $textObj!: Text
+    $textObj!: Text
 
     constructor(start: T, end: T, weight: number) {
         super(start, end)

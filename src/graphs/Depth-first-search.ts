@@ -32,15 +32,26 @@ export class Depth extends Engine implements Graph {
     }
 
     async chosenGraph(graf: string | number) {
-        if (graf === "Undirected") {
+        if (graf === "") {
+            await this.resetAlgorithm()
+        } else if (graf === "Undirected") {
+            await this.resetAlgorithm()
+            this.pause("")
             this.undirectedGraph()
         } else if (graf === "Directed") {
+            await this.resetAlgorithm()
+            this.pause("")
             this.directedGraph()
         } else {
+            await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
             .center(this.$Svg.width/10, this.$Svg.height/2)
             .font({ size: 100 })
             .stroke({ color: "#f44444", width: 5 })
+            this.Svg.text("also ERROR!")
+            .center(this.$Svg.width/10, this.$Svg.height/2 + 100)
+            .font({ size: 10 })
+            .stroke({ color: "#f44444", width: 0.5 })
         }
     }
 
@@ -53,14 +64,41 @@ export class Depth extends Engine implements Graph {
         return this;
     }
 
+    //Currently only works if each node has a connection to another node
+    //for example it would not find a node with an empty $outgoing
+    //and empty $incoming
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        //I think this is used to reset canvas when we go from example
-        //depth-first to breadth-first
+        this.resetHelp(this.graph, new Set<WeightedGraphNode>)
+    }
 
-        //in our case we will probably use the same graph for most algorithms
-        //so we would probably only need to remove highlighted paths from the 
-        //graph in this function
+    resetHelp(resetter: WeightedGraphNode | null,
+              visited: Set<WeightedGraphNode>
+    ): void {
+        if (!resetter || visited.has(resetter)) {
+            return;
+        }
+
+        visited.add(resetter)
+
+        const inp = resetter.$incoming
+        const out = resetter.$outgoing
+        resetter.remove()
+
+        for (const k in inp) {
+            if (inp[k]) {
+                this.resetHelp(inp[k].getStart(), visited)
+                inp[k].remove()
+                inp[k].$textObj.remove()
+            }
+        }
+        for (const k in out) {
+            if (out[k]) {
+                this.resetHelp(out[k].getStart(), visited)
+                out[k].remove()
+                out[k].$textObj.remove()
+            }
+        }
     }
 
     //defines a new Node object and puts it under where messages
