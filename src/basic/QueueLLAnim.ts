@@ -125,41 +125,38 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         );
 
         const size = this.queue.size();
-        // Creates an invisible node to act as the head pointer
-        if(size === 1){
-            this.Svg.add(this.headNode);
-            this.headNode.move(35,150);
-            this.headNode.opacity(0);
-            const head = this.Svg.text("Head");
-            head.move(50, 140);
-        }
-
-        // Same for tail, except moving
-        //
-        if (size === 1) {
-            this.Svg.add(this.tailNode);
-
-            this.tailNode.move(35 + 125, 150);
-            this.tailNode.opacity(0);
-
-            this.tailText.move(175, 140);
-            this.tailText.opacity(1);
-        } else if (size < 1) {
-            this.tailNode.opacity(0);
-            this.tailText.opacity(0);
-
-        } else {
-            const offput = size * 125;
-
-            this.tailNode.move(35 + offput, 150);
-            this.tailText.move(50 + offput, 140);
-            this.tailText.opacity(1);
-        }
-        //
+        
 
         this.Svg.add(node);
 
         const coords = this.newNodeCoords();
+
+        // Creates invisible nodes to act as the head and tail pointers
+        if(size === 1){
+            this.Svg.add(this.headNode);
+            this.headNode.move(coords[0]-37, coords[1]-75);
+            this.headNode.opacity(0);
+            const head = this.Svg.text("Head");
+            head.move(coords[0]+10, coords[1]-75);
+
+
+            this.Svg.add(this.tailNode);
+            this.tailText.opacity(1);
+            this.tailNode.opacity(0);
+
+            this.tailConnection = new LinkedConnection(
+                this.tailNode,
+                node,
+                this.nodeDimensions,
+                this.getStrokeWidth(),
+                this.Svg
+            );
+        } else{
+          this.tailText.opacity(1);
+        }
+
+        this.tailNode.move(coords[0], coords[1] + 75);
+        
         node.mirror(coords[2]);
 
         this.highlight(node, true);
@@ -181,13 +178,22 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         await this.pause(insertionText, value);
         // Move to the correct position with animation
         this.animate(node, !this.state.isResetting()).move(
-            coords[0],
+            coords[0], 
             coords[1]
         );
 
         connection?.updateEnd([coords[0], coords[1]], this.animationValue());
 
-        this.tailConnection?.updateEnd([coords[0], coords[1]],this.animationValue());
+        this.animate(this.tailText, !this.state.isResetting()).move(
+            coords[0] + 20,
+            coords[1] + 75
+        );
+
+        this.tailConnection?.updateAll(
+            [coords[0] + 35, coords[1] + 75], 
+            [coords[0] + 35, coords[1]],
+            this.animationValue()
+        );
 
         await this.pause(undefined);
 
@@ -198,20 +204,6 @@ export class QueueLLAnim<T> extends Engine implements Collection{
 
         // Add the node to the array and make connections
         this.nodeArray.push([node, connection]);
-
-        if (this.tailConnection) {
-            this.tailConnection.remove();
-            this.tailConnection = null;
-        }
-
-        // Create new tail connection
-        this.tailConnection = new LinkedConnection(
-            this.tailNode,
-            node,
-            this.nodeDimensions,
-            this.getStrokeWidth(),
-            this.Svg
-        );
         
     }
 
