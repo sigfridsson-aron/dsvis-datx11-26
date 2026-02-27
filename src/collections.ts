@@ -11,6 +11,7 @@ import { LinkedListAnim } from "~/basic/LinkedListAnim";
 import { StackLinkedListAnim } from "~/basic/StackLinkedListAnim";
 import { StackDynamicArrayAnim } from "~/basic/StackDynamicArrayAnim";
 import { QueueDynamicArrayAnim } from "~/basic/QueueDynamicArrayAnim";
+import { QueueLLAnim } from "~/basic/QueueLLAnim";
 import { initialiseEngine, RecordOfEngines } from "./helpers";
 
 export interface Collection extends Engine {
@@ -31,6 +32,7 @@ const COLLECTIONS_CLASSES = {
     StackLinkedListAnim: StackLinkedListAnim,
     StackDynamicArrayAnim: StackDynamicArrayAnim,
     QueueDynamicArrayAnim: QueueDynamicArrayAnim,
+    QueueLLAnim: QueueLLAnim,
 } as const satisfies RecordOfEngines<Collection>;
 
 const { engine, isBaseEngine } = initialiseEngine<Collection>(
