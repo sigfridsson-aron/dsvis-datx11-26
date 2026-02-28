@@ -54,6 +54,10 @@ export class Depth extends Engine implements Graph {
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
+    allEdges:WeightedConnection<WeightedGraphNode>[] = []
+    
+
+
 
     constructor(containorSelector: string) {
         super(containorSelector)
@@ -66,8 +70,59 @@ export class Depth extends Engine implements Graph {
     }
 
     async start() {
-        this.directedGraph()
+        const nodes =this.directedGraph()
+        
+
+        this.allEdges = this.getEdges(nodes)
+        this.updateEdgeTable(nodes)
+        console.log(this.searchGraph(nodes[1]))
+        
+        
     }
+
+
+    searchGraph(startNode:WeightedGraphNode): [WeightedGraphNode,WeightedGraphNode][] {
+        const visitedNodes: WeightedGraphNode[] = []
+        const result:[WeightedGraphNode,WeightedGraphNode][] = []
+        this.searchGraphRecursion(startNode,visitedNodes,result)
+        return result
+        
+
+    }
+
+
+
+    private searchGraphRecursion(currNode:WeightedGraphNode,visitedNodes:WeightedGraphNode[],result:[WeightedGraphNode,WeightedGraphNode][]):void {
+        
+        if (!currNode) {
+            throw new Error("start node doesnt exist")
+        }
+        
+        
+       
+        for (let i = 0; i < this.getEdges([currNode]).length;i++) {
+            const connectedNode = this.getEdges([currNode])[i].$end
+            if (!visitedNodes.includes(connectedNode)) {
+                
+
+                visitedNodes.push(currNode)
+                result.push([currNode,connectedNode])
+                this.searchGraphRecursion(connectedNode, visitedNodes,result)
+                
+
+            }
+        }
+
+
+
+    } 
+
+
+
+
+
+
+
 
     async chosenGraph(graf: string | number) {
         if (graf === "Undirected") {
@@ -152,6 +207,11 @@ export class Depth extends Engine implements Graph {
 
     //If we ever want to animate adding to graphs we would need to
     //adress this bug, run the code to se it.
+
+
+
+
+
     bugExample(): void {
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
@@ -165,7 +225,7 @@ export class Depth extends Engine implements Graph {
         this.pause("")
     }
 
-    undirectedGraph():void { // i am happy with this but feel free to add to it
+    undirectedGraph():WeightedGraphNode[] { // i am happy with this but feel free to add to it
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -199,9 +259,11 @@ export class Depth extends Engine implements Graph {
         this.putAtDeg(G, C, -45)
         this.link(G, C, 1, "both")
         this.link(G, F, 5, "both")
+        return [A,B,C,D,E,F,G]
+        
     }
 
-    directedGraph():void { //copied the undirected graph and made it directed
+    directedGraph():WeightedGraphNode[] { //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -235,9 +297,11 @@ export class Depth extends Engine implements Graph {
         this.putAtDeg(G, C, -45)
         this.link(G, C, 1, "from")
         this.link(G, F, 5, "to")
+        
+        return [A,B,C,D,E,F,G]
     }
 
-    mixedGraph(): void { //unfinished
+    mixedGraph(): WeightedGraphNode[] { //unfinished
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -258,6 +322,7 @@ export class Depth extends Engine implements Graph {
         D.setCenter(midW, midH + 100)
         this.link(A, E, 1, "both")
         E.setCenter(midW, midH - 100)
+        return [A,B,C,D,E]
     }
 
 
@@ -269,7 +334,7 @@ export class Depth extends Engine implements Graph {
     
 
     const columns = ["From", "To", "Weight"];
-    const edges = this.getAllEdges(createdNodes)
+    const edges = this.allEdges
     const rows = edges.length + 1; // including header
     
     const cellHeight = 40;
@@ -302,13 +367,20 @@ export class Depth extends Engine implements Graph {
     this.Svg.add(this.edgeTableGroup)
 }
 
-private getAllEdges(createdNodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
-    const edges:WeightedConnection<WeightedGraphNode>[] = []
-    for (const node of createdNodes) {
-        for (const key of node.$outGoingKeys) {
 
+
+
+
+
+
+
+private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
+    const edges:WeightedConnection<WeightedGraphNode>[] = []
+    for (const node of nodes) {
+        for (const key of node.$outGoingKeys) {
+            
             const edge = node.$outgoing[key];
-            console.log(key)
+            
             if (!edge) continue;
 
             edges.push(edge);
@@ -345,6 +417,8 @@ private drawRow(
             .center(x + cellWidth / 2, y + cellHeight / 2);
     }
 }
+
+
 
 
 
