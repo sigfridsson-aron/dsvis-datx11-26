@@ -2,40 +2,10 @@ import { parseValues } from "~/helpers";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
-import { GraphNode } from "~/objects/graph-node";
 import { G } from "@svgdotjs/svg.js";
-import { Rect } from "@svgdotjs/svg.js";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
-
-
-/********************code to understand Path type**********************/
-// const pathString = `M 0,0 L ${
-//     s * nX
-// },${nY} m ${nR},0 a ${nR},${nR} 0 1,0 ${
-//     -2 * nR
-// },0 a ${nR},${nR} 0 1,0 ${2 * nR},0`;
-// explanation of pathString
-// M 0,0 move to 0,0 (start at node)
-// L ${s'nX},${nY} draw a line from 0,0 to s*nX,nY
-// m ${nR},0 move (relative to where you left) 
-// to nR,0 i.e +nR in the x-axis
-// a ${nR},{nR} 0(rotation) 1(large arc),0(counterclock) ${-2*nR},0 
-// this command is draw an arc of a circle with x radius nR
-// and y-radius nR(the circle would be an elipse if y and x differ)
-// this arc should not be rotated, take the long way there(i don't
-// fully understand this) and go counterclockwise. Draw from where
-// you are to 2*nR,0
-
-//other commands
-//l (dx, dy)-draw a line from where you were(x, y) to (x+dx, y+dy)
-//H, h- draws line only using x
-//V, v- draws line only using y
-//C, c, S, s - draws cubic bezier curves (I doubt we'll use this)
-//Q, q, T, t - draws quadratic bezier curves (doubt we'll use this too)
-//A - same as a but from current point to set coordinates
-//Z, z - goes from current point to initial point (fills in gaps too i think)
-/********************code to understand Path type**********************/
+import { GraphNode } from "~/objects/graph-node";
 
 export const DepthMessages = {
     example: {
@@ -44,11 +14,10 @@ export const DepthMessages = {
     //the messages we put somewhere on the canvas
     //to be implemented I think this is in the form of json file
     //seems to be used when you put "this.pause(example.here)"
-    //current start uses the example
 } as const satisfies MessagesObject
 
 export class Depth extends Engine implements Graph {
-    graph: GraphNode | null = null;
+    graph: WeightedGraphNode | null = null;
     edgeTableGroup: G 
     createdNodes: WeightedGraphNode[] = []
     initialValues: (String | Number)[] = [];
@@ -166,15 +135,26 @@ export class Depth extends Engine implements Graph {
 
 
     async chosenGraph(graf: string | number) {
-        if (graf === "Undirected") {
+        if (graf === "") {
+            await this.resetAlgorithm()
+        } else if (graf === "Undirected") {
+            await this.resetAlgorithm()
+            this.pause("")
             this.undirectedGraph()
         } else if (graf === "Directed") {
+            await this.resetAlgorithm()
+            this.pause("")
             this.directedGraph()
         } else {
+            await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
             .center(this.$Svg.width/10, this.$Svg.height/2)
             .font({ size: 100 })
             .stroke({ color: "#f44444", width: 5 })
+            this.Svg.text("also ERROR!")
+            .center(this.$Svg.width/10, this.$Svg.height/2 + 100)
+            .font({ size: 10 })
+            .stroke({ color: "#f44444", width: 0.5 })
         }
     }
 
@@ -187,14 +167,41 @@ export class Depth extends Engine implements Graph {
         return this;
     }
 
+    //Currently only works if each node has a connection to another node
+    //for example it would not find a node with an empty $outgoing
+    //and empty $incoming
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        //I think this is used to reset canvas when we go from example
-        //depth-first to breadth-first
+        this.resetHelp(this.graph, new Set<WeightedGraphNode>)
+    }
 
-        //in our case we will probably use the same graph for most algorithms
-        //so we would probably only need to remove highlighted paths from the 
-        //graph in this function
+    resetHelp(resetter: WeightedGraphNode | null,
+              visited: Set<WeightedGraphNode>
+    ): void {
+        if (!resetter || visited.has(resetter)) {
+            return;
+        }
+
+        visited.add(resetter)
+
+        const inp = resetter.$incoming
+        const out = resetter.$outgoing
+        resetter.remove()
+
+        for (const k in inp) {
+            if (inp[k]) {
+                this.resetHelp(inp[k].getStart(), visited)
+                inp[k].remove()
+                inp[k].$textObj.remove()
+            }
+        }
+        for (const k in out) {
+            if (out[k]) {
+                this.resetHelp(out[k].getStart(), visited)
+                out[k].remove()
+                out[k].$textObj.remove()
+            }
+        }
     }
 
     //defines a new Node object and puts it under where messages
