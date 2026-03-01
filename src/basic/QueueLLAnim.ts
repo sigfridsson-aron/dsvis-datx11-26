@@ -211,11 +211,19 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         //await this.pop();
 
         const node = this.nodeArray[0][0];
+        let coords = [0, 0];
+        if(this.queue.size() > 1){
+            coords = this.nodeArray[this.queue.size() - 2][0].getCenterPos();
+        }
+        else{
+            this.tailConnection?.remove();
+        }
+        
         if (node) {
             // If the node is found
             this.highlight(node, true);
             await this.pause("delete.delete", value);
-            this.queue.dequeue();
+            await this.queue.dequeue();
             node.remove(); // Remove the node from the SVG
 
             await this.pause("delete.adjustLink");
@@ -238,27 +246,33 @@ export class QueueLLAnim<T> extends Engine implements Collection{
                 this.nodeArray[index + 1][1] = prevConnection;
                 prevConnection.setEnd(nextNode, this.animationValue());
             }
-            await this.pause("delete.adjustPos");
-            this.adjustNodes(index, index + 1);
 
+            await this.pause("delete.adjustPos");
+            
             
             if (!this.queue.isEmpty()){
-                console.log("Works?",this.nodeArray[this.nodeArray.length -1][0]);
-                const coords = this.nodeArray[this.queue.size() -1][0].getCenterPos();
-
-                this.tailNode.move(coords[0], coords[1] + 75);
-
-                this.animate(this.tailText, !this.state.isResetting()).move(
+                
+                await this.tailNode.move(coords[0], coords[1] + 63);
+                
+                
+                console.log("Works?", this.queue.size());
+                console.log("Works?", coords);
+                
+                await this.animate(this.tailText, !this.state.isResetting()).move(
                     coords[0],
-                    coords[1] + 75
+                    coords[1] + 63
                 );
-
-                this.tailConnection?.updateAll(
-                    [coords[0], coords[1] + 75], 
-                    [coords[0], coords[1]],
+                
+                await this.tailConnection?.updateAll(
+                    [coords[0], coords[1] + 63], 
+                    [coords[0], coords[1] - 12],
                     this.animationValue()
                 );
             }
+
+            this.adjustNodes(index, index + 1);
+
+            await this.pause(undefined);
         }
 
         
@@ -318,7 +332,6 @@ export class QueueLLAnim<T> extends Engine implements Collection{
                 ];
             }
         
-
             this.nodeArray.push([node, connection]);
         }
 
