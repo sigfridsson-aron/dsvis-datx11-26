@@ -197,6 +197,7 @@ export class Engine {
     setIdleTitle(): void {
         this.info.setTitle("Select an action from the menu above");
         this.info.setBody(NBSP);
+
     }
 
     ///////////////////////////////////////////////////////////////////////////////

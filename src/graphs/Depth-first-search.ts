@@ -5,6 +5,7 @@ import { Graph } from "~/graph";
 import { G } from "@svgdotjs/svg.js";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
+import { GraphNode } from "~/objects/graph-node";
 
 export const DepthMessages = {
     example: {
@@ -22,6 +23,11 @@ export class Depth extends Engine implements Graph {
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
+    allEdges:WeightedConnection<WeightedGraphNode>[] = []
+    
+    
+
+
 
     constructor(containorSelector: string) {
         super(containorSelector)
@@ -31,11 +37,102 @@ export class Depth extends Engine implements Graph {
         this.edgeTableGroup = this.Svg.group()
         this.edgeTableGroup.addClass("edge-table")
         
+        
     }
 
     async start() {
-        this.bugExample()
+        this.generalControls.setRunning(true)
+        const nodes =this.directedGraph()
+        
+        this.allEdges = this.getEdges(nodes)
+        const result = this.searchGraph(nodes[2])
+        console.log(result)
+       
+        await this.nodeTraversalVisualisation(result)
     }
+
+
+    async nodeTraversalVisualisation(graphTraversal:WeightedConnection<GraphNode>[]) {
+        this.generalControls.setRunning(false)
+        let currNode:GraphNode
+        let lastNode:GraphNode | null = null
+        
+        
+    
+        for (const edge of graphTraversal) {
+            
+            currNode = edge.$start
+            
+            if (currNode === lastNode) { 
+                lastNode = currNode
+            
+            }
+            else {
+                currNode.setHighlight(true)
+                await this.pause("the same node twice in a row")
+                currNode.setHighlight(false)
+            }
+
+            edge.setHighlight(true)
+            currNode = edge.$end
+            currNode.setHighlight(true)
+            await this.pause("i am here now")
+            currNode.setHighlight(false)
+            lastNode = currNode
+            
+
+        }
+    }
+
+
+
+
+
+    //search through the graph starting from "startNode". returns a list of chronological order of traversal
+    searchGraph(startNode:WeightedGraphNode):WeightedConnection<GraphNode>[] {
+        const visitedNodes: WeightedGraphNode[] = []
+        const result:WeightedConnection<GraphNode>[] = []
+        this.searchGraphRecursion(startNode,visitedNodes,result)
+        return result
+        
+
+    }
+
+
+
+    private searchGraphRecursion(currNode:WeightedGraphNode,visitedNodes:WeightedGraphNode[],result:WeightedConnection<GraphNode>[]):void {
+        
+        if (!currNode) {
+            throw new Error("start node doesnt exist")
+        }
+        
+        visitedNodes.push(currNode)
+        
+        const edges = this.getEdges([currNode])
+        for (let i = 0; i < edges.length;i++) {
+            const connectedNode = edges[i].$end
+            if (!visitedNodes.includes(connectedNode)) {
+                
+
+
+              
+                result.push(edges[i])
+                this.searchGraphRecursion(connectedNode, visitedNodes,result)
+                
+
+            }
+        }
+
+
+
+    } 
+
+
+
+
+
+
+
 
     async chosenGraph(graf: string | number) {
         if (graf === "") {
@@ -176,7 +273,7 @@ export class Depth extends Engine implements Graph {
         await this.pause("example.here")
     }
 
-    undirectedGraph():void { // i am happy with this but feel free to add to it
+    undirectedGraph():WeightedGraphNode[] { // i am happy with this but feel free to add to it
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -210,9 +307,11 @@ export class Depth extends Engine implements Graph {
         this.putAtDeg(G, C, -45)
         this.link(G, C, 1, "both")
         this.link(G, F, 5, "both")
+        return [A,B,C,D,E,F,G]
+        
     }
 
-    directedGraph():void { //copied the undirected graph and made it directed
+    directedGraph():WeightedGraphNode[] { //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -246,9 +345,12 @@ export class Depth extends Engine implements Graph {
         this.putAtDeg(G, C, -45)
         this.link(G, C, 1, "from")
         this.link(G, F, 5, "to")
+        
+        
+        return [A,B,C,D,E,F,G]
     }
 
-    mixedGraph(): void { //unfinished
+    mixedGraph(): WeightedGraphNode[] { //unfinished
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
 
@@ -269,6 +371,7 @@ export class Depth extends Engine implements Graph {
         D.setCenter(midW, midH + 100)
         this.link(A, E, 1, "both")
         E.setCenter(midW, midH - 100)
+        return [A,B,C,D,E]
     }
 
 
@@ -276,12 +379,11 @@ export class Depth extends Engine implements Graph {
     
 
     //Want the eventual algorithm to call this every it takes a "step"
-    updateEdgeTable(createdNodes:WeightedGraphNode[]) {
+    updateEdgeTable() {
     
 
     const columns = ["From", "To", "Weight"];
-    const edges = this.getAllEdges(createdNodes)
-    const rows = edges.length + 1; // including header
+    const edges = this.allEdges
     
     const cellHeight = 40;
     const cellWidth = 80;
@@ -313,13 +415,20 @@ export class Depth extends Engine implements Graph {
     this.Svg.add(this.edgeTableGroup)
 }
 
-private getAllEdges(createdNodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
-    const edges:WeightedConnection<WeightedGraphNode>[] = []
-    for (const node of createdNodes) {
-        for (const key in node.$outgoing) {
 
+
+
+
+
+
+//returns all outgoing edges from the provided nodes
+private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
+    const edges:WeightedConnection<WeightedGraphNode>[] = []
+    for (const node of nodes) {
+        for (const key in node.$outgoing) {
+            
             const edge = node.$outgoing[key];
-            console.log(key)
+            
             if (!edge) continue;
 
             edges.push(edge);
@@ -356,6 +465,11 @@ private drawRow(
             .center(x + cellWidth / 2, y + cellHeight / 2);
     }
 }
+
+
+
+
+
 
 
 
