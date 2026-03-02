@@ -90,6 +90,29 @@ export class StapleArray extends G {
         }
     }
 
+    /**
+     * Remove a value by its index.
+     * This method both removes the element from the staple array,
+     * and also removes it from the DOM.
+     * 
+     * @param i index of value to remove
+     */
+    removeValue(i: number) {
+        this.removeValues(i, i + 1)
+    }
+    
+    /**
+     * Remove values by index from start (inclusive) and end (exclusive)
+     * This method both removes the elements from the  staple array, 
+     * and also removes them from the DOM.
+     * 
+     * @param start index of the first value to remove (inclusive)
+     * @param end index of the last value to remove (exclusive)
+     */
+    removeValues(start: number, end: number) {
+        this.$staples.splice(start, end - start).forEach(value => value.remove())
+    }
+
     getValues() {
         return this.$staples.map((staple) => staple.getValue());
     }
