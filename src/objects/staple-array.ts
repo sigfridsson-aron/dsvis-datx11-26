@@ -85,8 +85,6 @@ export class StapleArray extends G {
             this.$staples.push(staple);
             this.add(staple)
         }
-        console.debug(this.$staples);
-        console.debug(hasNewMaxValue);
         if (hasNewMaxValue) {
             this.init(currentCenter.x, currentCenter.y);
         }
