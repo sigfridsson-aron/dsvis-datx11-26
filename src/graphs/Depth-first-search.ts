@@ -34,7 +34,7 @@ export class Depth extends Engine implements Graph {
     }
 
     async start() {
-        this.directedGraph()
+        this.bugExample()
     }
 
     async chosenGraph(graf: string | number) {
@@ -139,13 +139,17 @@ export class Depth extends Engine implements Graph {
     putAtDeg(
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
-        degree: number
+        degree: number,
+        animation: boolean = false
     ): void {
         const degreé = Math.PI/180 * degree * (-1)
         const [relativX, relativY] = relativNode.getCenter()
+        var ani = 0
+        if (animation) ani = this.getAnimationSpeed();
         putNode.setCenter(
             relativX + 125*Math.cos(degreé),
-            relativY + 125*Math.sin(degreé)
+            relativY + 125*Math.sin(degreé),
+            ani
         )
     }
 
@@ -156,19 +160,20 @@ export class Depth extends Engine implements Graph {
     // disconnected, tournament, eulerian, hamiltonian, chordal and complete
     // directed graphs
 
-    //If we ever want to animate adding to graphs we would need to
-    //adress this bug, run the code to se it.
-    bugExample(): void {
+    //The bug was that i didn't have await before the pauses
+    async bugExample() {
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
         const A = this.newNode("A")
         A.setCenter(midW, midH, this.getAnimationSpeed())
+        await this.pause("example.here")
         const B = this.newNode("B")
-        this.pause("")
+        await this.pause("example.here")
         this.graph = A
-        this.putAtDeg(B, A, 135)
+        this.putAtDeg(B, A, 135, true)
+        await this.pause("example.here")
         this.link(A, B, 2, "both")
-        this.pause("")
+        await this.pause("example.here")
     }
 
     undirectedGraph():void { // i am happy with this but feel free to add to it
@@ -311,7 +316,7 @@ export class Depth extends Engine implements Graph {
 private getAllEdges(createdNodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
     const edges:WeightedConnection<WeightedGraphNode>[] = []
     for (const node of createdNodes) {
-        for (const key of node.$outGoingKeys) {
+        for (const key in node.$outgoing) {
 
             const edge = node.$outgoing[key];
             console.log(key)
