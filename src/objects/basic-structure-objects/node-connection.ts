@@ -75,17 +75,12 @@ export class LinkedConnection extends Connection<LinkedNode> {
             // Intersect with left or right edge
             intersectionX = endNodeX + Math.sign(dx) * halfWidth;
             intersectionY = straight ? this.$coords.y1 : endNodeY;
-            console.log("yes");
         } else {
             // Intersect with top or bottom edge
             //intersectionX = straight ? this.$start.getPointerPos()[0] : endNodeX;
             intersectionX = straight ? this.$coords.x1 : endNodeX;
             intersectionY = endNodeY + Math.sign(dy) * halfHeight;
-            
-            console.log("no");
         }
-        console.log("node dimensions: " + this.nodeDimensions);
-        console.log("result: " + [intersectionX, intersectionY]);
         
         return [intersectionX, intersectionY];
     }

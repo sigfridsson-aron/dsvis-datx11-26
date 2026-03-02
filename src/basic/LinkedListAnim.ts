@@ -124,12 +124,16 @@ export class LinkedListAnim extends Engine implements Collection {
         );
 
         // Creates an invisible node to act as the head pointer
-        if(this.linkedList.size === 1){
+         if(this.linkedList.size === 1){
+            const coords = this.newNodeCoords();
+
+            this.headNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
             this.Svg.add(this.headNode);
-            this.headNode.move(35,150);
+            await this.headNode.move(coords[0]-this.nodeDimensions[1], coords[1] - this.nodeDimensions[0]);
             this.headNode.opacity(0);
             const head = this.Svg.text("Head");
-            head.move(50, 140);
+            head.font({size: this.getObjectSize() * 0.6});
+            head.move(this.headNode.getCenterPos()[0], this.headNode.getCenterPos()[1] - this.getObjectSize() * 0.7);
         }
 
         this.Svg.add(node);

@@ -6,7 +6,7 @@ import { LinkedConnection } from "~/objects/basic-structure-objects/node-connect
 import Queue from "./Queue"
 
 
-export const QueueLLMessages = {
+export const QueueLinkedListMessages = {
     general: {
         empty: "Queue is empty!",
         full: "Queue is full!",
@@ -44,12 +44,12 @@ export const QueueLLMessages = {
     },
 };
 
-export class QueueLLAnim<T> extends Engine implements Collection{
+export class QueueLinkedListAnim<T> extends Engine implements Collection{
 
     private readonly TOP_MARGIN = 200;
     private readonly MIN_SIDE_MARGIN = 20;
 
-    messages: MessagesObject = QueueLLMessages;
+    messages: MessagesObject = QueueLinkedListMessages;
     initialValues: string[] | null = null; // Only used for hard-coded values
     maxListSize: number = 0; // Limit the size of the Queue to maintain readability
     queue: Queue<string | number> = new Queue(); // Queue instance
@@ -98,15 +98,19 @@ export class QueueLLAnim<T> extends Engine implements Collection{
     // Enqueue
     async insert(...values: (string | number)[]): Promise<void>{
         for (const val of values) {
-            if (this.queue.size() === this.maxListSize) {
-                await this.pause("general.full");
-            } else {
-                if(this.queue.size() != 0){
-                    //await this.findTail();
-                    await this.pause("Insert at tail.");
-                }
-                await this.insertBack(val);
+            // if (this.queue.size() === this.maxListSize) {
+            //     await this.pause("general.full");
+            // } else {
+            //     if(this.queue.size() != 0){
+            //         //await this.findTail();
+            //         await this.pause("Insert at tail.");
+            //     }
+            //     await this.insertBack(val);
+            // }
+            if(this.queue.size() != 0){
+                await this.pause("Insert at tail.");
             }
+            await this.insertBack(val);
         }
     }
 
@@ -133,14 +137,18 @@ export class QueueLLAnim<T> extends Engine implements Collection{
 
         // Creates invisible nodes to act as the head and tail pointers
         if(size === 1){
+            this.headNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
             this.Svg.add(this.headNode);
-            this.headNode.move(coords[0]-37, coords[1]-75);
+            await this.headNode.move(coords[0]-this.nodeDimensions[1], coords[1] - this.nodeDimensions[0]);
             this.headNode.opacity(0);
             const head = this.Svg.text("Head");
-            head.move(coords[0]+10, coords[1]-75);
+            head.font({size: this.getObjectSize() * 0.6});
+            head.move(this.headNode.getCenterPos()[0], this.headNode.getCenterPos()[1] - this.getObjectSize() * 0.7);
 
 
+            this.tailNode = new LinkedNode("Tail", this.nodeDimensions, this.getStrokeWidth());
             this.Svg.add(this.tailNode);
+            this.tailText.font({size: this.getObjectSize() * 0.6});
             this.tailText.opacity(1);
             this.tailNode.opacity(0);
 
@@ -155,7 +163,7 @@ export class QueueLLAnim<T> extends Engine implements Collection{
           this.tailText.opacity(1);
         }
 
-        this.tailNode.move(coords[0], coords[1] + 75);
+        this.tailNode.move(coords[0], coords[1] + this.nodeDimensions[0]);
         
         node.mirror(coords[2]);
 
@@ -185,13 +193,13 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         connection?.updateEnd([coords[0], coords[1]], this.animationValue());
 
         this.animate(this.tailText, !this.state.isResetting()).move(
-            coords[0] + 20,
-            coords[1] + 75
+            this.tailNode.getCenterPos()[0] - this.getObjectSize() * 0.5, 
+            this.tailNode.getCenterPos()[1] - this.getObjectSize() * 0.3
         );
 
         this.tailConnection?.updateAll(
-            [coords[0] + 35, coords[1] + 75], 
-            [coords[0] + 35, coords[1]],
+            [coords[0] + this.nodeDimensions[1], coords[1] + this.nodeDimensions[0]], 
+            [coords[0] + this.nodeDimensions[1], coords[1]],
             this.animationValue()
         );
 
@@ -213,7 +221,7 @@ export class QueueLLAnim<T> extends Engine implements Collection{
         const node = this.nodeArray[0][0];
         let coords = [0, 0];
         if(this.queue.size() > 1){
-            coords = this.nodeArray[this.queue.size() - 2][0].getCenterPos();
+            coords = this.nodeArray[this.queue.size() - 2][0].getPos();
         }
         else{
             this.tailConnection?.remove();
@@ -252,20 +260,20 @@ export class QueueLLAnim<T> extends Engine implements Collection{
             
             if (!this.queue.isEmpty()){
                 
-                await this.tailNode.move(coords[0], coords[1] + 63);
+                this.tailNode.move(coords[0], coords[1] + this.nodeDimensions[0]);
                 
                 
                 console.log("Works?", this.queue.size());
                 console.log("Works?", coords);
                 
-                await this.animate(this.tailText, !this.state.isResetting()).move(
-                    coords[0],
-                    coords[1] + 63
-                );
+                this.animate(this.tailText, !this.state.isResetting()).move(
+                    this.tailNode.getCenterPos()[0] - this.getObjectSize() * 0.5, 
+                    this.tailNode.getCenterPos()[1] - this.getObjectSize() * 0.3
+                 );
                 
-                await this.tailConnection?.updateAll(
-                    [coords[0], coords[1] + 63], 
-                    [coords[0], coords[1] - 12],
+                this.tailConnection?.updateAll(
+                    [coords[0] + this.nodeDimensions[1], coords[1] + this.nodeDimensions[0]], 
+                    [coords[0] + this.nodeDimensions[1], coords[1]],
                     this.animationValue()
                 );
             }
@@ -419,11 +427,11 @@ export class QueueLLAnim<T> extends Engine implements Collection{
             mirrored = true;
         }
 
-        if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
-            throw new Error(
-                "Cannot add more nodes: Exceeded bottom margin of canvas"
-            );
-        }
+        // if (y + nodeHeight > this.$Svg.height - this.MIN_SIDE_MARGIN) {
+        //     throw new Error(
+        //         "Cannot add more nodes: Exceeded bottom margin of canvas"
+        //     );
+        // }
 
         return [x, y, mirrored];
     }

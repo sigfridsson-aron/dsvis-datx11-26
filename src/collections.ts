@@ -7,11 +7,12 @@ import { SplayTree } from "~/trees/SplayTree";
 import { BTreeAlgorithmControl } from "./algorithm-controls/BTree-algorithm-controls";
 import { CollectionAlgorithmControl } from "./algorithm-controls/collection-algorithm-controls";
 import { StackAlgorithmControl } from "./algorithm-controls/Stack-algorithm-controls";
+import { QueueAlgorithmControl } from "./algorithm-controls/Queue-algorithm-controls";
 import { LinkedListAnim } from "~/basic/LinkedListAnim";
 import { StackLinkedListAnim } from "~/basic/StackLinkedListAnim";
 import { StackDynamicArrayAnim } from "~/basic/StackDynamicArrayAnim";
 import { QueueDynamicArrayAnim } from "~/basic/QueueDynamicArrayAnim";
-import { QueueLLAnim } from "~/basic/QueueLLAnim";
+import { QueueLinkedListAnim } from "~/basic/QueueLinkedListAnim";
 import { initialiseEngine, RecordOfEngines } from "./helpers";
 
 export interface Collection extends Engine {
@@ -32,7 +33,7 @@ const COLLECTIONS_CLASSES = {
     StackLinkedListAnim: StackLinkedListAnim,
     StackDynamicArrayAnim: StackDynamicArrayAnim,
     QueueDynamicArrayAnim: QueueDynamicArrayAnim,
-    QueueLLAnim: QueueLLAnim,
+    QueueLinkedListAnim: QueueLinkedListAnim,
 } as const satisfies RecordOfEngines<Collection>;
 
 const { engine, isBaseEngine } = initialiseEngine<Collection>(
@@ -47,6 +48,12 @@ if (!isBaseEngine) {
             engine
         );
     } 
+    else if(engine instanceof QueueDynamicArrayAnim || engine instanceof QueueLinkedListAnim){
+        engine.algorithmControls = new QueueAlgorithmControl(
+            engine.container,
+            engine
+        );
+    }
     else if(engine instanceof StackDynamicArrayAnim || engine instanceof StackLinkedListAnim){
         engine.algorithmControls = new StackAlgorithmControl(
             engine.container,

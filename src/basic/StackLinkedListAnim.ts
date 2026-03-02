@@ -101,67 +101,6 @@ export class StackLinkedListAnim extends Engine implements Collection {
         }
     }
 
-    // Visualization logic for inserting a node to the back
-    async insertBack(value: string | number): Promise<void> {
-        this.linkedList.insertBack(value);
-
-        const insertionText =
-            this.linkedList.size === 1 ? "insert.head" : "insert.element";
-        await this.pause(insertionText, value);
-
-        const node = new LinkedNode(
-            value,
-            this.nodeDimensions,
-            this.getStrokeWidth()
-        );
-
-        // Creates an invisible node to act as the head pointer
-        if(this.linkedList.size === 1){
-            this.Svg.add(this.headNode);
-            this.headNode.move(35,150);
-            this.headNode.opacity(0);
-            const head = this.Svg.text("Head");
-            head.move(50, 140);
-        }
-
-        this.Svg.add(node);
-
-        const coords = this.newNodeCoords();
-        node.mirror(coords[2]);
-
-        this.highlight(node, true);
-
-        // Start at the lower center and then move to the correct position with animation
-        node.center(
-            this.$Svg.width / 2,
-            this.$Svg.height - this.nodeDimensions[1] * 2
-        );
-
-        const connection = await this.makeConnections(node);
-        if (connection) {
-            this.highlight(connection, true);
-        }
-
-
-        await this.pause(insertionText, value);
-        // Move to the correct position with animation
-        this.animate(node, !this.state.isResetting()).move(
-            coords[0],
-            coords[1]
-        );
-        connection?.updateEnd([coords[0], coords[1]], this.animationValue());
-
-        await this.pause(undefined);
-
-        this.highlight(node, false);
-        if (connection) {
-            this.highlight(connection, false);
-        }
-
-        // Add the node to the array and make connections
-        this.nodeArray.push([node, connection]);
-        
-    }
 
     // Visualization logic for inserting a node to the front
     async insertFront(value: string | number): Promise<void> {
@@ -178,11 +117,15 @@ export class StackLinkedListAnim extends Engine implements Collection {
         );
 
         if(this.linkedList.size === 1){
+            const coords = this.newNodeCoords();
+
+            this.headNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
             this.Svg.add(this.headNode);
-            this.headNode.move(35,150);
+            await this.headNode.move(coords[0]-this.nodeDimensions[1], coords[1] - this.nodeDimensions[0]);
             this.headNode.opacity(0);
             const head = this.Svg.text("Head");
-            head.move(50, 140);
+            head.font({size: this.getObjectSize() * 0.6});
+            head.move(this.headNode.getCenterPos()[0], this.headNode.getCenterPos()[1] - this.getObjectSize() * 0.7);
         }
 
         this.Svg.add(node);
@@ -194,6 +137,8 @@ export class StackLinkedListAnim extends Engine implements Collection {
             this.$Svg.width / 2,
             this.$Svg.height - this.nodeDimensions[1] * 2
         );
+
+        
 
         const connection = await new LinkedConnection(
             this.headNode, 
@@ -216,6 +161,11 @@ export class StackLinkedListAnim extends Engine implements Collection {
         await this.pause("delete.adjustPos");
         this.adjustNodes(0, 0);
         
+
+        
+        
+
+
         this.highlight(node, false);
         if (connection) {
             this.highlight(connection, false);
@@ -341,7 +291,10 @@ export class StackLinkedListAnim extends Engine implements Collection {
                 prevConnection.setEnd(nextNode, this.animationValue());
             }
             await this.pause("delete.adjustPos");
+            
             this.adjustNodes(index, index + 1);
+
+            await this.pause(undefined);
         }
     }
 
