@@ -6,9 +6,11 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
     insertSelect: HTMLSelectElement;
     insertField: HTMLInputElement;
     insertSubmit: HTMLInputElement;
+    customInsertContainer: HTMLSpanElement;
     sortSubmit: HTMLInputElement;
     pseudoCode: HTMLDivElement;
     clearSubmit: HTMLInputElement;
+    unsortSelect: HTMLSelectElement;
     engine: Sorter;
 
     constructor(container: HTMLElement, engine: Sorter) {
@@ -27,6 +29,9 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             "input.insertSubmit",
             container
         );
+        this.customInsertContainer = querySelector<HTMLSpanElement>(
+            "span#customInsertContainer"
+        )
         this.clearSubmit = querySelector<HTMLInputElement>(
             "input.clearSubmit",
             container
@@ -39,14 +44,22 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             "input.sortSubmit",
             container
         );
+        this.unsortSelect = querySelector<HTMLSelectElement>(
+            "select.unsort",
+            container
+        );
 
         this.initialize();
     }
 
     initialize() {
         this.insertSelect.addEventListener("change", () => {
-            this.insertField.value = this.insertSelect.value;
-            this.insertSelect.value = "";
+            if (this.insertSelect.value === "custom") {
+                this.customInsertContainer.classList.remove("hidden")
+            } else {
+                this.customInsertContainer.classList.add("hidden")
+                this.engine.submit(this.engine.setArraySize, this.insertSelect) // TODO: Fix this
+            }
         });
 
         addReturnSubmit(this.insertField, "ALPHANUM+", () =>
@@ -64,5 +77,10 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
         this.clearSubmit.addEventListener("click", () =>
             this.engine.confirmResetAll()
         );
+
+        this.unsortSelect.addEventListener("change", () => {
+            this.engine.submit(this.engine.unsort, null);
+        });
+
     }
 }

@@ -178,7 +178,7 @@ export function initialiseEngine<T extends Engine = Engine>(
 
     const EngineClass = engineSubclasses[algo] || Engine;
     const engine = new EngineClass(containerID);
-    engine.initialise();
+    engine.initialise([32, 83, 22, 15, 8, 12, 43, 54, 23 ,34, 76 ,87, 32]);
 
     algoSelector.addEventListener("change", () => {
         if (algoSelector.value in engineSubclasses) {
