@@ -70,14 +70,21 @@ export class BaseSorter extends Engine implements Sorter {
         }
     }
 
-    async swap(arr: DSArray, j: number, k: number) {
-        arr.swap(j, k, true);
-        arr.setIndexHighlight(j, true);
+    async swap(arr: StapleArray, j: number, k: number) {
+        arr.swap(j, k);
+        arr.setStapleHighlight(j);
         await this.pause(
             "sort.swap",
             this.sortArray.getValue(j),
             this.sortArray.getValue(k)
         );
+    }
+
+    async swapNoAnm(arr: StapleArray, j: number, k: number) {
+        arr.swap(j, k);
+        arr.clearStapleHighlight(j);
+        this.sortArray.getValue(j),
+        this.sortArray.getValue(k)
     }
 
     // Kommenterade ut animeringeringen till arrayen.
@@ -156,5 +163,32 @@ export class BaseSorter extends Engine implements Sorter {
 
     async sort() {
         throw new Error("Sort not implemented");
+    }
+
+    async unsort(args?: string | number) {
+        const unsortSelect = document.querySelector<HTMLSelectElement>("select.unsort");
+        const unsortType = unsortSelect?.value;
+        const sortingMethodSelect = document.querySelector<HTMLSelectElement>("select.sortingMethod");
+        if (unsortType === "unsortRandom") {
+            for (let i = this.sortArray.length() - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                await this.swapNoAnm(this.sortArray, i, j);
+            }
+        } else if (unsortType === "unsortReversed") {
+            for (let i = 0; i < Math.floor(this.sortArray.length() / 2); i++) {
+                await this.swapNoAnm(this.sortArray, i, this.sortArray.length() - 1 - i);
+            }
+        } else if (unsortType === "unsortGood") {
+            // I aint happy with all the if statements, should be changed
+            if (sortingMethodSelect?.value === "selectionSort") {
+                // an already sorted array is the best case for selection sort, so we can just do nothing
+            } else if (sortingMethodSelect?.value === "insertionSort") {
+                // ?
+            } else if (sortingMethodSelect?.value === "mergeSort") {
+                // ?
+            } else if (sortingMethodSelect?.value === "quickSort") {
+                // ?
+            }
+        }
     }
 }
