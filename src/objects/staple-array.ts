@@ -13,7 +13,11 @@ export class StapleArray extends G {
     /**
      * Also call {@link init()} to finalize initialization
      */
-    constructor(items: number[], stapleMaxHeight: number, stapleWidth: number = 25) {
+    constructor(
+        items: number[],
+        stapleMaxHeight: number,
+        stapleWidth: number = 25
+    ) {
         super();
         this.$stapleMaxHeight = stapleMaxHeight;
         this.$stapleWidth = stapleWidth;
@@ -71,18 +75,22 @@ export class StapleArray extends G {
     }
 
     addValues(...values: number[]) {
-        const currentCenter = { x: this.cx(), y: this.cy() }
+        const currentCenter = { x: this.cx(), y: this.cy() };
         let hasNewMaxValue: boolean = true;
         for (const value of values) {
             if (value > this.$maxValue) {
                 hasNewMaxValue = true;
                 this.$maxValue = value;
             }
-            const staple = new ValueStaple(value, this.$stapleWidth, this.$stapleMaxHeight * (value / this.$maxValue));
+            const staple = new ValueStaple(
+                value,
+                this.$stapleWidth,
+                this.$stapleMaxHeight * (value / this.$maxValue)
+            );
             this.$staples.push(staple);
-            this.add(staple)
+            this.add(staple);
         }
-        if (hasNewMaxValue) {
+        if (hasNewMaxValue) { // TODO: probably needs to run this no matter what
             this.init(currentCenter.x, currentCenter.y);
         }
     }
@@ -91,18 +99,18 @@ export class StapleArray extends G {
      * Remove a value by its index.
      * This method both removes the element from the staple array,
      * and also removes it from the DOM.
-     * 
+     *
      * @param i index of value to remove
      */
     removeValue(i: number) {
-        this.removeValues(i, i + 1)
+        this.removeValues(i, i + 1);
     }
-    
+
     /**
      * Remove values by index from start (inclusive) and end (exclusive)
-     * This method both removes the elements from the  staple array, 
+     * This method both removes the elements from the  staple array,
      * and also removes them from the DOM.
-     * 
+     *
      * @param start index of the first value to remove (inclusive)
      * @param end index of the last value to remove (exclusive)
      */
@@ -115,9 +123,9 @@ export class StapleArray extends G {
     reset() {
         this.removeValues(0, this.$staples.length)
     }
-
+    
     delete() {
-        this.remove()
+        this.remove();
     }
 
     getValues() {
@@ -152,7 +160,7 @@ export class StapleArray extends G {
             // staple.center(0, 0);
             staple.x(this.getStapleX(i));
         });
-        this.center
+        // this.center
     }
 
     private createStaples(values: number[]): ValueStaple[] {
@@ -178,11 +186,11 @@ export class StapleArray extends G {
     }
 
     /**
-     * Note that this method only sets the new max height, and doesn't 
-     * resize or position the staples accordingly. To make sure the staples 
-     * get their correct position and size, always call 
+     * Note that this method only sets the new max height, and doesn't
+     * resize or position the staples accordingly. To make sure the staples
+     * get their correct position and size, always call
      * {@link resizeAndPositionStaples()} afterwards.
-     * 
+     *
      * @param maxHeight height of the staple with the largest value
      * @returns itself
      */
@@ -192,11 +200,11 @@ export class StapleArray extends G {
     }
 
     /**
-     * Note that this method only sets the new staple width, and doesn't 
-     * resize or position the staples accordingly. To make sure the staples 
-     * get their correct position and size, always call 
+     * Note that this method only sets the new staple width, and doesn't
+     * resize or position the staples accordingly. To make sure the staples
+     * get their correct position and size, always call
      * {@link resizeAndPositionStaples()} afterwards.
-     * 
+     *
      * @param maxHeight height of the staple with the largest value
      * @returns itself
      */

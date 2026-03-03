@@ -125,19 +125,23 @@ export class BaseSorter extends Engine implements Sorter {
         method: SubmitFunction,
         field: HTMLInputElement | null
     ): Promise<boolean> {
+        if (field === null) {
+            await this.execute(method, [])
+            return true
+        }
         let rawValue: string = "";
         try {
-            if (field !== null) {
                 rawValue = field.value;
                 field.value = "";
-            }
-            const inputNumbers = rawValue
-                .split(" ")
-                .filter((value) => !isNaN(Number(value)) && !isNaN(parseInt(value)))
-                .map((value) => parseInt(value))
-            console.debug(`executing this with the followig ${inputNumbers}`)
-            await this.execute(method, inputNumbers);
-            return true;
+                const inputNumbers = rawValue
+                    .split(" ")
+                    .filter(
+                        (value) =>
+                            !isNaN(Number(value)) && !isNaN(parseInt(value))
+                    )
+                    .map((value) => parseInt(value));
+                await this.execute(method, inputNumbers);
+                return true;
         } catch (e: any) {
             console.error(e);
             return false;
