@@ -36,7 +36,7 @@ export class BaseSorter extends Engine implements Sorter {
         this.sortArray = new StapleArray([], this.STAPLE_MAX_HEIGHT, this.STAPLE_WIDTH); // Only added to make sure that sortArray never is null
     }
 
-    initialise(initialValues: number[] = [32, 83, 22, 15, 8, 12, 43, 54, 23 ,34, 76 ,87, 32]) {
+    initialise(initialValues: number[] = []) {
         this.initialValues = initialValues;
         super.initialise();
     }
