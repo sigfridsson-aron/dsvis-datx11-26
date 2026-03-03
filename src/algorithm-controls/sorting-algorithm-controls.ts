@@ -3,10 +3,10 @@ import { Sorter } from "~/sorting";
 import { EngineAlgorithmControl } from "./engine-algorithm-controls";
 
 export class SortingAlgorithmControls extends EngineAlgorithmControl {
-    insertSelect: HTMLSelectElement;
+    presetSizeSelect: HTMLSelectElement;
+    presetSizeInputField: HTMLInputElement;
     insertField: HTMLInputElement;
     insertSubmit: HTMLInputElement;
-    customInsertContainer: HTMLSpanElement;
     sortSubmit: HTMLInputElement;
     pseudoCode: HTMLDivElement;
     clearSubmit: HTMLInputElement;
@@ -17,23 +17,24 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
         super(container);
         this.engine = engine;
 
-        this.insertSelect = querySelector<HTMLSelectElement>(
-            "select.insertSelect",
+        this.presetSizeSelect = querySelector<HTMLSelectElement>(
+            "select#presetSizeSelect",
+            container
+        );
+        this.presetSizeInputField = querySelector<HTMLInputElement>(
+            "input#presetSizeInputField",
             container
         );
         this.insertField = querySelector<HTMLInputElement>(
-            "input.insertField",
+            "input#insertField",
             container
         );
         this.insertSubmit = querySelector<HTMLInputElement>(
-            "input.insertSubmit",
+            "input#insertSubmit",
             container
         );
-        this.customInsertContainer = querySelector<HTMLSpanElement>(
-            "span#customInsertContainer"
-        )
         this.clearSubmit = querySelector<HTMLInputElement>(
-            "input.clearSubmit",
+            "input#clearSubmit",
             container
         );
         this.pseudoCode = querySelector<HTMLDivElement>(
@@ -41,11 +42,11 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             container
         );
         this.sortSubmit = querySelector<HTMLInputElement>(
-            "input.sortSubmit",
+            "input#sortSubmit",
             container
         );
         this.unsortSelect = querySelector<HTMLSelectElement>(
-            "select.unsort",
+            "select#unsortSelect",
             container
         );
 
@@ -53,13 +54,9 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
     }
 
     initialize() {
-        this.insertSelect.addEventListener("change", () => {
-            if (this.insertSelect.value === "custom") {
-                this.customInsertContainer.classList.remove("hidden")
-            } else {
-                this.customInsertContainer.classList.add("hidden")
-                this.engine.submit(this.engine.setArraySize, this.insertSelect) // TODO: Fix this
-            }
+        this.presetSizeSelect.addEventListener("change", () => {
+            this.presetSizeInputField.value = this.presetSizeSelect.value;
+            this.engine.setArraySize(this.presetSizeSelect.value)
         });
 
         addReturnSubmit(this.insertField, "ALPHANUM+", () =>
