@@ -50,7 +50,12 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
 
     initialize() {
         this.presetSizeSelect.addEventListener("change", () => {
-            this.engine.setArraySize(this.presetSizeSelect.value)
+            const value = this.presetSizeSelect.value;
+            if (isNaN(Number(value)) || isNaN(parseInt(String(value)))) {
+                console.debug("setArraySize needs a number as argument");
+                throw new Error("Incorrect argument to setArraySize");
+            }
+            this.engine.setArraySize(Number(value));
         });
 
         addReturnSubmit(this.insertField, "ALPHANUM+", () =>

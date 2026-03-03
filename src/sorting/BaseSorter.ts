@@ -144,12 +144,7 @@ export class BaseSorter extends Engine implements Sorter {
         }
     }
 
-    async setArraySize(...args: (string | number)[]): Promise<void> {
-        if (isNaN(Number(args[0])) || isNaN(parseInt(String(args[0])))) {
-            console.debug("setArraySize needs a number as argument");
-            throw new Error("Incorrect argument to setArraySize");
-        }
-        const size: number = Number(args[0]);
+    setArraySize(size: number): void {
         const values: number[] = Array.apply(null, Array(size)).map((_) => {
             return Math.floor(Math.random() * 99) + 1;
         });
