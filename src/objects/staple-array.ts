@@ -38,10 +38,16 @@ export class StapleArray extends G {
     init(centerX: number, centerY: number): this {
         this.$boundingBox?.remove()
         this.$boundingBox = this.rect(
-            this.$staples.length * (this.$stapleWidth + this.STAPLE_GAP) - this.STAPLE_GAP, // Remove one staple gap to avoid extra gap at the end.
-            this.$stapleMaxHeight + 40 // Extra 40 to account for text and padding
+            Math.max(
+                0, // Prevent negative widths when there are no staples in the array
+                this.$staples.length * (this.$stapleWidth + this.STAPLE_GAP) -
+                    this.STAPLE_GAP // Remove one staple gap to avoid extra gap at the end.
+            ),
+            this.$stapleMaxHeight
         )
             .center(0, 0)
+            .dy(-this.$stapleMaxHeight / 2) // Move bounding box to cover staples
+            .height(this.$stapleMaxHeight + 30) // Add size of 30 to cover the text
             .addClass("invisible");
         this.$staples.forEach((staple, i) => {
             staple.init();
