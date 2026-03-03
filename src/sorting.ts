@@ -15,6 +15,7 @@ export interface Sorter extends Engine {
     sort: SubmitFunction;
     insert: SubmitFunction;
     unsort: SubmitFunction;
+    setArraySize: SubmitFunction;
 }
 
 const SORTING_CLASSES = {

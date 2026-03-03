@@ -2,7 +2,7 @@ import { DSArray } from "src/objects/dsarray";
 import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
-import { Sort, SortMessages } from "~/sorting/sort";
+import { BaseSorter, SortMessages } from "~/sorting/BaseSorter";
 
 export const QuickSortMessages = {
     sort: {
@@ -16,7 +16,7 @@ export const QuickSortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class QuickSort extends Sort implements Sorter {
+export class QuickSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(QuickSortMessages, SortMessages);
 
     async sort() {
