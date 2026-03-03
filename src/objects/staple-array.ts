@@ -113,6 +113,10 @@ export class StapleArray extends G {
         this.$staples.splice(start, end - start).forEach(value => value.remove())
     }
 
+    delete() {
+        this.remove()
+    }
+
     getValues() {
         return this.$staples.map((staple) => staple.getValue());
     }
