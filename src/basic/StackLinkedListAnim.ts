@@ -4,7 +4,7 @@ import { LinkedNode } from "~/objects/basic-structure-objects/linked-node";
 import { LinkedConnection } from "~/objects/basic-structure-objects/node-connection";
 import LinkedList from "./LinkedList";
 
-export const LinkedListMessages = {
+export const StackLinkedListMessages = {
     general: {
         empty: "List is empty!",
         full: "List is full!",
@@ -27,12 +27,12 @@ export const LinkedListMessages = {
         notfound: (element: string | number) => `Node ${element} has child`,
     },
     insert: {
-        element: (element: string | number) => `Insert element: ${element}`,
+        element: (element: string | number) => `Pushing element: ${element}`,
         head: (element: string | number) =>
-            `List is empty, insert ${element} as head`,
+            `List is empty, pushing ${element} as head`,
     },
     delete: {
-        delete: (value: string) => `Deleting node ${value}`,
+        delete: `Popping, removing head`,
         adjustLink: "Adjusting link",
         adjustPos: "Adjusting positions",
     },
@@ -42,11 +42,11 @@ export const LinkedListMessages = {
     },
 };
 
-export class LinkedListAnim extends Engine implements Collection {
+export class StackLinkedListAnim extends Engine implements Collection {
     private readonly TOP_MARGIN = 200;
     private readonly MIN_SIDE_MARGIN = 20;
 
-    messages: MessagesObject = LinkedListMessages;
+    messages: MessagesObject = StackLinkedListMessages;
     initialValues: string[] | null = null; // Only used for hard-coded values
     maxListSize: number = 0; // Limit the size of the list to maintain readability
     linkedList: LinkedList<string | number> = new LinkedList(); // Linked list instance
@@ -95,85 +95,12 @@ export class LinkedListAnim extends Engine implements Collection {
             // if (this.linkedList.size === this.maxListSize) {
             //     await this.pause("general.full");
             // } else {
-            //     if(this.linkedList.size != 0){
-            //         await this.findTail();
-            //         await this.pause("Tail of linked list found.");
-            //     }
-            //     await this.insertBack(val);
+            //     await this.insertFront(val);
             // }
-            if(this.linkedList.size != 0){
-                await this.findTail();
-                await this.pause("Tail of linked list found.");
-            }
-            await this.insertBack(val);
+            await this.insertFront(val);
         }
     }
 
-    // Visualization logic for inserting a node to the back
-    async insertBack(value: string | number): Promise<void> {
-        this.linkedList.insertBack(value);
-
-        const insertionText =
-            this.linkedList.size === 1 ? "insert.head" : "insert.element";
-        await this.pause(insertionText, value);
-
-        const node = new LinkedNode(
-            value,
-            this.nodeDimensions,
-            this.getStrokeWidth()
-        );
-
-        // Creates an invisible node to act as the head pointer
-         if(this.linkedList.size === 1){
-            const coords = this.newNodeCoords();
-
-            this.headNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
-            this.Svg.add(this.headNode);
-            await this.headNode.move(coords[0]-this.nodeDimensions[1], coords[1] - this.nodeDimensions[0]);
-            this.headNode.opacity(0);
-            const head = this.Svg.text("Head");
-            head.font({size: this.getObjectSize() * 0.6});
-            head.move(this.headNode.getCenterPos()[0], this.headNode.getCenterPos()[1] - this.getObjectSize() * 0.7);
-        }
-
-        this.Svg.add(node);
-
-        const coords = this.newNodeCoords();
-        node.mirror(coords[2]);
-
-        this.highlight(node, true);
-
-        // Start at the lower center and then move to the correct position with animation
-        node.center(
-            this.$Svg.width / 2,
-            this.$Svg.height - this.nodeDimensions[1] * 2
-        );
-
-        const connection = await this.makeConnections(node);
-        if (connection) {
-            this.highlight(connection, true);
-        }
-
-
-        await this.pause(insertionText, value);
-        // Move to the correct position with animation
-        this.animate(node, !this.state.isResetting()).move(
-            coords[0],
-            coords[1]
-        );
-        connection?.updateEnd([coords[0], coords[1]], this.animationValue());
-
-        await this.pause(undefined);
-
-        this.highlight(node, false);
-        if (connection) {
-            this.highlight(connection, false);
-        }
-
-        // Add the node to the array and make connections
-        this.nodeArray.push([node, connection]);
-        
-    }
 
     // Visualization logic for inserting a node to the front
     async insertFront(value: string | number): Promise<void> {
@@ -190,11 +117,15 @@ export class LinkedListAnim extends Engine implements Collection {
         );
 
         if(this.linkedList.size === 1){
+            const coords = this.newNodeCoords();
+
+            this.headNode = new LinkedNode("Head", this.nodeDimensions, this.getStrokeWidth());
             this.Svg.add(this.headNode);
-            this.headNode.move(35,150);
+            await this.headNode.move(coords[0]-this.nodeDimensions[1], coords[1] - this.nodeDimensions[0]);
             this.headNode.opacity(0);
             const head = this.Svg.text("Head");
-            head.move(50, 140);
+            head.font({size: this.getObjectSize() * 0.6});
+            head.move(this.headNode.getCenterPos()[0], this.headNode.getCenterPos()[1] - this.getObjectSize() * 0.7);
         }
 
         this.Svg.add(node);
@@ -206,6 +137,8 @@ export class LinkedListAnim extends Engine implements Collection {
             this.$Svg.width / 2,
             this.$Svg.height - this.nodeDimensions[1] * 2
         );
+
+        
 
         const connection = await new LinkedConnection(
             this.headNode, 
@@ -228,6 +161,11 @@ export class LinkedListAnim extends Engine implements Collection {
         await this.pause("delete.adjustPos");
         this.adjustNodes(0, 0);
         
+
+        
+        
+
+
         this.highlight(node, false);
         if (connection) {
             this.highlight(connection, false);
@@ -319,8 +257,8 @@ export class LinkedListAnim extends Engine implements Collection {
 
     // Visualization logic for deleting a node
     async delete(value: string | number): Promise<void> {
-        const node = await this.findOne(value);
-        if (node) {
+        if (this.nodeArray.length > 0) {
+            const node = this.nodeArray[0][0];
             // If the node is found
             this.highlight(node, true);
             await this.pause("delete.delete", value);
@@ -353,7 +291,10 @@ export class LinkedListAnim extends Engine implements Collection {
                 prevConnection.setEnd(nextNode, this.animationValue());
             }
             await this.pause("delete.adjustPos");
+            
             this.adjustNodes(index, index + 1);
+
+            await this.pause(undefined);
         }
     }
 
@@ -457,7 +398,7 @@ export class LinkedListAnim extends Engine implements Collection {
             (this.$Svg.height - this.TOP_MARGIN - this.MIN_SIDE_MARGIN) /
                 (nodeHeight + this.getNodeSpacing())
         );
-        return maxNodesPerRow * maxRows;
+        return maxNodesPerRow * maxRows + 100;
     }
 
     // Calculates the next position for a node in a zigzag layout pattern and if it should be mirrored
