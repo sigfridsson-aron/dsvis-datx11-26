@@ -61,10 +61,6 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async insert(...values: Array<number | string>) {
-        this.sortArray.center(
-            this.getTreeRoot()[0],
-            this.getTreeRoot()[1] + this.$Svg.margin * 4
-        );
         for (const val of values) {
             await this.insertOne(val);
         }
