@@ -145,7 +145,6 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async setArraySize(...args: (string | number)[]): Promise<void> {
-        this.sortArray.delete();
         if (isNaN(Number(args[0])) || isNaN(parseInt(String(args[0])))) {
             console.debug("setArraySize needs a number as argument");
             throw new Error("Incorrect argument to setArraySize");
@@ -154,13 +153,7 @@ export class BaseSorter extends Engine implements Sorter {
         const values: number[] = Array.apply(null, Array(size)).map((_) => {
             return Math.floor(Math.random() * 99) + 1;
         });
-        const [xRoot, yRoot] = this.getTreeRoot();
-        this.sortArray = this.Svg.put(
-            new StapleArray(values, this.STAPLE_MAX_HEIGHT, this.STAPLE_WIDTH)
-        ).init(
-            xRoot,
-            yRoot + this.$Svg.margin * 4
-        );
+        this.initialise(values)
     }
 
     async sort() {
