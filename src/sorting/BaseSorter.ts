@@ -137,6 +137,23 @@ export class BaseSorter extends Engine implements Sorter {
         }
     }
 
+    async setArraySize(...args: (string | number)[]): Promise<void> {
+        this.sortArray.delete();
+        if (typeof args[0] !== "number") {
+            console.debug("setArraySize needs a number as argument");
+            throw new Error("Incorrect argument to setArraySize");
+        }
+        const size: number = args[0];
+        const values: number[] = Array.apply(null, Array(size)).map((_) => {
+            return Math.floor(Math.random() * 99) + 1;
+        });
+        this.sortArray = new StapleArray(
+            values,
+            this.STAPLE_MAX_HEIGHT,
+            this.STAPLE_WIDTH
+        ).init(...this.getTreeRoot());
+    }
+
     async sort() {
         throw new Error("Sort not implemented");
     }

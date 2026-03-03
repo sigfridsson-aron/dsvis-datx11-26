@@ -14,6 +14,7 @@ let scrollSpeed: number = 1;
 export interface Sorter extends Engine {
     sort: SubmitFunction;
     insert: SubmitFunction;
+    setArraySize: SubmitFunction;
 }
 
 const SORTING_CLASSES = {
