@@ -1,9 +1,10 @@
-import { G } from "@svgdotjs/svg.js";
+import { G, Rect } from "@svgdotjs/svg.js";
 import { ValueStaple } from "~/objects/value-staple";
 
 export class StapleArray extends G {
     STAPLE_GAP: number = 3;
 
+    $boundingBox: Rect | undefined = undefined;
     $staples: ValueStaple[] = [];
     $stapleMaxHeight: number;
     $stapleWidth: number;
@@ -31,6 +32,13 @@ export class StapleArray extends G {
      * which is why this separate method is needed.
      */
     init(centerX: number, centerY: number): this {
+        this.$boundingBox?.remove()
+        this.$boundingBox = this.rect(
+            this.$staples.length * (this.$stapleWidth + this.STAPLE_GAP) - this.STAPLE_GAP, // Remove one staple gap to avoid extra gap at the end.
+            this.$stapleMaxHeight + 40 // Extra 40 to account for text and padding
+        )
+            .center(0, 0)
+            .addClass("invisible");
         this.$staples.forEach((staple, i) => {
             staple.init();
         });
