@@ -28,12 +28,12 @@
       <span class="formgroup">
         <label for="presetSizeSelect">Preset array sizes:</label>
         <select id="presetSizeSelect" class="presetSizeSelect disableWhenRunning">
-          <option value="10">Tiny (10)</option>
-          <option selected value="20">Small (20)</option>
-          <option value="50">Medium (50)</option>
-          <option value="100">Large (100)</option>
-          <option value="200">Huge (200)</option>
-          <option value="0">Empty</option>
+          <option value="tiny">Tiny (10)</option>
+          <option selected value="small">Small (20)</option>
+          <option value="medium">Medium (50)</option>
+          <option value="large">Large (100)</option>
+          <option value="huge">Huge (200)</option>
+          <option value="empty">Empty</option>
         </select>
       </span>
       <span class="formgroup">
@@ -81,13 +81,13 @@
         </label>
       </span>
       <span class="formgroup">
-        <label>Node size:
-          <select class="objectSize">
-            <option value="12">Tiny</option>
-            <option value="20">Small</option>
-            <option value="28">Medium</option>
-            <option value="40" selected>Large</option>
-            <option value="50">Huge</option>
+        <label>Staple size:
+          <select class="objectSize"> <!-- TODO: Rename to match purpose -->
+            <option value="tiny">Tiny</option>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large" selected>Large</option>
+            <option value="huge">Huge</option>
           </select>
         </label>
       </span>

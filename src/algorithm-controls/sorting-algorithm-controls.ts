@@ -50,12 +50,44 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
 
     initialize() {
         this.presetSizeSelect.addEventListener("change", () => {
-            const value = this.presetSizeSelect.value;
-            if (isNaN(Number(value)) || isNaN(parseInt(String(value)))) {
-                console.debug("setArraySize needs a number as argument");
-                throw new Error("Incorrect argument to setArraySize");
+            let arraySize: number;
+            let objectSize: string | undefined;
+            switch (this.presetSizeSelect.value) {
+                case "tiny":
+                    arraySize = 10;
+                    objectSize = "huge"
+                    break;
+                case "small":
+                    arraySize = 20;
+                    objectSize = "large"
+                    break;
+                case "medium":
+                    arraySize = 50
+                    objectSize = "medium"
+                    break;
+                case "large":
+                    arraySize = 100;
+                    objectSize = "small"
+                    break;
+                case "huge":
+                    arraySize = 200;
+                    objectSize = "tiny"
+                    break;
+                case "empty":
+                    arraySize = 0;
+                    break;
+                default:
+                    console.debug("Value of preset size selected was incorrect");
+                    return;
             }
-            this.engine.setArraySize(Number(value));
+
+            this.engine.setArraySize(arraySize);
+            if (objectSize) {
+                this.engine.generalControls.objectSizeSelect.value = objectSize;
+                this.engine.generalControls.objectSizeSelect.dispatchEvent(
+                    new Event("change")
+                );
+            }
         });
 
         addReturnSubmit(this.insertField, "ALPHANUM+", () =>

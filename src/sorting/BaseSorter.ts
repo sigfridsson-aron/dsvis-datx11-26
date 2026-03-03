@@ -181,4 +181,22 @@ export class BaseSorter extends Engine implements Sorter {
             }
         }
     }
+
+    getObjectSize(): number {
+        switch (this.generalControls.objectSizeSelect.value) {
+            case "tiny":
+                return 3
+            case "small":
+                return 8
+            case "medium":
+                return 15
+            case "large":
+                return 30
+            case "huge":
+                return 40
+            default:
+                console.debug("There was an error getting the object size")
+                return 15
+        }
+    }
 }
