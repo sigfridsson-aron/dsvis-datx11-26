@@ -57,14 +57,13 @@ export class StapleArray extends G {
     swap(i: number, j: number) {
         const iStaple = this.$staples[i];
         const jStaple = this.$staples[j];
-        const iPosition = { x: iStaple.x(), y: iStaple.y() };
 
         // Move staples to the correct position in the array
         this.$staples.splice(i, 1, jStaple);
         this.$staples.splice(j, 1, iStaple);
 
-        this.engine().animate(iStaple).x(Number(jStaple.x()));
-        this.engine().animate(jStaple).x(Number(iPosition.x));
+        this.engine().animate(iStaple).x(this.getStapleX(j));
+        this.engine().animate(jStaple).x(this.getStapleX(i));
     }
 
     length(): number {
@@ -144,10 +143,14 @@ export class StapleArray extends G {
         });
     }
 
+    private getStapleX(i: number): number {
+        return Number(this.x()) + (this.$stapleWidth + this.STAPLE_GAP) * i;
+    }
+
     private positionStaples() {
         this.$staples.forEach((staple, i) => {
             // staple.center(0, 0);
-            staple.dx((this.$stapleWidth + this.STAPLE_GAP) * i);
+            staple.x(this.getStapleX(i));
         });
         this.center
     }
