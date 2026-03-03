@@ -6,6 +6,7 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
     insertSelect: HTMLSelectElement;
     insertField: HTMLInputElement;
     insertSubmit: HTMLInputElement;
+    customInsertContainer: HTMLSpanElement;
     sortSubmit: HTMLInputElement;
     pseudoCode: HTMLDivElement;
     clearSubmit: HTMLInputElement;
@@ -27,6 +28,9 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             "input.insertSubmit",
             container
         );
+        this.customInsertContainer = querySelector<HTMLSpanElement>(
+            "span#customInsertContainer"
+        )
         this.clearSubmit = querySelector<HTMLInputElement>(
             "input.clearSubmit",
             container
@@ -45,8 +49,12 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
 
     initialize() {
         this.insertSelect.addEventListener("change", () => {
-            this.insertField.value = this.insertSelect.value;
-            this.insertSelect.value = "";
+            if (this.insertSelect.value === "custom") {
+                this.customInsertContainer.classList.remove("hidden")
+            } else {
+                this.customInsertContainer.classList.add("hidden")
+                this.engine.submit(this.engine.setArraySize, this.insertSelect) // TODO: Fix this
+            }
         });
 
         addReturnSubmit(this.insertField, "ALPHANUM+", () =>
