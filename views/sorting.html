@@ -26,29 +26,34 @@
 
     <fieldset class="algorithmControls">
       <span class="formgroup">
-        <label for="insertSelect">Array size:</label>
-        <select id="insertSelect" class="insertSelect disableWhenRunning">
+        <label for="presetSizeSelect">Preset array sizes:</label>
+        <select id="presetSizeSelect" class="presetSizeSelect disableWhenRunning">
           <option value="10">Tiny (10)</option>
           <option value="20">Small (20)</option>
-          <option value="50">Medium (50)</option>
+          <option selected value="50">Medium (50)</option>
           <option value="100">Large (100)</option>
           <option value="200">Huge (200)</option>
-          <option value="custom">Custom values&hellip;</option>
+          <option value="0">Empty</option>
         </select>
-        <span id="customInsertContainer" class="customInsertContainer hidden"> <!-- TODO: should you always be able to insert values (also into predefined sizes?) -->
-          <input id="insertField" class="insertField disableWhenRunning" type="text" size="10" maxlength="20" />
-          <input id="insertSubmit" class="insertSubmit disableWhenRunning" type="submit" value="Insert" />
-        </span>
+
+        <!-- Placeholder to hold values to be sent with the submit function (requires input field) -->
+        <input id="presetSizeInputField" type="text" style="display: none;" disabled/>
+
       </span>
       <span class="formgroup">
-        <input class="sortSubmit disableWhenRunning" type="submit" value="Sort" />
+        <label for="insertField">Insert values:</label>
+        <input id="insertField" class="insertField disableWhenRunning" type="text" size="10" maxlength="20" />
+        <input id="insertSubmit" class="insertSubmit disableWhenRunning" type="submit" value="Insert" />
       </span>
       <span class="formgroup">
-        <input class="clearSubmit disableWhenRunning" type="submit" value="Clear" />
+        <input id="sortSubmit" class="sortSubmit disableWhenRunning" type="submit" value="Sort" />
+      </span>
+      <span class="formgroup">
+        <input id="clearSubmit" class="clearSubmit disableWhenRunning" type="submit" value="Clear" />
       </span>
       <!-- döp om till bättre namn -->
       <span class="formgroup">
-        <select class="unsort disableWhenRunning">
+        <select id="unsortSelect" class="unsort disableWhenRunning">
           <option value="" selected>Unsort Array</option>
           <option value="unsortRandom">Random</option>
           <option value="unsortReversed">Reversed</option>
