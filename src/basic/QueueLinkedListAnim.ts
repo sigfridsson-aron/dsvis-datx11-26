@@ -32,6 +32,7 @@ export const QueueLinkedListMessages = {
         element: (element: string | number) => `Insert element: ${element}`,
         head: (element: string | number) =>
             `Queue is empty, insert ${element} as head`,
+        adjustPointer: "Moving tail pointer"
     },
     delete: {
         delete: (value: string) => `Popping head node`,
@@ -151,6 +152,7 @@ export class QueueLinkedListAnim<T> extends Engine implements Collection{
             this.tailText.font({size: this.getObjectSize() * 0.6});
             this.tailText.opacity(1);
             this.tailNode.opacity(0);
+            await this.tailNode.move(coords[0], coords[1] + this.nodeDimensions[0]);
 
             this.tailConnection = new LinkedConnection(
                 this.tailNode,
@@ -159,9 +161,9 @@ export class QueueLinkedListAnim<T> extends Engine implements Collection{
                 this.getStrokeWidth(),
                 this.Svg
             );
-        } else{
-          this.tailText.opacity(1);
-        }
+            this.tailConnection.opacity(0);
+
+        } 
 
         this.tailNode.move(coords[0], coords[1] + this.nodeDimensions[0]);
         
@@ -191,6 +193,12 @@ export class QueueLinkedListAnim<T> extends Engine implements Collection{
         );
 
         connection?.updateEnd([coords[0], coords[1]], this.animationValue());
+        
+        await this.pause(undefined)
+
+        if(this.tailConnection){
+            this.highlight(this.tailConnection, true);
+        }
 
         this.animate(this.tailText, !this.state.isResetting()).move(
             this.tailNode.getCenterPos()[0] - this.getObjectSize() * 0.5, 
@@ -203,15 +211,26 @@ export class QueueLinkedListAnim<T> extends Engine implements Collection{
             this.animationValue()
         );
 
-        await this.pause(undefined);
-
+        
         this.highlight(node, false);
         if (connection) {
             this.highlight(connection, false);
         }
 
+        await this.pause("insert.adjustPointer");
+
+        if(this.tailConnection){
+            this.highlight(this.tailConnection, false);
+        }
+
+        
+        this.tailConnection?.opacity(1);
+
+
         // Add the node to the array and make connections
         this.nodeArray.push([node, connection]);
+
+        await this.pause(undefined);
         
     }
 
