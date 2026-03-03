@@ -4,7 +4,6 @@ import { EngineAlgorithmControl } from "./engine-algorithm-controls";
 
 export class SortingAlgorithmControls extends EngineAlgorithmControl {
     presetSizeSelect: HTMLSelectElement;
-    presetSizeInputField: HTMLInputElement;
     insertField: HTMLInputElement;
     insertSubmit: HTMLInputElement;
     sortSubmit: HTMLInputElement;
@@ -19,10 +18,6 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
 
         this.presetSizeSelect = querySelector<HTMLSelectElement>(
             "select#presetSizeSelect",
-            container
-        );
-        this.presetSizeInputField = querySelector<HTMLInputElement>(
-            "input#presetSizeInputField",
             container
         );
         this.insertField = querySelector<HTMLInputElement>(
@@ -55,7 +50,6 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
 
     initialize() {
         this.presetSizeSelect.addEventListener("change", () => {
-            this.presetSizeInputField.value = this.presetSizeSelect.value;
             this.engine.setArraySize(this.presetSizeSelect.value)
         });
 
