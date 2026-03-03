@@ -108,7 +108,13 @@ export class StapleArray extends G {
      * @param end index of the last value to remove (exclusive)
      */
     removeValues(start: number, end: number) {
-        this.$staples.splice(start, end - start).forEach(value => value.remove())
+        this.$staples
+            .splice(start, end - start)
+            .forEach((value) => value.remove());
+    }
+
+    reset() {
+        this.removeValues(0, this.$staples.length)
     }
 
     delete() {
