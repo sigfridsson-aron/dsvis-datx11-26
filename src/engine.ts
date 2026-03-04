@@ -22,6 +22,7 @@ type Action = {
     method: (...args: unknown[]) => Promise<void>;
     args: unknown[];
     stepCount: number;
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ export const NBSP = "\u00A0";
 
 export class Engine {
     // Default variable names start with $
-
+    
     Svg: Svg;
     messages: MessagesObject = {};
 
@@ -93,6 +94,7 @@ export class Engine {
     // Inititalisation
 
     constructor(containerSelector: string) {
+        
         this.debugger = new Debugger();
         this.state = new State();
 
@@ -115,6 +117,8 @@ export class Engine {
         );
 
         this.Svg = new Svg(svgContainer);
+        
+
         this.Svg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
         this.Svg.$engine = this;
         if (this.debugger.isEnabled()) {
@@ -127,6 +131,7 @@ export class Engine {
     initialise(): void {
         this.resetAll();
         this.generalControls.setRunning(true);
+        
     }
 
     async resetAll(): Promise<void> {
@@ -192,6 +197,7 @@ export class Engine {
     setIdleTitle(): void {
         this.info.setTitle("Select an action from the menu above");
         this.info.setBody(NBSP);
+
     }
 
     ///////////////////////////////////////////////////////////////////////////////
