@@ -21,6 +21,9 @@ export class StapleArray extends G {
         super();
         this.$stapleMaxHeight = stapleMaxHeight;
         this.$stapleWidth = stapleWidth;
+
+        this.STAPLE_GAP = Math.max(1, Math.round(0.1 * stapleWidth));
+
         this.$maxValue = Math.max(...items);
         this.createStaples(items).forEach((item: ValueStaple) => {
             this.add(item);
