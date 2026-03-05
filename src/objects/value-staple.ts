@@ -25,6 +25,7 @@ export class ValueStaple extends G {
         this.$rect = this.rect(stapleWidth, stapleHeight).fill('#32a852');
         this.$stapleHeight = stapleHeight; // TODO: Make height percentage logic part of the array (single staple shouldn't have max height/percentage)
         this.setStapleWidth(stapleWidth);
+        this.addClass("valueStaple")
     }
 
     /**

@@ -305,3 +305,8 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 .customInsertContainer.hidden {
 	display: none;
 }
+
+.valueStaple > rect {
+	fill: rgb(58, 120, 255);
+	stroke: none;
+}
