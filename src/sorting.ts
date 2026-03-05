@@ -36,10 +36,6 @@ if (!isBaseEngine) {
         SortEngine
     );
     SortEngine.algorithmControls = algorithmControls;
-
-    // Dispatch change event on the preset size select to ensure the engine 
-    // is initialized with the pre-selected option
-    algorithmControls.presetSizeSelect.dispatchEvent(new Event("change"))
 }
 
 const zoomInButton = querySelector(".zoomIn");
