@@ -56,7 +56,7 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         }
         this.$textObj = this.root()
         .text(this.$weight.toString())
-        .font({ size: 25 })
+        .font({ size: 25*this.$end.getSize()/40 })
         .fill("#000000")
         .stroke({ color: "#B32034", width: 2 })
         .center(
@@ -86,6 +86,7 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
             [offx, offy] = this._offset()
         }
 
+        this.$textObj.font({ size: 25*this.$end.getSize()/40 })
         this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
         .center(
             (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*7,

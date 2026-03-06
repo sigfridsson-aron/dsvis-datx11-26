@@ -36,13 +36,10 @@ export class Depth extends Engine implements Graph {
         this.generalControls = new EngineGeneralControls(this.container, this)
         this.edgeTableGroup = this.Svg.group()
         this.edgeTableGroup.addClass("edge-table")
-
-        
-        
-        
     }
 
     async start() {
+        await this.resetAlgorithm()
         const nodes = this.directedGraph()
         
         this.allEdges = this.getEdges(nodes)
@@ -148,13 +145,13 @@ export class Depth extends Engine implements Graph {
             await this.resetAlgorithm()
         } else if (graf === "Undirected") {
             await this.resetAlgorithm()
-            this.createdNodes = this.undirectedGraph()
+            this.undirectedGraph()
         } else if (graf === "Directed") {
             await this.resetAlgorithm()
-            this.createdNodes = this.directedGraph()
+            this.directedGraph()
         } else if (graf === "Tree") {
             await this.resetAlgorithm()
-            this.createdNodes = this.treeGraph()
+            this.treeGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -330,7 +327,7 @@ private drawRow(
     // disconnected, tournament, eulerian, hamiltonian, chordal and complete
     // directed graphs
 
-    //The bug was that i didn't have await before the pauses
+    //New bug putAtDeg seems to cause issues if you redraw a graph
     async bugExample() {
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
@@ -363,6 +360,7 @@ private drawRow(
         const J = this.newNode("J")
 
         A.setCenter(midW, midH)
+        this.graph = A
 
         this.putAtDeg(B, A, 135)
         this.link(A, B, 1, "both")
@@ -395,8 +393,6 @@ private drawRow(
         this.putAtDeg(J, G, 45)
         this.link(G, J, 8, "both")
 
-
-        this.graph = A
         return [A,B,C,D,E,F,G,H,I,J]
         
     }
@@ -474,6 +470,7 @@ private drawRow(
         const N = this.newNode("N")
 
         A.setCenter(midW, midH)
+        this.graph = A
 
         this.putAtDeg(B, A, -20, false, 150)
         this.putAtDeg(C, A, -160, false, 150)
@@ -509,7 +506,6 @@ private drawRow(
         this.putAtDeg(N, D, -90, false, 100)
         this.link(D, N, 10, "to")
         
-        this.graph = A
         return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
     }
 
