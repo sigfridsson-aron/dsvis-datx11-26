@@ -36,65 +36,89 @@ export class Depth extends Engine implements Graph {
         this.generalControls = new EngineGeneralControls(this.container, this)
         this.edgeTableGroup = this.Svg.group()
         this.edgeTableGroup.addClass("edge-table")
+
+        
         
         
     }
 
     async start() {
-        await this.resetAlgorithm()
-
-        const nodes = this.treeGraph()
-        await this.pause("example.here")
-
-        // this.generalControls.setRunning(true)
-        // const nodes = this.undirectedGraph()
-        // this.updateEdgeTable()
+        const nodes = this.directedGraph()
         
-        // this.allEdges = this.getEdges(nodes)
-        // const result = this.searchGraph(this.graph)
-        // console.log(result)
-       
-        // await this.nodeTraversalVisualisation(result)
+        this.allEdges = this.getEdges(nodes)
+        const result = this.searchGraph(nodes[2])
+        console.log(result)
+        await this.nodeTraversalVisualisation(result)
     }
 
 
-    async nodeTraversalVisualisation(graphTraversal:WeightedConnection<GraphNode>[]) {
-        this.generalControls.setRunning(false)
-        let currNode:GraphNode
-        let lastNode:GraphNode | null = null
-
+    async nodeTraversalVisualisation(graphTraversal:WeightedConnection<WeightedGraphNode>[]) {
+        
+        let currNode:WeightedGraphNode
+        let lastNode:WeightedGraphNode | null = null
+        const knownEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
+        const visitedEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
     
         for (const edge of graphTraversal) {
             
+
             currNode = edge.$start
+            currNode.setHighlight(true)
+           
+
+            for (const key in currNode.$outgoing) {
+                const currEdge = currNode.$outgoing[key]
+                
+                if (!currEdge) continue
+                if (!visitedEdges.has(currEdge)) {
+                    knownEdges.add(currEdge)
+
+                }
+                
+            }
+            this.updateEdgeTable(knownEdges)
+            await this.pause(`At node ${currNode.getText()}`)
+            lastNode?.setHighlight(false)
             
+            visitedEdges.add(edge)
+
             if (currNode === lastNode) { 
+                //this skips the needs for extra userinput when you go from A->B B->C 
                 lastNode = currNode
             }
             else {
-                currNode.setHighlight(true)
-                await this.pause("the same node twice in a row")
+                //Sets highlight to start of edge
+                
                 currNode.setHighlight(false)
             }
 
+            //remove edge from edgetable
+            knownEdges.delete(edge)
+            this.updateEdgeTable(knownEdges)
+
+
+            //Sets highlight to end of edge
             edge.setHighlight(true)
             currNode = edge.$end
             currNode.setHighlight(true)
             await this.pause("i am here now")
             currNode.setHighlight(false)
             lastNode = currNode
+
         }
+
+        await this.pause("Done!")
     }
 
+ 
 
 
 
 
     //search through the graph starting from "startNode". returns a list of chronological order of traversal
-    searchGraph(startNode:WeightedGraphNode | null):WeightedConnection<GraphNode>[] {
-        if (!startNode) { return []; }
+    searchGraph(startNode:WeightedGraphNode):WeightedConnection<WeightedGraphNode>[] {
         const visitedNodes: WeightedGraphNode[] = []
-        const result:WeightedConnection<GraphNode>[] = []
+        const result:WeightedConnection<WeightedGraphNode>[] = []
         this.searchGraphRecursion(startNode,visitedNodes,result)
         return result
     }
@@ -236,9 +260,11 @@ export class Depth extends Engine implements Graph {
     }
 
     //Want the eventual algorithm to call this every it takes a "step"
-    updateEdgeTable() {
+    updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
+    
+
     const columns = ["From", "To", "Weight"];
-    const edges = this.allEdges
+    const edges = knownEdges
     
     const cellHeight = 40;
     const cellWidth = 80;
@@ -250,19 +276,22 @@ export class Depth extends Engine implements Graph {
     this.edgeTableGroup.clear();
 
     this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
-     for (let i = 0; i < edges.length; i++) {
-        const currEdge = edges[i]
+
+    let k = 0
+     for (const edge of edges) {
+        const currEdge = edge
         const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
     
 
         this.drawRow(
             rowData,
-            i + 1,
+            k + 1,
             startX,
             startY,
             cellWidth,
             cellHeight
         );
+        k++
     }           
     
     this.Svg.add(this.edgeTableGroup)
