@@ -148,10 +148,13 @@ export class Depth extends Engine implements Graph {
             await this.resetAlgorithm()
         } else if (graf === "Undirected") {
             await this.resetAlgorithm()
-            this.undirectedGraph()
+            this.createdNodes = this.undirectedGraph()
         } else if (graf === "Directed") {
             await this.resetAlgorithm()
-            this.directedGraph()
+            this.createdNodes = this.directedGraph()
+        } else if (graf === "Tree") {
+            await this.resetAlgorithm()
+            this.createdNodes = this.treeGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -174,42 +177,20 @@ export class Depth extends Engine implements Graph {
         return this;
     }
 
-    //Currently only works if each node has a connection to another node
-    //for example it would not find a node with an empty $outgoing
-    //and empty $incoming
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.resetHelp(this.graph, new Set<WeightedGraphNode>)
+        for (const k of this.createdNodes) {
+            k.remove()
+            for (const c in k.$incoming) {
+                k.$incoming[c]?.remove()
+                k.$incoming[c]?.$textObj.remove()
+            }
+            for (const c in k.$outgoing) {
+                k.$outgoing[c]?.remove()
+                k.$outgoing[c]?.$textObj.remove()
+            }
+        }
         this.createdNodes = []
-    }
-
-    resetHelp(resetter: WeightedGraphNode | null,
-              visited: Set<WeightedGraphNode>
-    ): void {
-        if (!resetter || visited.has(resetter)) {
-            return;
-        }
-
-        visited.add(resetter)
-
-        const inp = resetter.$incoming
-        const out = resetter.$outgoing
-        resetter.remove()
-
-        for (const k in inp) {
-            if (inp[k]) {
-                this.resetHelp(inp[k].getStart(), visited)
-                inp[k].remove()
-                inp[k].$textObj.remove()
-            }
-        }
-        for (const k in out) {
-            if (out[k]) {
-                this.resetHelp(out[k].getStart(), visited)
-                out[k].remove()
-                out[k].$textObj.remove()
-            }
-        }
     }
 
     //defines a new Node object and puts it under where messages
@@ -499,29 +480,29 @@ private drawRow(
         this.link(A, B, 10, "to")
         this.link(A, C, 10, "to")
 
-        this.putAtDeg(D, B, -135, false, 75)
-        this.putAtDeg(E, B, -45, false, 75)
+        this.putAtDeg(D, B, -135, false, 90)
+        this.putAtDeg(E, B, -45, false, 90)
         this.link(B, D, 10, "to")
         this.link(B, E, 10, "to")
 
         this.putAtDeg(F, C, -135, false, 125)
-        this.putAtDeg(G, C, -45, false, 75)
+        this.putAtDeg(G, C, -45, false, 90)
         this.link(C, F, 10, "to")
         this.link(C, G, 10, "to")
 
-        this.putAtDeg(H, F, -135, false, 75)
-        this.putAtDeg(I, F, -45, false, 75)
+        this.putAtDeg(H, F, -135, false, 90)
+        this.putAtDeg(I, F, -45, false, 90)
         this.link(F, H, 10, "to")
         this.link(F, I, 10, "to")
 
-        this.putAtDeg(J, G, -45, false, 75)
+        this.putAtDeg(J, G, -45, false, 90)
         this.link(G, J, 10, "to")
 
         this.putAtDeg(K, I, -100, false, 100)
         this.link(I, K, 10, "to")
 
-        this.putAtDeg(L, K, -135, false, 75)
-        this.putAtDeg(M, K, -45, false, 75)
+        this.putAtDeg(L, K, -135, false, 90)
+        this.putAtDeg(M, K, -45, false, 90)
         this.link(K, L, 10, "to")
         this.link(K, M, 10, "to")
 
@@ -529,7 +510,7 @@ private drawRow(
         this.link(D, N, 10, "to")
         
         this.graph = A
-        return []
+        return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
     }
 
     mixedGraph(): WeightedGraphNode[] { //unfinished
