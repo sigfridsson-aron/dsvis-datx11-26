@@ -152,6 +152,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "Tree") {
             await this.resetAlgorithm()
             this.treeGraph()
+        } else if (graf === "Mixed") {
+            await this.resetAlgorithm()
+            this.mixedGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -223,9 +226,10 @@ export class Depth extends Engine implements Graph {
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
         degree: number,
-        animation: boolean = false,
-        distance: number = 125
+        distance: number = 125,
+        animation: boolean = false
     ): void {
+        distance = distance*putNode.getSize()/40
         const degreé = Math.PI/180 * degree * (-1)
         const [relativX, relativY] = relativNode.getCenter()
         var ani = 0
@@ -322,7 +326,7 @@ private drawRow(
 
     //Implement default graphs below
 
-    //TODO immplement mixed(both directed and undirected),
+    //TODO implement
     // cyclic, acyclic, DAG (directed acyclic), connected (strongly, weakly), 
     // disconnected, tournament, eulerian, hamiltonian, chordal and complete
     // directed graphs
@@ -337,7 +341,7 @@ private drawRow(
         const B = this.newNode("B")
         await this.pause("example.here")
         this.graph = A
-        this.putAtDeg(B, A, 135, true)
+        this.putAtDeg(B, A, 135, 125, true)
         await this.pause("example.here")
         this.link(A, B, 2, "both")
         await this.pause("example.here")
@@ -450,6 +454,64 @@ private drawRow(
         return [A,B,C,D,E,F,G,H,I,J]
     }
 
+    mixedGraph(): WeightedGraphNode[] {
+        //Looks pretty ugly if you've got suggestions please tell me
+        //or feel free to make them yourself
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2 + 100
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+        const I = this.newNode("I")
+        const J = this.newNode("J")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.putAtDeg(B, A, -90)
+        this.link(A, B, 3, "to")
+
+        this.putAtDeg(C, A, -30, 100)
+        this.link(C, A, 2, "both")
+        this.link(C, B, 4, "both")
+
+        this.putAtDeg(D, A, -150, 100)
+        this.link(D, A, 9, "to")
+
+        this.putAtDeg(E, A, 90, 200)
+        this.link(E, A, 0, "to")
+        this.link(E, A, 1, "from")
+
+        this.putAtDeg(F, A, 30)
+        this.link(C, F, 6, "to")
+        this.link(F, E, 4, "to")
+
+        this.putAtDeg(G, F, 60)
+        this.link(F, G, 7, "both")
+        this.link(G, E, 3, "to")
+
+        this.putAtDeg(H, E, 190)
+        this.link(H, E, 2, "from")
+        this.link(H, E, 8, "to")
+
+        this.putAtDeg(I, H, 170)
+        this.link(H, I, 5, "both")
+
+        this.putAtDeg(J, H, 220)
+        this.link(I, J, 2, "to")
+        this.link(I, J, 3, "from")
+        this.link(J, D, 2, "from")
+        this.link(J, A, 1, "from")
+        this.link(D, B, 4, "from")
+        return [A,B,C,D,E,F,G,H,I,J]
+    }
+
     treeGraph(): WeightedGraphNode[] {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 - 200
@@ -472,64 +534,40 @@ private drawRow(
         A.setCenter(midW, midH)
         this.graph = A
 
-        this.putAtDeg(B, A, -20, false, 150)
-        this.putAtDeg(C, A, -160, false, 150)
+        this.putAtDeg(B, A, -20, 150)
+        this.putAtDeg(C, A, -160, 150)
         this.link(A, B, 10, "to")
         this.link(A, C, 10, "to")
 
-        this.putAtDeg(D, B, -135, false, 90)
-        this.putAtDeg(E, B, -45, false, 90)
+        this.putAtDeg(D, B, -135, 90)
+        this.putAtDeg(E, B, -45, 90)
         this.link(B, D, 10, "to")
         this.link(B, E, 10, "to")
 
-        this.putAtDeg(F, C, -135, false, 125)
-        this.putAtDeg(G, C, -45, false, 90)
+        this.putAtDeg(F, C, -135, 125)
+        this.putAtDeg(G, C, -45, 90)
         this.link(C, F, 10, "to")
         this.link(C, G, 10, "to")
 
-        this.putAtDeg(H, F, -135, false, 90)
-        this.putAtDeg(I, F, -45, false, 90)
+        this.putAtDeg(H, F, -135, 90)
+        this.putAtDeg(I, F, -45, 90)
         this.link(F, H, 10, "to")
         this.link(F, I, 10, "to")
 
-        this.putAtDeg(J, G, -45, false, 90)
+        this.putAtDeg(J, G, -45, 90)
         this.link(G, J, 10, "to")
 
-        this.putAtDeg(K, I, -100, false, 100)
+        this.putAtDeg(K, I, -100, 100)
         this.link(I, K, 10, "to")
 
-        this.putAtDeg(L, K, -135, false, 90)
-        this.putAtDeg(M, K, -45, false, 90)
+        this.putAtDeg(L, K, -135, 90)
+        this.putAtDeg(M, K, -45, 90)
         this.link(K, L, 10, "to")
         this.link(K, M, 10, "to")
 
-        this.putAtDeg(N, D, -90, false, 100)
+        this.putAtDeg(N, D, -90, 100)
         this.link(D, N, 10, "to")
         
         return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
-    }
-
-    mixedGraph(): WeightedGraphNode[] { //unfinished
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-
-        const A = this.newNode("A")
-        const B = this.newNode("B")
-        const C = this.newNode("C")
-        const D = this.newNode("D")
-        const E = this.newNode("E")
-
-        this.graph = A
-        this.link(A, B, 4, "to")
-        A.setCenter(midW, midH)
-        this.link(A, B, 3, "from")
-        B.setCenter(midW + 100, midH)
-        this.link(A, C, 5, "to")
-        C.setCenter(midW - 100, midH)
-        this.link(A, D, 11, "from")
-        D.setCenter(midW, midH + 100)
-        this.link(A, E, 1, "both")
-        E.setCenter(midW, midH - 100)
-        return [A,B,C,D,E]
     }
 }
