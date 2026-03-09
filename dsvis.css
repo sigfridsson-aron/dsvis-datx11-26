@@ -309,4 +309,7 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 }
 
 
-
+/* Sorting */
+.customInsertContainer.hidden {
+	display: none;
+}

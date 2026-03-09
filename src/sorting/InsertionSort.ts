@@ -1,7 +1,7 @@
 import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
-import { Sort, SortMessages } from "~/sorting/sort";
+import { BaseSorter, SortMessages } from "~/sorting/BaseSorter";
 
 export const InsertionSortMessages = {
     sort: {
@@ -13,36 +13,37 @@ export const InsertionSortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class InsertionSort extends Sort implements Sorter {
+export class InsertionSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(
         InsertionSortMessages,
         SortMessages
     );
 
     async sort() {
-        let sortSize = this.sortArray.getSize();
+        let sortSize = this.sortArray.length();
 
         if (sortSize <= 1) {
             await this.pause("general.empty");
             return;
         }
 
-        if (this.sortArray.getValue(this.sortArray.getSize() - 1) === NBSP) {
-            this.sortArray.setSize(this.sortArray.getSize() - 1);
-            sortSize--;
-        }
+        // TODO: remove?
+        // if (this.sortArray.getValue(this.sortArray.length() - 1) === NBSP) {
+        //     this.sortArray.setSize(this.sortArray.length() - 1);
+        //     sortSize--;
+        // }
 
         //Center the array depending on its size
         this.sortArray.center(
-            this.getTreeRoot()[0] + this.compensate,
+            this.getTreeRoot()[0], // + this.compensate, // TODO: remove compensate?
             this.getTreeRoot()[1] + this.$Svg.margin * 4
         );
         for (let i = 1; i < sortSize; i++) {
             let j = i;
 
             while (j > 0) {
-                this.sortArray.setIndexHighlight(j, true);
-                this.sortArray.setIndexHighlight(j - 1, true);
+                this.sortArray.setStapleHighlight(j);
+                this.sortArray.setStapleHighlight(j - 1);
                 await this.pause(
                     "sort.compare",
                     this.sortArray.getValue(j),
@@ -51,10 +52,7 @@ export class InsertionSort extends Sort implements Sorter {
 
                 //Check if the current element is larger than the element to its left
                 if (
-                    compare(
-                        this.sortArray.getValue(j),
-                        this.sortArray.getValue(j - 1)
-                    ) >= 0
+                    this.sortArray.getValue(j) >= this.sortArray.getValue(j - 1)
                 ) {
                     //Then message this, disable the highlights and break
                     await this.pause(
@@ -62,16 +60,16 @@ export class InsertionSort extends Sort implements Sorter {
                         this.sortArray.getValue(j - 1),
                         this.sortArray.getValue(j)
                     );
-                    this.sortArray.setIndexHighlight(j, false);
-                    this.sortArray.setIndexHighlight(j - 1, false);
+                    this.sortArray.clearStapleHighlight(j);
+                    this.sortArray.clearStapleHighlight(j - 1);
                     break;
                 }
 
                 //If the current element is smaller then swap it with the left neighbour
-                await this.swap(this.sortArray, j, j - 1);
+                this.sortArray.swap(j, j - 1);
 
-                this.sortArray.setIndexHighlight(j, false);
-                this.sortArray.setIndexHighlight(j - 1, false);
+                this.sortArray.clearStapleHighlight(j);
+                this.sortArray.clearStapleHighlight(j - 1);
                 j -= 1;
             }
         }

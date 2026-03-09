@@ -1,4 +1,4 @@
-import { Marker, Text } from "@svgdotjs/svg.js";
+import { Text } from "@svgdotjs/svg.js";
 import { LinkedNode } from "./basic-structure-objects/linked-node";
 import { BTreeNode } from "./btree-node";
 import { Connection } from "./connection";
@@ -56,9 +56,9 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         }
         this.$textObj = this.root()
         .text(this.$weight.toString())
-        .font({ size: 25 })
+        .font({ size: 25*this.$end.getSize()/40 })
         .fill("#000000")
-        .stroke({ color: "#b01a1a", width: 1 })
+        .stroke({ color: "#B32034", width: 2 })
         .center(
             (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*17,
             (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*17
@@ -86,10 +86,11 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
             [offx, offy] = this._offset()
         }
 
+        this.$textObj.font({ size: 25*this.$end.getSize()/40 })
         this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
         .center(
-            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*5,
-            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*5
+            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*7,
+            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*7
         )
     }
 

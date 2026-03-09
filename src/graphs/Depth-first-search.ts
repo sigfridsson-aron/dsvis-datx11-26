@@ -19,7 +19,7 @@ export const DepthMessages = {
 export class Depth extends Engine implements Graph {
     graph: WeightedGraphNode | null = null;
     edgeTableGroup: G 
-    createdNodes: WeightedGraphNode[] = []
+    createdNodes: WeightedGraphNode[] = [];
     initialValues: (String | Number)[] = [];
     messages: MessagesObject = DepthMessages;
     generalControls: EngineGeneralControls;
@@ -36,10 +36,6 @@ export class Depth extends Engine implements Graph {
         this.generalControls = new EngineGeneralControls(this.container, this)
         this.edgeTableGroup = this.Svg.group()
         this.edgeTableGroup.addClass("edge-table")
-
-        
-        
-        
     }
 
     async start() {
@@ -86,7 +82,6 @@ export class Depth extends Engine implements Graph {
             if (currNode === lastNode) { 
                 //this skips the needs for extra userinput when you go from A->B B->C 
                 lastNode = currNode
-
             }
             else {
                 //Sets highlight to start of edge
@@ -103,9 +98,9 @@ export class Depth extends Engine implements Graph {
             edge.setHighlight(true)
             currNode = edge.$end
             currNode.setHighlight(true)
+            await this.pause("i am here now")
+            currNode.setHighlight(false)
             lastNode = currNode
-
-
 
         }
 
@@ -123,8 +118,6 @@ export class Depth extends Engine implements Graph {
         const result:WeightedConnection<WeightedGraphNode>[] = []
         this.searchGraphRecursion(startNode,visitedNodes,result)
         return result
-        
-
     }
 
 
@@ -141,38 +134,20 @@ export class Depth extends Engine implements Graph {
         for (let i = 0; i < edges.length;i++) {
             const connectedNode = edges[i].$end
             if (!visitedNodes.includes(connectedNode)) {
-                
-
-
-              
                 result.push(edges[i])
                 this.searchGraphRecursion(connectedNode, visitedNodes,result)
-                
-
             }
         }
-
-
-
     } 
-
-
-
-
-
-
-
 
     async chosenGraph(graf: string | number) {
         if (graf === "") {
             await this.resetAlgorithm()
         } else if (graf === "Undirected") {
             await this.resetAlgorithm()
-            this.pause("")
             this.undirectedGraph()
         } else if (graf === "Directed") {
             await this.resetAlgorithm()
-            this.pause("")
             this.directedGraph()
         } 
          else if (graf === "Tree") {
@@ -201,41 +176,20 @@ export class Depth extends Engine implements Graph {
         return this;
     }
 
-    //Currently only works if each node has a connection to another node
-    //for example it would not find a node with an empty $outgoing
-    //and empty $incoming
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.resetHelp(this.graph, new Set<WeightedGraphNode>)
-    }
-
-    resetHelp(resetter: WeightedGraphNode | null,
-              visited: Set<WeightedGraphNode>
-    ): void {
-        if (!resetter || visited.has(resetter)) {
-            return;
-        }
-
-        visited.add(resetter)
-
-        const inp = resetter.$incoming
-        const out = resetter.$outgoing
-        resetter.remove()
-
-        for (const k in inp) {
-            if (inp[k]) {
-                this.resetHelp(inp[k].getStart(), visited)
-                inp[k].remove()
-                inp[k].$textObj.remove()
+        for (const k of this.createdNodes) {
+            k.remove()
+            for (const c in k.$incoming) {
+                k.$incoming[c]?.remove()
+                k.$incoming[c]?.$textObj.remove()
+            }
+            for (const c in k.$outgoing) {
+                k.$outgoing[c]?.remove()
+                k.$outgoing[c]?.$textObj.remove()
             }
         }
-        for (const k in out) {
-            if (out[k]) {
-                this.resetHelp(out[k].getStart(), visited)
-                out[k].remove()
-                out[k].$textObj.remove()
-            }
-        }
+        this.createdNodes = []
     }
 
     //defines a new Node object and puts it under where messages
@@ -270,147 +224,21 @@ export class Depth extends Engine implements Graph {
     putAtDeg(
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
-        degree: number
+        degree: number,
+        distance: number = 125,
+        animation: boolean = false
     ): void {
+        distance = distance*putNode.getSize()/40
         const degreé = Math.PI/180 * degree * (-1)
         const [relativX, relativY] = relativNode.getCenter()
+        var ani = 0
+        if (animation) ani = this.getAnimationSpeed();
         putNode.setCenter(
-            relativX + 125*Math.cos(degreé),
-            relativY + 125*Math.sin(degreé)
+            relativX + distance*Math.cos(degreé),
+            relativY + distance*Math.sin(degreé),
+            ani
         )
     }
-
-    //Implement default graphs below
-
-    //TODO immplement mixed(both directed and undirected),
-    // cyclic, acyclic, DAG (directed acyclic), connected (strongly, weakly), 
-    // disconnected, tournament, eulerian, hamiltonian, chordal and complete
-    // directed graphs
-
-    //If we ever want to animate adding to graphs we would need to
-    //adress this bug, run the code to se it.
-
-
-
-
-
-    bugExample(): void {
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-        const A = this.newNode("A")
-        A.setCenter(midW, midH, this.getAnimationSpeed())
-        const B = this.newNode("B")
-        this.pause("")
-        this.graph = A
-        this.putAtDeg(B, A, 135)
-        this.link(A, B, 2, "both")
-        this.pause("")
-    }
-
-    undirectedGraph():WeightedGraphNode[] { // i am happy with this but feel free to add to it
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-
-        const A = this.newNode("A")
-        const B = this.newNode("B")
-        const C = this.newNode("C")
-        const D = this.newNode("D")
-        const E = this.newNode("E")
-        const F = this.newNode("F")
-        const G = this.newNode("G")
-
-        this.graph = A
-        A.setCenter(midW, midH)
-        this.link(A, B, 1, "both")
-        this.putAtDeg(B, A, 135)
-
-        this.link(A, C, 666, "both")
-        this.putAtDeg(C, A, 0)
-        this.link(C, D, 30, "both")
-
-        this.link(B, D, 4, "both")
-        this.putAtDeg(D, B, 45)
-        this.link(A, D, 3, "both")
-
-        this.putAtDeg(E, A, 225)
-        this.link(E, A, 5, "both")
-
-        this.putAtDeg(F, C, 45)
-        this.link(F, C, 2, "both")
-
-        this.putAtDeg(G, C, -45)
-        this.link(G, C, 1, "both")
-        this.link(G, F, 5, "both")
-        return [A,B,C,D,E,F,G]
-        
-    }
-
-    directedGraph():WeightedGraphNode[] { //copied the undirected graph and made it directed
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-
-        const A = this.newNode("A")
-        const B = this.newNode("B")
-        const C = this.newNode("C")
-        const D = this.newNode("D")
-        const E = this.newNode("E")
-        const F = this.newNode("F")
-        const G = this.newNode("G")
-
-        this.graph = A
-        A.setCenter(midW, midH)
-        this.link(A, B, 1, "from")
-        this.putAtDeg(B, A, 135)
-
-        this.link(A, C, 666, "from")
-        this.putAtDeg(C, A, 0)
-        this.link(C, D, 30, "to")
-
-        this.link(B, D, 4, "to")
-        this.putAtDeg(D, B, 45)
-        this.link(A, D, 3, "from")
-
-        this.putAtDeg(E, A, 225)
-        this.link(E, A, 5, "to")
-
-        this.putAtDeg(F, C, 45)
-        this.link(F, C, 2, "to")
-
-        this.putAtDeg(G, C, -45)
-        this.link(G, C, 1, "from")
-        this.link(G, F, 5, "to")
-        
-        
-        return [A,B,C,D,E,F,G]
-    }
-
-    mixedGraph(): WeightedGraphNode[] { //unfinished
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-
-        const A = this.newNode("A")
-        const B = this.newNode("B")
-        const C = this.newNode("C")
-        const D = this.newNode("D")
-        const E = this.newNode("E")
-
-        this.graph = A
-        this.link(A, B, 4, "to")
-        A.setCenter(midW, midH)
-        this.link(A, B, 3, "from")
-        B.setCenter(midW + 100, midH)
-        this.link(A, C, 5, "to")
-        C.setCenter(midW - 100, midH)
-        this.link(A, D, 11, "from")
-        D.setCenter(midW, midH + 100)
-        this.link(A, E, 1, "both")
-        E.setCenter(midW, midH - 100)
-        return [A,B,C,D,E]
-    }
-
-
-
-    
 
     //Want the eventual algorithm to call this every it takes a "step"
     updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
@@ -446,17 +274,9 @@ export class Depth extends Engine implements Graph {
         );
         k++
     }           
-
-
     
     this.Svg.add(this.edgeTableGroup)
 }
-
-
-
-
-
-
 
 //returns all outgoing edges from the provided nodes
 private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {

@@ -3,7 +3,7 @@ import { compare, updateDefault } from "~/helpers";
 import { DSArray } from "~/objects/dsarray";
 import { TextCircle } from "~/objects/text-circle";
 import { Sorter } from "~/sorting";
-import { Sort, SortMessages } from "./sort";
+import { BaseSorter, SortMessages } from "./BaseSorter";
 
 export const MergeSortMessages = {
     sort: {
@@ -13,7 +13,7 @@ export const MergeSortMessages = {
     },
 } as const satisfies MessagesObject;
 
-export class MergeSort extends Sort implements Sorter {
+export class MergeSort extends BaseSorter implements Sorter {
     mergeArrayList: DSArray[] = [];
     messages: MessagesObject = updateDefault(MergeSortMessages, SortMessages);
     async sort() {
