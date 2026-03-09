@@ -5,7 +5,6 @@ export class WeightedGraphNode extends GraphNode {
     $outgoing: Record<string, WeightedConnection<this> | null> = {};
     $incoming: Record<string, WeightedConnection<this> | null> = {};
     $weights: Record<string, number | null> = {};
-   
 
 
     constructor(text: string, size: number, strokeWidth: number) {
@@ -36,7 +35,6 @@ export class WeightedGraphNode extends GraphNode {
         weight: number,
         dir: string
     ): this {
-    
         if (dir === "from" && theirNode) {
             theirNode.connect(ourKey, theirKey, this, strokeWidth, weight, "to")
             return this
@@ -71,8 +69,9 @@ export class WeightedGraphNode extends GraphNode {
             }
             var bend = 0
             if(theirNode.$outgoing[ourKey] && theirNode.$outgoing[ourKey].$weight != weight) {
-                bend = 0.3
+                bend = 0.2
                 theirNode.$outgoing[ourKey].$bend = bend
+                theirNode.$outgoing[ourKey].update(theirNode.$outgoing[ourKey].$coords)
             }
             const edge = this.root()
                 .put(new WeightedConnection(this, theirNode, weight))
