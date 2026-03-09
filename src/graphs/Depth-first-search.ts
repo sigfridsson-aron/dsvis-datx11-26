@@ -44,10 +44,10 @@ export class Depth extends Engine implements Graph {
 
     async start() {
         
-        const nodes = this.directedGraph()
+        const nodes = this.treeGraph()
         
         this.allEdges = this.getEdges(nodes)
-        const result = this.searchGraph(nodes[2])
+        const result = this.searchGraph(nodes[0])
         console.log(result)
         await this.nodeTraversalVisualisation(result)
     }
@@ -174,7 +174,12 @@ export class Depth extends Engine implements Graph {
             await this.resetAlgorithm()
             this.pause("")
             this.directedGraph()
-        } else {
+        } 
+         else if (graf === "Tree") {
+            await this.resetAlgorithm()
+            this.createdNodes = this.treeGraph() }
+        
+        else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
             .center(this.$Svg.width/10, this.$Svg.height/2)
@@ -500,6 +505,65 @@ private drawRow(
 
 
 
+
+treeGraph(): WeightedGraphNode[] {
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2 - 200
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+        const I = this.newNode("I")
+        const J = this.newNode("J")
+        const K = this.newNode("K")
+        const L = this.newNode("L")
+        const M = this.newNode("M")
+        const N = this.newNode("N")
+
+        A.setCenter(midW, midH)
+        this.graph = A
+
+        this.putAtDeg(B, A, -20)
+        this.putAtDeg(C, A, -160)
+        this.link(A, B, 10, "to")
+        this.link(A, C, 10, "to")
+
+        this.putAtDeg(D, B, -135)
+        this.putAtDeg(E, B, -45)
+        this.link(B, D, 10, "to")
+        this.link(B, E, 10, "to")
+
+        this.putAtDeg(F, C, -135)
+        this.putAtDeg(G, C, -45)
+        this.link(C, F, 10, "to")
+        this.link(C, G, 10, "to")
+
+        this.putAtDeg(H, F, -135)
+        this.putAtDeg(I, F, -45)
+        this.link(F, H, 10, "to")
+        this.link(F, I, 10, "to")
+
+        this.putAtDeg(J, G, 250)
+        this.link(G, J, 10, "to")
+
+        this.putAtDeg(K, I, -100)
+        this.link(I, K, 10, "to")
+
+        this.putAtDeg(L, K, -135)
+        this.putAtDeg(M, K, -45)
+        this.link(K, L, 10, "to")
+        this.link(K, M, 10, "to")
+
+        this.putAtDeg(N, D, -90)
+        this.link(D, N, 10, "to")
+
+        return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
+    }
 
 
 
