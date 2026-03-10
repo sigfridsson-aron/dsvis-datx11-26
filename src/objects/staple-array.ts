@@ -188,12 +188,18 @@ export class StapleArray extends G {
         return staples;
     }
 
-    setStapleHighlight(i: number) {
-        this.$staples[i].setHighlight(true);
+    setStapleHighlight(i: number, type: 'primary' | 'secondary' | 'tertiary' = 'primary') {
+        this.$staples[i].$rect.addClass(`${type}Highlight`);
     }
 
-    clearStapleHighlight(i: number) {
-        this.$staples[i].setHighlight(false);
+    clearStapleHighlight(i: number, type: 'primary' | 'secondary' | 'tertiary' | 'all' = 'primary') {
+        if (type === 'all') {
+            this.$staples[i].$rect.removeClass(`primaryHighlight`)
+            this.$staples[i].$rect.removeClass(`secondaryHighlight`)
+            this.$staples[i].$rect.removeClass(`tertiaryHighlight`)
+        } else {
+            this.$staples[i].$rect.removeClass(`${type}Highlight`)
+        }
     }
 
     /**
