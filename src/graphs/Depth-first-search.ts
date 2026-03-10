@@ -154,6 +154,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "aCyclic") {
             await this.resetAlgorithm()
             this.acyclicGraph()
+        } else if (graf === "DAG") {
+            await this.resetAlgorithm()
+            this.DAGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -670,6 +673,50 @@ private drawRow(
 
         this.link(H, F, 1, "from")
         this.putAtDeg(H, F, 0)
+
+        return [A,B,C,D,E,F,G,H]
+    }
+
+    DAGraph(): WeightedGraphNode[] {
+        const midW = this.$Svg.width/2 - 300
+        const midH = this.$Svg.height/2 - 150
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.link(B, A, 2, "from")
+        this.putAtDeg(B, A, -90)
+
+        this.link(C, A, 2, "from")
+        this.putAtDeg(C, A, -45)
+
+        this.link(D, B, 8, "from")
+        this.link(D, C, 4, "from")
+        this.putAtDeg(D, C, -20)
+
+        this.link(E, B, 5, "from")
+        this.putAtDeg(E, B, -20)
+
+        this.link(F, E, 2, "from")
+        this.link(F, D, 4, "from")
+        this.putAtDeg(F, D, -80)
+
+        this.link(G, B, 3, "from")
+        this.link(G, F, 6, "from")
+        this.putAtDeg(G, B, -90, 140)
+
+        this.link(H, F, 2, "from")
+        this.link(H, G, 1, "to")
+        this.putAtDeg(H, F, -150)
 
         return [A,B,C,D,E,F,G,H]
     }
