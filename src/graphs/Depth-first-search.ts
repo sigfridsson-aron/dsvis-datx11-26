@@ -163,6 +163,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "Strongly") {
             await this.resetAlgorithm()
             this.stronglyConnectedGraph()
+        } else if (graf === "Eulerian") {
+            await this.resetAlgorithm()
+            this.eulerianGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -335,7 +338,7 @@ private drawRow(
     //Implement default graphs below
 
     //TODO implement 
-    // eulerian, hamiltonian, chordal
+    // hamiltonian, chordal
 
     //New bug putAtDeg seems to cause issues if you redraw a graph
     async bugExample() {
@@ -787,5 +790,45 @@ private drawRow(
         this.putAtDeg(E, C, -120)
 
         return [A,B,C,D,E]
+    }
+
+    eulerianGraph(): WeightedGraphNode[] {
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.link(B, A, 1, "from")
+        this.putAtDeg(B, A, -120)
+
+        this.link(C, A, 3, "from")
+        this.link(C, B, 2, "to")
+        this.link(C, B, 3, "from")
+        this.putAtDeg(C, A, -60)
+
+        this.link(D, A, 7, "to")
+        this.putAtDeg(D, A, 90)
+
+        this.link(E, C, 4, "from")
+        this.link(E, D, 9, "from")
+        this.link(E, D, 4, "to")
+        this.link(E, A, 6, "to")
+        this.putAtDeg(E, C, 45)
+
+        this.link(F, B, 5, "from")
+        this.link(F, D, 6, "from")
+        this.link(F, D, 7, "to")
+        this.link(F, A, 8, "to")
+        this.putAtDeg(F, B, 135)
+
+        return [A,B,C,D,E,F]
     }
 }
