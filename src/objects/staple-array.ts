@@ -85,7 +85,7 @@ export class StapleArray extends G {
 
     addValues(...values: number[]) {
         const currentCenter = { x: this.cx(), y: this.cy() };
-        let hasNewMaxValue: boolean = true;
+        let hasNewMaxValue: boolean = false;
         for (const value of values) {
             if (value > this.$maxValue) {
                 hasNewMaxValue = true;
@@ -99,9 +99,11 @@ export class StapleArray extends G {
             this.$staples.push(staple);
             this.add(staple);
         }
+
         if (hasNewMaxValue) { // TODO: probably needs to run this no matter what
-            this.init(currentCenter.x, currentCenter.y);
+            this.resizeStaples();
         }
+        this.init(currentCenter.x, currentCenter.y);
     }
 
     /**
@@ -152,8 +154,8 @@ export class StapleArray extends G {
 
     private resizeStaples() {
         this.$staples.forEach((staple) => {
-            staple.width(this.$stapleWidth);
-            staple.height(
+            staple.setStapleWidth(this.$stapleWidth);
+            staple.setStapleHeight(
                 this.$stapleMaxHeight * (staple.getValue() / this.$maxValue)
             );
             staple.init();
