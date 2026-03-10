@@ -310,3 +310,16 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 	fill: rgb(58, 120, 255);
 	stroke: none;
 }
+
+/* TODO: Update highlighting to be consistent across components in the library, and use proper colors */
+svg .primaryHighlight {
+	fill: blue;	
+}
+
+svg .secondaryHighlight {
+	fill: green
+}
+
+svg .tertiaryHighlight {
+	fill: orange;
+}
