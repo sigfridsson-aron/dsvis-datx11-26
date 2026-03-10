@@ -148,6 +148,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "Mixed") {
             await this.resetAlgorithm()
             this.mixedGraph()
+        } else if (graf === "Cyclic") {
+            await this.resetAlgorithm()
+            this.cyclicGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -320,7 +323,7 @@ private drawRow(
     //Implement default graphs below
 
     //TODO implement
-    // cyclic, acyclic, DAG (directed acyclic), connected (strongly, weakly), 
+    // acyclic, DAG (directed acyclic), connected (strongly, weakly), 
     // disconnected, tournament, eulerian, hamiltonian, chordal and complete
     // directed graphs
 
@@ -562,5 +565,65 @@ private drawRow(
         this.link(D, N, 10, "to")
         
         return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
+    }
+
+    cyclicGraph(): WeightedGraphNode[] {
+        //Neutered sign
+        const midW = this.$Svg.width/2 + 100
+        const midH = this.$Svg.height/2 - 25
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+        const I = this.newNode("I")
+        const J = this.newNode("J")
+        const K = this.newNode("K")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.link(A, B, 1, "to")
+        this.putAtDeg(B, A, 135)
+
+        this.link(B, C, 2, "to")
+        this.putAtDeg(C, B, 180)
+
+        this.link(C, D, 3, "to")
+        this.putAtDeg(D, C, 225)
+
+        this.link(D, E, 4, "to")
+        this.putAtDeg(E, D, 270)
+        
+        this.link(E, F, 5, "to")
+        this.putAtDeg(F, E, 315)
+
+        this.link(F, G, 6, "to")
+        this.link(F, B, 14, "both")
+        this.putAtDeg(G, F, 0)
+
+        this.link(G, H, 7, "to")
+        this.putAtDeg(H, G, 45)
+
+        this.link(H, A, 8, "to")
+
+        this.link(D, I, 9, "both")
+        this.putAtDeg(I, D, 100)
+
+        this.link(I, J, 10, "both")
+        this.putAtDeg(J, I, 202)
+
+        this.link(J, K, 11, "both")
+        this.link(J, D, 12, "to")
+        this.putAtDeg(K, D, 220)
+
+        this.link(K, D, 13, "both")
+
+
+        return [A,B,C,D,E,F,G,H,I,J,K]
     }
 }
