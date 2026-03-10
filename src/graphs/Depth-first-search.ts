@@ -157,6 +157,12 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "DAG") {
             await this.resetAlgorithm()
             this.DAGraph()
+        } else if (graf === "Weakly") {
+            await this.resetAlgorithm()
+            this.weaklyConnectedGraph()
+        } else if (graf === "Strongly") {
+            await this.resetAlgorithm()
+            this.stronglyConnectedGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -212,13 +218,13 @@ export class Depth extends Engine implements Graph {
         theirNode: WeightedGraphNode,
         weight: number,
         dir: string
-    ): void {
-        ourNode.connect(theirNode.getText(), 
-                        ourNode.getText(), 
-                        theirNode, 
-                        this.getStrokeWidth(), 
-                        weight, 
-                        dir)
+    ): WeightedGraphNode {
+        return ourNode.connect(theirNode.getText(), 
+                               ourNode.getText(), 
+                               theirNode, 
+                               this.getStrokeWidth(), 
+                               weight, 
+                               dir)
     }
 
     //Puts a Node a 100(px not sure what unit we have) away from
@@ -328,10 +334,8 @@ private drawRow(
 
     //Implement default graphs below
 
-    //TODO implement
-    // DAG (directed acyclic), connected (strongly, weakly), 
-    // disconnected, tournament, eulerian, hamiltonian, chordal and complete
-    // directed graphs
+    //TODO implement 
+    // eulerian, hamiltonian, chordal
 
     //New bug putAtDeg seems to cause issues if you redraw a graph
     async bugExample() {
@@ -719,5 +723,69 @@ private drawRow(
         this.putAtDeg(H, F, -150)
 
         return [A,B,C,D,E,F,G,H]
+    }
+
+    weaklyConnectedGraph(): WeightedGraphNode[] {
+        //Somewhat small but I thought it might be better to
+        //focus on it being weakly connected
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2 + 150
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.link(B, A, 1, "to")
+        this.putAtDeg(B, A, 80)
+
+        this.link(C, B, 3, "to")
+        this.putAtDeg(C, B, 110)
+
+        this.link(D, A, 5, "from")
+        this.link(D, B, 2, "from")
+        this.putAtDeg(D, A, 20)
+
+        this.link(E, C, 1, "from")
+        this.link(E, A, 3, "to")
+        this.putAtDeg(E, C, -120)
+
+        return [A,B,C,D,E]
+    }
+
+    stronglyConnectedGraph(): WeightedGraphNode[] {
+        //Somewhat small but I thought it might be better to
+        //focus on it being strongly connected
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2 + 150
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+
+        this.link(B, A, 1, "from")
+        this.putAtDeg(B, A, 80)
+
+        this.link(C, B, 3, "to")
+        this.putAtDeg(C, B, 110)
+
+        this.link(D, A, 5, "from")
+        this.link(D, B, 2, "from")
+        this.putAtDeg(D, A, 20)
+
+        this.link(E, C, 1, "from")
+        this.link(E, A, 3, "to")
+        this.putAtDeg(E, C, -120)
+
+        return [A,B,C,D,E]
     }
 }
