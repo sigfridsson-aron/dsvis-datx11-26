@@ -7,6 +7,7 @@ import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { EngineGeneralControls } from "./general-controls/engine-general-controls";
+import { Timeline } from "@svgdotjs/svg.js";
 
 export type SubmitFunction = (...args: (string | number)[]) => Promise<void>;
 
@@ -58,6 +59,8 @@ export class Engine {
     debugger: Debugger;
     state: State;
     info: Info;
+
+    timeline: Timeline;
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -122,6 +125,8 @@ export class Engine {
         }
 
         this.info = new Info(this.Svg, this.$Svg.margin);
+
+        this.timeline = new Timeline()
     }
 
     initialise(): void {
@@ -472,7 +477,9 @@ export class Engine {
         if (this.state.isAnimating() && animate) {
             this.info.setStatus("running");
             this.info.setStatus("paused", this.getAnimationSpeed());
-            return elem.animate(this.getAnimationSpeed(), 0, "now");
+            const elementRunner = elem.animate(this.getAnimationSpeed());
+            this.timeline.schedule(elementRunner, 0, "now").play();
+            return elementRunner;
         } else {
             return elem;
         }
