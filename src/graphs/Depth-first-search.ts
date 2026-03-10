@@ -151,6 +151,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "Cyclic") {
             await this.resetAlgorithm()
             this.cyclicGraph()
+        } else if (graf === "aCyclic") {
+            await this.resetAlgorithm()
+            this.acyclicGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -323,7 +326,7 @@ private drawRow(
     //Implement default graphs below
 
     //TODO implement
-    // acyclic, DAG (directed acyclic), connected (strongly, weakly), 
+    // DAG (directed acyclic), connected (strongly, weakly), 
     // disconnected, tournament, eulerian, hamiltonian, chordal and complete
     // directed graphs
 
@@ -625,5 +628,49 @@ private drawRow(
 
 
         return [A,B,C,D,E,F,G,H,I,J,K]
+    }
+
+    acyclicGraph(): WeightedGraphNode[] {
+        //Somewhat basic
+        const midW = this.$Svg.width/2 - 100
+        const midH = this.$Svg.height/2 + 100
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+
+        this.graph = A
+        A.setCenter(midW, midH)
+        
+        this.link(A, B, 4, "from")
+        this.putAtDeg(B, A, 135)
+
+        this.link(A, C, 7, "from")
+        this.putAtDeg(C, A, 45)
+
+        this.link(D, B, 6, "to")
+        this.link(D, B, 3, "from")
+        this.putAtDeg(D, B, 90)
+
+        this.link(E, C, 5, "to")
+        this.link(E, C, 7, "from")
+        this.link(E, D, 2, "both")
+        this.putAtDeg(E, C, 90)
+
+        this.link(F, A, 9, "from")
+        this.putAtDeg(F, A, -90)
+
+        this.link(G, F, 1, "to")
+        this.putAtDeg(G, F, 180)
+
+        this.link(H, F, 1, "from")
+        this.putAtDeg(H, F, 0)
+
+        return [A,B,C,D,E,F,G,H]
     }
 }
