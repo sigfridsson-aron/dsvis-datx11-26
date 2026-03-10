@@ -61,9 +61,7 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async insert(...values: Array<number | string>) {
-        for (const val of values) {
-            await this.insertOne(val);
-        }
+        this.sortArray.addValues(...values.filter((value: number | string) => typeof value === "number"))
     }
 
     async swap(arr: StapleArray, j: number, k: number) {
@@ -84,7 +82,7 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     // Kommenterade ut animeringeringen till arrayen.
-    async insertOne(value: number | string) {
+    async insertOne(value: number | string) { // TODO: remove?
         if (typeof value === 'number') {
             this.sortArray.addValues(value)
         }
