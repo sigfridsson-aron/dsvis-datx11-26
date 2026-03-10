@@ -7,12 +7,12 @@ export class ValueStaple extends G {
     $text: Text;
     $value: number;
 
-    // stapleWidth and hideText is always set by the setStapleWidth method,
+    // These attributes are always set by the set* methods called in the constructor,
     // hence the assertion that the property is initialized
     $stapleWidth!: number;
     $hideText!: boolean;
+    $stapleHeight!: number;
 
-    $stapleHeight: number;
 
     /**
      * Also call {@link init()} to finalize initialization
@@ -23,7 +23,7 @@ export class ValueStaple extends G {
         this.$text = this.text(String(value));
         
         this.$rect = this.rect(stapleWidth, stapleHeight).fill('#32a852');
-        this.$stapleHeight = stapleHeight; // TODO: Make height percentage logic part of the array (single staple shouldn't have max height/percentage)
+        this.setStapleHeight(stapleHeight); // TODO: Make height percentage logic part of the array (single staple shouldn't have max height/percentage)
         this.setStapleWidth(stapleWidth);
         this.addClass("valueStaple")
     }
@@ -74,6 +74,12 @@ export class ValueStaple extends G {
         this.$stapleWidth = width;
         this.$hideText = width < 25
         this.$rect.width(width);
+        return this;
+    }
+
+    setStapleHeight(height: number): this {
+        this.$stapleHeight = height;
+        this.$rect.height(height);
         return this;
     }
 }
