@@ -181,6 +181,7 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     getObjectSize(): number {
+        // TODO: show max and min values when text is hidden
         switch (this.generalControls.objectSizeSelect.value) {
             case "tiny":
                 return 3
