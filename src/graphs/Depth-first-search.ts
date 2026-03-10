@@ -40,10 +40,10 @@ export class Depth extends Engine implements Graph {
 
     async start() {
         await this.resetAlgorithm()
-        const nodes = this.directedGraph()
+        const nodes = this.treeGraph()
         
         this.allEdges = this.getEdges(nodes)
-        const result = this.searchGraph(nodes[2])
+        const result = this.searchGraph(nodes[0])
         console.log(result)
         await this.nodeTraversalVisualisation(result)
     }
@@ -57,11 +57,8 @@ export class Depth extends Engine implements Graph {
         const visitedEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
     
         for (const edge of graphTraversal) {
-            
-
             currNode = edge.$start
             currNode.setHighlight(true)
-           
 
             for (const key in currNode.$outgoing) {
                 const currEdge = currNode.$outgoing[key]
@@ -93,15 +90,11 @@ export class Depth extends Engine implements Graph {
             knownEdges.delete(edge)
             this.updateEdgeTable(knownEdges)
 
-
             //Sets highlight to end of edge
             edge.setHighlight(true)
             currNode = edge.$end
             currNode.setHighlight(true)
-            await this.pause("i am here now")
-            currNode.setHighlight(false)
             lastNode = currNode
-
         }
 
         await this.pause("Done!")
@@ -275,7 +268,7 @@ export class Depth extends Engine implements Graph {
         );
         k++
     }           
-    
+
     this.Svg.add(this.edgeTableGroup)
 }
 
@@ -341,9 +334,9 @@ private drawRow(
         const B = this.newNode("B")
         await this.pause("example.here")
         this.graph = A
-        this.putAtDeg(B, A, 135, 125, true)
-        await this.pause("example.here")
         this.link(A, B, 2, "both")
+        await this.pause("example.here")
+        this.putAtDeg(B, A, 135, 125, true)
         await this.pause("example.here")
     }
 
@@ -539,29 +532,29 @@ private drawRow(
         this.link(A, B, 10, "to")
         this.link(A, C, 10, "to")
 
-        this.putAtDeg(D, B, -135, 90)
-        this.putAtDeg(E, B, -45, 90)
+        this.putAtDeg(D, B, -135, 100)
+        this.putAtDeg(E, B, -45, 100)
         this.link(B, D, 10, "to")
         this.link(B, E, 10, "to")
 
         this.putAtDeg(F, C, -135, 125)
-        this.putAtDeg(G, C, -45, 90)
+        this.putAtDeg(G, C, -45, 100)
         this.link(C, F, 10, "to")
         this.link(C, G, 10, "to")
 
-        this.putAtDeg(H, F, -135, 90)
-        this.putAtDeg(I, F, -45, 90)
+        this.putAtDeg(H, F, -135, 100)
+        this.putAtDeg(I, F, -45, 100)
         this.link(F, H, 10, "to")
         this.link(F, I, 10, "to")
 
-        this.putAtDeg(J, G, -45, 90)
+        this.putAtDeg(J, G, -45, 100)
         this.link(G, J, 10, "to")
 
         this.putAtDeg(K, I, -100, 100)
         this.link(I, K, 10, "to")
 
-        this.putAtDeg(L, K, -135, 90)
-        this.putAtDeg(M, K, -45, 90)
+        this.putAtDeg(L, K, -135, 100)
+        this.putAtDeg(M, K, -45, 100)
         this.link(K, L, 10, "to")
         this.link(K, M, 10, "to")
 

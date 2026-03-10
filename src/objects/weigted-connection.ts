@@ -1,4 +1,4 @@
-import { Text } from "@svgdotjs/svg.js";
+import { G } from "@svgdotjs/svg.js";
 import { LinkedNode } from "./basic-structure-objects/linked-node";
 import { BTreeNode } from "./btree-node";
 import { Connection } from "./connection";
@@ -6,12 +6,18 @@ import { GraphNode } from "./graph-node";
 
 export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> extends Connection<T> {
     $weight: number
-    $textObj!: Text
+    $textObj!: G
 
     constructor(start: T, end: T, weight: number) {
         super(start, end)
         
         this.$weight = weight
+    }
+
+    override setHighlight(high: boolean | null): this {
+        super.setHighlight(high)
+        this.$textObj.setHighlight(true)
+        return this
     }
 
     // for the overridden functions i only added _createWeight and _redrawWeight
@@ -54,15 +60,24 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         if (this.$bend > 0) {
             [offx, offy] = this._offset()
         }
-        this.$textObj = this.root()
-        .text(this.$weight.toString())
-        .font({ size: 25*this.$end.getSize()/40 })
-        .fill("#000000")
-        .stroke({ color: "#B32034", width: 2 })
-        .center(
-            (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*17,
-            (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*17
-        );
+
+        // Create a group for the text object
+        this.$textObj = this.root().group()
+
+        // Create the text object
+        this.$textObj.text(this.$weight.toString())
+                     .font({ size: 20*this.$end.getSize()/40 })
+                     .center(
+                         (C.x1 + C.x2)/2 + (C.y1 - C.y2) * this.$bend - offx*10,
+                         (C.y1 + C.y2)/2 + (C.x2 - C.x1) * this.$bend - offy*10
+                     );
+
+        // Create a box to function as a background
+        const box = this.$textObj.bbox()
+        this.$textObj.rect(box.width + 5, box.height)
+                     .center(box.cx, box.cy)
+                     .radius(9)
+                     .back()
     }
 
     // When update gets called this animates the text object
@@ -89,8 +104,8 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         this.$textObj.font({ size: 25*this.$end.getSize()/40 })
         this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
         .center(
-            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*7,
-            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*7
+            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*10,
+            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*10
         )
     }
 
