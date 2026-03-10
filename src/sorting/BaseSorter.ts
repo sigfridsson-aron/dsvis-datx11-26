@@ -66,7 +66,6 @@ export class BaseSorter extends Engine implements Sorter {
 
     async swap(arr: StapleArray, j: number, k: number) {
         arr.swap(j, k);
-        arr.setStapleHighlight(j);
         await this.pause(
             "sort.swap",
             this.sortArray.getValue(j),
