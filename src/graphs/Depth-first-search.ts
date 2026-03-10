@@ -169,6 +169,9 @@ export class Depth extends Engine implements Graph {
         } else if (graf === "Hamiltonian") {
             await this.resetAlgorithm()
             this.hamiltonianGraph()
+        } else if (graf === "Chordal") {
+            await this.resetAlgorithm()
+            this.chordalGraph()
         } else {
             await this.resetAlgorithm()
             this.Svg.text("You are WRONG!")
@@ -340,10 +343,7 @@ private drawRow(
 
     //Implement default graphs below
 
-    //TODO implement 
-    // chordal
-
-    //New bug putAtDeg seems to cause issues if you redraw a graph
+    //New bug putAtDeg seems to cause issues if you redraw a graph (only in animation)
     async bugExample() {
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
@@ -866,4 +866,67 @@ private drawRow(
 
         return [A,B,C,D,E]
     }
+
+    chordalGraph(): WeightedGraphNode[] {
+        const midW = this.$Svg.width/2 - 200
+        const midH = this.$Svg.height/2 + 50
+
+        const A = this.newNode("A")
+        const B = this.newNode("B")
+        const C = this.newNode("C")
+        const D = this.newNode("D")
+        const E = this.newNode("E")
+        const F = this.newNode("F")
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+        const I = this.newNode("I")
+        const J = this.newNode("J")
+        const K = this.newNode("K")
+        const L = this.newNode("L")
+
+        A.setCenter(midW, midH)
+        this.graph = A
+
+        this.link(B, A, 1, "both")
+        this.putAtDeg(B, A, -10)
+
+        this.link(C, A, 1, "both")
+        this.link(C, B, 1, "both")
+        this.putAtDeg(C, A, 50)
+
+        this.link(D, A, 2, "from")
+        this.putAtDeg(D, A, -90)
+
+        this.link(E, D, 4, "from")
+        this.link(E, A, 1, "from")
+        this.putAtDeg(E, D, 170)
+
+        this.link(F, E, 7, "from")
+        this.link(F, A, 2, "from")
+        this.putAtDeg(F, E, 120)
+
+        this.link(G, F, 5, "from")
+        this.link(G, A, 3, "to")
+        this.putAtDeg(G, F, 60)
+
+        this.link(H, B, 4, "from")
+        this.putAtDeg(H, B, -80)
+
+        this.link(I, H, 1, "from")
+        this.link(I, B, 7, "from")
+        this.putAtDeg(I, H, 45)
+
+        this.link(J, I, 6, "from")
+        this.link(J, B, 4, "to")
+        this.putAtDeg(J, I, 110)
+
+        this.link(K, C, 2, "from")
+        this.putAtDeg(K, C, 70)
+
+        this.link(L, K, 1, "from")
+        this.link(L, C, 3, "to")
+        this.putAtDeg(L, K, 190)
+
+        return [A,B,C,D,E,F,G,H,I,J,K,L]
+    }    
 }
