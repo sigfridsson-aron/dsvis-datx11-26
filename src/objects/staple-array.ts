@@ -162,7 +162,7 @@ export class StapleArray extends G {
         });
     }
 
-    private getStapleX(i: number): number {
+    getStapleX(i: number): number {
         return Number(this.x()) + (this.$stapleWidth + this.STAPLE_GAP) * i;
     }
 
