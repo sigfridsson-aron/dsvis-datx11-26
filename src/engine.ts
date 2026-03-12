@@ -7,6 +7,7 @@ import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { EngineGeneralControls } from "./general-controls/engine-general-controls";
+import { Timeline } from "@svgdotjs/svg.js";
 
 export type SubmitFunction = (...args: (string | number)[]) => Promise<void>;
 
@@ -38,6 +39,7 @@ export const NBSP = "\u00A0";
 export class Engine {
     // Default variable names start with $
 
+    // Use separate containing Svg to hold information that shouldn't be moved when panning
     _containingSvg: Svg;
 
     Svg: Svg;
@@ -63,7 +65,7 @@ export class Engine {
 
     timeline: Timeline;
     isPanning: boolean = false;
-    lastPointerPosition: { x?: number, y?: number } = {};
+    lastPointerPosition: { x?: number; y?: number } = {};
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -122,9 +124,10 @@ export class Engine {
 
         makeCanvasPannable(this, svgContainer);
 
+        // See explanation at property declaration for _containingSvg
         this._containingSvg = new Svg(svgContainer);
         this._containingSvg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
-        this.Svg = this._containingSvg.nested()
+        this.Svg = this._containingSvg.nested();
         this.Svg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
         this.Svg.$engine = this;
         if (this.debugger.isEnabled()) {
@@ -133,7 +136,7 @@ export class Engine {
 
         this.info = new Info(this._containingSvg, this.$Svg.margin);
 
-        this.timeline = new Timeline()
+        this.timeline = new Timeline();
     }
 
     initialise(): void {
