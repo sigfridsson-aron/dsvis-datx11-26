@@ -196,7 +196,6 @@ export class StapleArray extends G {
 
     private createStaples(values: number[]): ValueStaple[] {
         const staples: ValueStaple[] = [];
-        this.$maxValue = Math.max(...values);
         values.forEach((value: number) => {
             const staple: ValueStaple = new ValueStaple(
                 value,
