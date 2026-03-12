@@ -11,14 +11,20 @@ export class StapleArray extends G {
     $maxValue: number;
 
     /**
-     * Also call {@link init()} to finalize initialization. 
+     * @constructor
+     * @description Creates a staple array object. Also call {@link init()} to finalize initialization. 
      * Note that init() needs to be called after the staple
      * is added to the DOM.
+     * @param values Values to create the staples from
+     * @param stapleMaxHeight Height of the tallest staple
+     * @param stapleWidth Width of the staples
+     * @param maxValue Optional max value to use when calculating the ratio of the staples. If omitted, max(values) is used.
      */
     constructor(
-        items: number[],
+        values: number[],
         stapleMaxHeight: number,
-        stapleWidth: number = 25
+        stapleWidth: number,
+        maxValue?: number
     ) {
         super();
         this.$stapleMaxHeight = stapleMaxHeight;
@@ -26,10 +32,14 @@ export class StapleArray extends G {
 
         this.STAPLE_GAP = Math.max(1, Math.round(0.1 * stapleWidth));
 
-        this.$maxValue = Math.max(...items);
-        this.createStaples(items).forEach((item: ValueStaple) => {
-            this.add(item);
-            this.$staples.push(item);
+        if (maxValue) {
+            this.$maxValue = maxValue;
+        } else {
+            this.$maxValue = Math.max(...values);
+        }
+        this.createStaples(values).forEach((value: ValueStaple) => {
+            this.add(value);
+            this.$staples.push(value);
         });
     }
 
