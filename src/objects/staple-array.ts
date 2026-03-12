@@ -11,7 +11,9 @@ export class StapleArray extends G {
     $maxValue: number;
 
     /**
-     * Also call {@link init()} to finalize initialization
+     * Also call {@link init()} to finalize initialization. 
+     * Note that init() needs to be called after the staple
+     * is added to the DOM.
      */
     constructor(
         items: number[],
@@ -162,7 +164,7 @@ export class StapleArray extends G {
         });
     }
 
-    private getStapleX(i: number): number {
+    getStapleX(i: number): number {
         return Number(this.x()) + (this.$stapleWidth + this.STAPLE_GAP) * i;
     }
 

@@ -15,7 +15,9 @@ export class ValueStaple extends G {
 
 
     /**
-     * Also call {@link init()} to finalize initialization
+     * Also call {@link init()} to finalize initialization. 
+     * Note that init() needs to be called after the staple
+     * is added to the DOM.
      */
     constructor(value: number, stapleWidth: number, stapleHeight: number) {
         super();
