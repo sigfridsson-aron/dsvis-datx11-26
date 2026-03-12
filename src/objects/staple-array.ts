@@ -67,7 +67,7 @@ export class StapleArray extends G {
         return this;
     }
 
-    swap(i: number, j: number) {
+    swap(i: number, j: number, animate: boolean = true) {
         const iStaple = this.$staples[i];
         const jStaple = this.$staples[j];
 
@@ -75,8 +75,8 @@ export class StapleArray extends G {
         this.$staples.splice(i, 1, jStaple);
         this.$staples.splice(j, 1, iStaple);
 
-        this.engine().animate(iStaple).x(this.getStapleX(j));
-        this.engine().animate(jStaple).x(this.getStapleX(i));
+        this.engine().animate(iStaple, animate).x(this.getStapleX(j)); // TODO: Don't put animation inside the Staple array class?
+        this.engine().animate(jStaple, animate).x(this.getStapleX(i));
     }
 
     length(): number {

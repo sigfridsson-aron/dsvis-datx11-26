@@ -77,7 +77,7 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async swapNoAnm(arr: StapleArray, j: number, k: number) {
-        arr.swap(j, k);
+        arr.swap(j, k, false);
         arr.clearStapleHighlight(j);
         this.sortArray.getValue(j),
         this.sortArray.getValue(k)
