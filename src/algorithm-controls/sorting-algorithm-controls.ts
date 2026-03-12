@@ -90,7 +90,7 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             }
         });
 
-        addReturnSubmit(this.insertField, "ALPHANUM+", () =>
+        addReturnSubmit(this.insertField, "int+", () =>
             this.engine.submit(this.engine.insert, this.insertField)
         );
 

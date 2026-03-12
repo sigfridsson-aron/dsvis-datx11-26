@@ -148,7 +148,8 @@ export class EngineGeneralControls {
             {
                 element: this.fastForwardButton,
                 type: "click",
-                handler: (resolve, reject) => {
+                handler: async (resolve, reject) => {
+                    this.engine.timeline.finish();
                     this.engine.actions[this.engine.currentAction].stepCount =
                         Number.MAX_SAFE_INTEGER;
                     this.fastForward(resolve, reject);

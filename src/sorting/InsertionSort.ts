@@ -66,7 +66,7 @@ export class InsertionSort extends BaseSorter implements Sorter {
                 }
 
                 //If the current element is smaller then swap it with the left neighbour
-                this.sortArray.swap(j, j - 1);
+                await this.swap(this.sortArray, j, j - 1);
 
                 this.sortArray.clearStapleHighlight(j);
                 this.sortArray.clearStapleHighlight(j - 1);
