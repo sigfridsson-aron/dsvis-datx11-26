@@ -1,7 +1,7 @@
 import { Element } from "@svgdotjs/svg.js";
 import { Cookies } from "~/cookies";
 import { Debugger } from "~/debugger";
-import { isValidReason, parseValues, querySelector } from "~/helpers";
+import { isValidReason, makeCanvasPannable, parseValues, querySelector } from "~/helpers";
 import { Info } from "~/info";
 import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
@@ -38,6 +38,8 @@ export const NBSP = "\u00A0";
 export class Engine {
     // Default variable names start with $
 
+    _containingSvg: Svg;
+
     Svg: Svg;
     messages: MessagesObject = {};
 
@@ -58,6 +60,10 @@ export class Engine {
     debugger: Debugger;
     state: State;
     info: Info;
+
+    timeline: Timeline;
+    isPanning: boolean = false;
+    lastPointerPosition: { x?: number, y?: number } = {};
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -114,14 +120,20 @@ export class Engine {
             this.container
         );
 
-        this.Svg = new Svg(svgContainer);
+        makeCanvasPannable(this, svgContainer);
+
+        this._containingSvg = new Svg(svgContainer);
+        this._containingSvg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
+        this.Svg = this._containingSvg.nested()
         this.Svg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
         this.Svg.$engine = this;
         if (this.debugger.isEnabled()) {
             this.Svg.addClass("debug");
         }
 
-        this.info = new Info(this.Svg, this.$Svg.margin);
+        this.info = new Info(this._containingSvg, this.$Svg.margin);
+
+        this.timeline = new Timeline()
     }
 
     initialise(): void {
