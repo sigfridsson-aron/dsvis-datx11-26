@@ -33,7 +33,7 @@ export class hashTable extends G {
     getCX(i: number): number {
         return (
             this.cx() +
-            this.engine().getObjectSize() * (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
+            this.engine().getObjectSize() * 2 * (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
         );
     }
 
@@ -182,6 +182,7 @@ export class hashTable extends G {
         }
         return this;
     }
+
 
     addArrow(index: number, arrowId: string = "arrow", color: string = "#000") {
         const arrowSize = this.engine().getObjectSize() / 3.5;

@@ -11,16 +11,27 @@ export const SortMessages = {
     },
     insert: {
         value: (value: string) => `Pushing value: ${value}`,
-        movePointer: (value: string) => `Moving ${value} pointer`
+    },
+    find: {
+        start: (element: string | number) => `Searching for ${element}`,
+        found: (element: string | number) => `Found ${element}`,
+        notfound: (element: string | number) => `Did not find ${element}`,
+        lookStart: (index: string | number) =>
+            `Looking into index: ${index}`,
+        look: (index: string | number) =>
+            `Looking into the next index: ${index}`,
+        read: (element: string | number) =>
+            `Reading the value of the index: ${element}`,
+        nonExistent: (element: string | number) =>
+            `Element ${element} does not exist`,
+        notEmpty: (index: number) => `Index: ${index} is not empty`,
     },
     copy: {
-        index: (index: number) => `Copying index: ${index}`,
-        newSize: (size: number) => `Creating new Dynamic Array of length:  ${size}`,
+        index: (index: number) => `Copying to index: ${index}`,
+        newSize: (size: number) => `Creating new Hash Table of length: ${size}`,
     },
     delete: {
-        delete: `Popping value at head`,
-        removePointer: (value: string) => `Removing ${value} pointer`,
-        movePointer: (value: string) => `Moving ${value} pointer`
+        delete: (value: string) => `Deleting ${value}`,
     },
 } as const satisfies MessagesObject;
 
@@ -28,15 +39,14 @@ export class HashTableLinearProbing extends Engine implements Collection {
     initialValues: Array<string> = [];
     compensate: number = 0;
     sortArray: hashTable;
-    empty: String;
-    indexLength: number = 0;
+    metadataArray: number[] = []; // metadata array of the same length as the hash table. 0 = empty, 1 = removed, 2 = filled
+    loadFactor: number = 0;
     baseSize: number = 28;
     messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
         super(containerSelector);
         this.sortArray = new hashTable(0, this.getObjectSize()); // Only added to make sure that sortArray never is null
-        this.empty = "";
     }
 
     initialise(initialValues = []) {
@@ -46,7 +56,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.indexLength = 0;
+        this.loadFactor = 0;
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
             new hashTable(8, this.getObjectSize())
@@ -65,7 +75,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
                 async () => await this.insert(...this.initialValues)
             );
         }
-        this.empty = this.sortArray.getValue(0);
+        this.metadataArray = Array(8).fill(0);
     }
 
     async insert(...values: Array<number | string>) {
@@ -91,6 +101,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
             new hashTable(this.sortArray.getSize(), this.getObjectSize())
         ).init(0, xRoot, yRoot + this.$Svg.margin * 6);
         newArray.setSize(length);
+        let newmetaArray = Array(length).fill(0);
         newArray.center(
         this.getTreeRoot()[0],
         this.getTreeRoot()[1] + this.$Svg.margin * 4 + this.getObjectSize() * 4
@@ -104,7 +115,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
         for(let i = 0; i < this.sortArray.getSize(); i++){
             let val = this.sortArray.getValue(i)
-            if(val != this.empty){
+            if(this.metadataArray[i] == 2){
                 const arrayLabel = this.Svg.put(
                     new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
                 ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
@@ -115,16 +126,16 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
                 newArray.setIndexHighlight(newIndex, true); //rehash and prob when resizing
 
-                await this.pause("looking");
-                while(newArray.getValue(newIndex) !=  this.empty){
-                    await this.pause("not empty");
+                await this.pause("find.lookStart", newIndex);
+                while(newmetaArray[newIndex] == 2){
+                    await this.pause("find.notEmpty", newIndex);
                     console.log(newArray.getValue(newIndex));
                     newArray.setIndexHighlight(newIndex, false);
                     newIndex = (newIndex + 1) % newArray.getSize();
                     newArray.setIndexHighlight(newIndex, true);
-                    await this.pause("go to next");
+                    await this.pause("find.look", newIndex);
                 }
-                await this.pause("is empty");
+                await this.pause("Found empty index");
 
 
                 newArray.setIndexHighlight(newIndex, false);
@@ -140,11 +151,13 @@ export class HashTableLinearProbing extends Engine implements Collection {
                 arrayLabel.remove();
                     
                 newArray.setValue(newIndex, val);
+                newmetaArray[newIndex] = 2;
             }
         }
 
         this.sortArray.remove();
         this.sortArray = newArray;
+        this.metadataArray = newmetaArray;
         this.animate(this.sortArray, !this.state.isResetting()).center(
         this.getTreeRoot()[0],
         this.getTreeRoot()[1] + this.$Svg.margin * 1.5
@@ -158,7 +171,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     }
 
     async insertOne(value: number | string) {
-        if(this.indexLength >= this.sortArray.getSize() * 0.75){
+        if(this.loadFactor >= this.sortArray.getSize() * 0.75){
             await this.pause("Load Factor exceeded!");
             await this.resize(this.sortArray.getSize() * 2);
         }
@@ -170,16 +183,16 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
         let currentIndex = this.hashString(value) % this.sortArray.getSize();
         this.sortArray.setIndexHighlight(currentIndex, true);
-        await this.pause("looking");
-        while(this.sortArray.getValue(currentIndex) !=  this.empty){
-            await this.pause("not empty");
+        await this.pause("find.lookStart", currentIndex);
+        while(this.metadataArray[currentIndex] == 2){
+            await this.pause("find.notEmpty", currentIndex);
             console.log(this.sortArray.getValue(currentIndex));
             this.sortArray.setIndexHighlight(currentIndex, false);
             currentIndex = (currentIndex + 1) % this.sortArray.getSize();
             this.sortArray.setIndexHighlight(currentIndex, true);
-            await this.pause("go to next");
+            await this.pause("find.look", currentIndex);
         }
-        await this.pause("is empty");
+        await this.pause("Found empty index");
         arrayLabel.setCenter(
             this.sortArray.getCX(currentIndex),
             this.sortArray.getCY(currentIndex),
@@ -191,8 +204,9 @@ export class HashTableLinearProbing extends Engine implements Collection {
         arrayLabel.remove();
         this.sortArray.setDisabled(currentIndex, false);
         this.sortArray.setValue(currentIndex, value);
+        if(this.metadataArray[currentIndex] == 0){this.loadFactor++};
+        this.metadataArray[currentIndex] = 2;
         this.sortArray.setIndexHighlight(currentIndex, true);
-        this.indexLength++;
         this.sortArray.setIndexHighlight(currentIndex, false);
 
         await this.pause(undefined);
@@ -206,43 +220,44 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     async findOne(value: string | number): Promise<number | null> {
         await this.pause("find.start", value); //start the search
-        let curIndex = 0;
+        value = String(value)
+        let curIndex = this.hashString(value) % this.sortArray.getSize();
         this.sortArray.setIndexHighlight(curIndex, true);
         await this.pause("find.read", curIndex);
-        for(let i = 0; i < this.indexLength; i++){
-            if(value == this.sortArray.getValue(i)){
+        while(this.metadataArray[curIndex] != 0 ){
+            if(this.metadataArray[curIndex] == 2 && value == this.sortArray.getValue(curIndex)){
                 await this.pause("find.found", value);
-                this.sortArray.setIndexHighlight(i, false);
-                return i;
+                this.sortArray.setIndexHighlight(curIndex, false);
+                return curIndex;
             }
             else{
                 await this.pause("find.notfound", value); //not found
-                this.sortArray.setIndexHighlight(i, false);
-                if (i + 1 < this.indexLength) {
-                    this.sortArray.setIndexHighlight(i + 1, true);
-                    await this.pause("find.look", i + 1);
-                }
+                this.sortArray.setIndexHighlight(curIndex, false);
+                curIndex = (curIndex + 1) % this.sortArray.getSize();
+                this.sortArray.setIndexHighlight(curIndex, true);
+                await this.pause("find.look", curIndex);
             }
         }
+        this.sortArray.setIndexHighlight(curIndex, false);
         await this.pause("find.nonExistent", value);
         return null;
     }
 
     async delete(value: string | number): Promise<void> {
-        const index = this.indexLength - 1;
-        if(index >= 0){
-            await this.pause("delete.delete");
-            this.sortArray.setIndexHighlight(index, true);
-            this.sortArray.setIndexHighlight(index, false);
-            this.sortArray.setValue(index, "");
-            this.indexLength--;
-
-            if(this.indexLength != 0 && this.indexLength <= this.sortArray.getSize() / 4){
-                await this.pause("Array is less than 1/4 full!");
-                await this.resize(this.sortArray.getSize() / 2);
+        if(value != undefined){
+            const index = await this.findOne(value);
+            if(index){
+                this.sortArray.setIndexHighlight(index, true);
+                await this.pause("delete.delete");
+                this.sortArray.setValue(index, "DEL");
+                this.metadataArray[index] = 1;
+                this.sortArray.setIndexHighlight(index, false);
+                this.sortArray.setDisabled(index, true);
+                
             }
+            await this.pause(undefined);
         }
-        await this.pause(undefined);
+
 
     }
     
