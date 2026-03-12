@@ -159,6 +159,10 @@ export class StapleArray extends G {
         return this.$staples[index].getValue();
     }
 
+    getMaxValue(): number {
+        return this.$maxValue;
+    }
+
     resizeAndPositionStaples() {
         this.resizeStaples();
         this.positionStaples();
