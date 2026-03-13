@@ -6,8 +6,8 @@ import { GraphNode } from "~/objects/graph-node";
 import { BaseGraph } from "./base-graph";
 
 export const DepthMessages = {
-    example: {
-        here: "test"
+    error: {
+        nullGraph: "Please choose a graph first"
     }
     //the messages we put somewhere on the canvas
     //to be implemented I think this is in the form of json file
@@ -18,10 +18,11 @@ export class Depth extends BaseGraph implements Graph {
     messages: MessagesObject = DepthMessages;
 
     override async start() {
-        await this.resetAlgorithm()
-        const nodes = this.treeGraph()
-        
-        const result = this.searchGraph(nodes[0])
+        if (!this.graph) {
+            await this.pause("error.nullGraph")
+            return
+        }
+        const result = this.searchGraph(this.graph)
         console.log(result)
         await this.nodeTraversalVisualisation(result)
     }

@@ -1,6 +1,6 @@
 import { Graph } from "~/graph";
 import { EngineAlgorithmControl } from "./engine-algorithm-controls";
-import { querySelector } from "~/helpers";
+import { addReturnSubmit, querySelector } from "~/helpers";
 
 
 export class GraphAlgorithmControl extends EngineAlgorithmControl {
@@ -8,6 +8,9 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
     chosenGraph: HTMLInputElement; //name of element will be displayed as a message
                                    //uppercase letters will hava a space like
                                    //Chosen Graph will be displayed
+    insertNode: HTMLInputElement;
+    startNode: HTMLInputElement;
+    reset: HTMLInputElement;
     chooseGraphI: HTMLSelectElement;
     engine: Graph;
     
@@ -31,6 +34,21 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
             container
         );
 
+        this.insertNode = querySelector<HTMLInputElement> (
+            "input.insertNode",
+            container
+        )
+
+        this.startNode = querySelector<HTMLInputElement> (
+            "input.startNode",
+            container
+        )
+
+        this.reset = querySelector<HTMLInputElement> (
+            "input.reset",
+            container
+        )
+
         this.initialize();
     }
 
@@ -46,5 +64,17 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
         this.start.addEventListener("click", () => {
             this.engine.submit(this.engine.start, null)
         });
+
+        addReturnSubmit(this.insertNode, "ALPHANUM+", () =>
+                    this.engine.submit(this.engine.startNode, this.insertNode)
+            );
+
+        this.startNode.addEventListener("click", () => {
+            this.engine.submit(this.engine.startNode, this.insertNode)
+        })
+
+        this.reset.addEventListener("click", () => {
+            this.engine.submit(this.engine.reset, null)
+        })
     }
 }

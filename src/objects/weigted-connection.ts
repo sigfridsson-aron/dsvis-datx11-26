@@ -16,7 +16,7 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
 
     override setHighlight(high: boolean | null): this {
         super.setHighlight(high)
-        this.$textObj.setHighlight(true)
+        this.$textObj.setHighlight(high)
         return this
     }
 

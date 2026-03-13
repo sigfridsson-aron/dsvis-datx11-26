@@ -16,7 +16,6 @@
 
   <main>
     <section id="graphContainer">
-      <h2>Currently unfinished testing environ for graphs</h2>
       <label for="algorithmSelector">Choose a graph algorith:</label>
       <h2 class="selectorWrapper">
         <select name="algorithmSelector" class="algorithmSelector">
@@ -42,13 +41,18 @@
             <option value="Strongly">Strongly connected graph</option>
             <option value="Eulerian">Eulerian graph</option>
             <option value="Hamiltonian">Hamiltonian graph</option>
-            <option value="Chordal"">Chordal graph</option>
+            <option value="Chordal">Chordal graph</option>
             <option value="Tree">Tree graph</option>
           </select>
           <input class="chosengraph disableWhenRunning" type="hidden">
-          <label>Start:
-            <input class="start disableWhenRunning" type="submit" value="start" />
-          </label>
+          <input class="start disableWhenRunning" type="submit" value="Start" />
+          <span class="formgroup">
+            <label>Pick starting node:
+            <input class="insertNode disableWhenRunning" type="text" size="1" maxlength="20" />
+              <input class="startNode disableWhenRunning" type="submit" value="Pick" />
+            </label>
+          </span>
+          <input class="reset disableWhenRunning" type="submit" value="Reset Algorithm" />
         </span>
       </fieldset>
 
