@@ -3,7 +3,9 @@ import { Engine } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { parseValues } from "~/helpers";
+import { HighlightCircle } from "~/objects/highlight-circle";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
+import { WeightedConnection } from "~/objects/weigted-connection";
 
 
 export class BaseGraph extends Engine implements Graph {
@@ -24,6 +26,158 @@ export class BaseGraph extends Engine implements Graph {
     async start() {
         //Only here because it's apart of the Graph interface
     }
+
+
+async nodeTraversalVisualisation(
+    graphTraversal: WeightedConnection<WeightedGraphNode>[]
+) {
+    let lastNode: WeightedGraphNode | null = null
+
+    const knownEdges = new Set<WeightedConnection<WeightedGraphNode>>()
+    const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
+
+    let pointer: HighlightCircle | null = null
+
+    for (const edge of graphTraversal) {
+
+        const startNode = edge.$start
+        
+        // discover outgoing edges
+        for (const currEdge of Object.values(startNode.$outgoing)) {
+                if (currEdge && !visitedEdges.has(currEdge)) {
+                    knownEdges.add(currEdge)
+                }
+            }
+        this.updateEdgeTable(knownEdges)
+        if (lastNode !== startNode) {
+
+            // create pointer on first visit
+            if (!pointer) {
+                pointer = this.Svg.put(new HighlightCircle()).init(
+                    startNode.cx(),
+                    startNode.cy(),
+                    this.getObjectSize(),
+                    this.getStrokeWidth()
+                )
+            } else {
+                // animate pointer to node
+                pointer.setCenter(
+                    startNode.cx(),
+                    startNode.cy(),
+                    this.getAnimationSpeed()
+                )
+            }
+
+
+            this.updateEdgeTable(knownEdges)
+
+            await this.pause(`At node ${startNode.getText()}`)
+        }
+
+        visitedEdges.add(edge)
+
+        // remove edge from known edges
+        knownEdges.delete(edge)
+        
+
+        const endNode = edge.$end
+        // discover outgoing edges
+        for (const currEdge of Object.values(endNode.$outgoing)) {
+                if (currEdge && !visitedEdges.has(currEdge)) {
+                    knownEdges.add(currEdge)
+                }
+            }
+        this.updateEdgeTable(knownEdges)
+
+        // highlight the traversed edge
+        edge.setHighlight(true)
+
+        // animate pointer to next node
+        pointer?.setCenter(
+            endNode.cx(),
+            endNode.cy(),
+            this.getAnimationSpeed()
+        )
+
+        await this.pause(`At node ${endNode.getText()}`)
+
+        lastNode = endNode
+    }
+
+    pointer?.remove()
+
+    await this.pause("Done!")
+}
+
+updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
+    
+
+    const columns = ["From", "To", "Weight"];
+    const edges = knownEdges
+    
+    const cellHeight = 40;
+    const cellWidth = 80;
+
+    const startX = this.$Svg.width-cellWidth*columns.length;
+    const startY = 0;
+    
+    // Clear previous content
+    this.edgeTable.clear();
+
+    this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
+
+    let k = 0
+     for (const edge of edges) {
+        const currEdge = edge
+        const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
+    
+
+        this.drawRow(
+            rowData,
+            k + 1,
+            startX,
+            startY,
+            cellWidth,
+            cellHeight
+        );
+        k++
+    }           
+
+    this.Svg.add(this.edgeTable)
+}
+
+private drawRow(
+    rowData: string[],
+    rowIndex: number,
+    startX: number,
+    startY: number,
+    cellWidth: number,
+    cellHeight: number,
+
+) {
+    
+
+    for (let col = 0; col < rowData.length; col++) {
+
+        const x = startX + col * cellWidth;
+        const y = startY + rowIndex * cellHeight;
+
+        const rect = this.edgeTable
+            .rect(cellWidth, cellHeight)
+            .move(x, y);
+
+       
+
+        this.edgeTable
+            .text(rowData[col])
+            .font({
+                anchor: 'middle',
+                leading: '1em',
+                size: 14
+            })
+            .center(x + cellWidth / 2, y + cellHeight / 2);
+    }
+}
 
     async chosenGraph(graf: string | number) {
         if (graf === "") {

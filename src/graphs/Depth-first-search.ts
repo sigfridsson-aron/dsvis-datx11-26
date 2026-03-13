@@ -27,56 +27,7 @@ export class Depth extends BaseGraph implements Graph {
     }
 
 
-    async nodeTraversalVisualisation(graphTraversal:WeightedConnection<WeightedGraphNode>[]) {
-        
-        let currNode:WeightedGraphNode
-        let lastNode:WeightedGraphNode | null = null
-        const knownEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
-        const visitedEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
     
-        for (const edge of graphTraversal) {
-            currNode = edge.$start
-            currNode.setHighlight(true)
-
-            for (const key in currNode.$outgoing) {
-                const currEdge = currNode.$outgoing[key]
-                
-                if (!currEdge) continue
-                if (!visitedEdges.has(currEdge)) {
-                    knownEdges.add(currEdge)
-
-                }
-                
-            }
-            this.updateEdgeTable(knownEdges)
-            await this.pause(`At node ${currNode.getText()}`)
-            lastNode?.setHighlight(false)
-            
-            visitedEdges.add(edge)
-
-            if (currNode === lastNode) { 
-                //this skips the needs for extra userinput when you go from A->B B->C 
-                lastNode = currNode
-            }
-            else {
-                //Sets highlight to start of edge
-                
-                currNode.setHighlight(false)
-            }
-
-            //remove edge from edgetable
-            knownEdges.delete(edge)
-            this.updateEdgeTable(knownEdges)
-
-            //Sets highlight to end of edge
-            edge.setHighlight(true)
-            currNode = edge.$end
-            currNode.setHighlight(true)
-            lastNode = currNode
-        }
-
-        await this.pause("Done!")
-    }
 
  
 
@@ -111,43 +62,8 @@ export class Depth extends BaseGraph implements Graph {
         }
     } 
 
-    //Want the eventual algorithm to call this every it takes a "step"
-    updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
+  
     
-
-    const columns = ["From", "To", "Weight"];
-    const edges = knownEdges
-    
-    const cellHeight = 40;
-    const cellWidth = 80;
-
-    const startX = this.$Svg.width-cellWidth*columns.length;
-    const startY = 0;
-    
-    // Clear previous content
-    this.edgeTable.clear();
-
-    this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
-
-    let k = 0
-     for (const edge of edges) {
-        const currEdge = edge
-        const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
-    
-
-        this.drawRow(
-            rowData,
-            k + 1,
-            startX,
-            startY,
-            cellWidth,
-            cellHeight
-        );
-        k++
-    }           
-
-    this.Svg.add(this.edgeTable)
-}
 
 //returns all outgoing edges from the provided nodes
 private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
@@ -166,31 +82,5 @@ private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode
 
 }
 
-private drawRow(
-    rowData: string[],
-    rowIndex: number,
-    startX: number,
-    startY: number,
-    cellWidth: number,
-    cellHeight: number
-) {
-    for (let col = 0; col < rowData.length; col++) {
 
-        const x = startX + col * cellWidth;
-        const y = startY + rowIndex * cellHeight;
-
-        this.edgeTable
-            .rect(cellWidth, cellHeight)
-            .move(x, y);
-
-        this.edgeTable
-            .text(rowData[col])
-            .font({
-                anchor: 'middle',
-                leading: '1em',
-                size: 14
-            })
-            .center(x + cellWidth / 2, y + cellHeight / 2);
-    }
-}
 }
