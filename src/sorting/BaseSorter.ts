@@ -165,20 +165,20 @@ export class BaseSorter extends Engine implements Sorter {
         throw new Error("Sort not implemented");
     }
 
-    async unsort(args?: string | number) {
-        const unsortSelect = document.querySelector<HTMLSelectElement>("select.unsort");
-        const unsortType = unsortSelect?.value;
+    async shuffle(args?: string | number) {
+        const shuffleSelect = document.querySelector<HTMLSelectElement>("select.shuffle");
+        const shuffleType = shuffleSelect?.value;
         const sortingMethodSelect = document.querySelector<HTMLSelectElement>("select.sortingMethod");
-        if (unsortType === "unsortRandom") {
+        if (shuffleType === "shuffleRandom") {
             for (let i = this.sortArray.length() - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 await this.swapNoAnm(this.sortArray, i, j);
             }
-        } else if (unsortType === "unsortReversed") {
+        } else if (shuffleType === "shuffleReversed") {
             for (let i = 0; i < Math.floor(this.sortArray.length() / 2); i++) {
                 await this.swapNoAnm(this.sortArray, i, this.sortArray.length() - 1 - i);
             }
-        } else if (unsortType === "unsortGood") {
+        } else if (shuffleType === "shuffleGood") {
             // I aint happy with all the if statements, should be changed
             if (sortingMethodSelect?.value === "selectionSort") {
                 // an already sorted array is the best case for selection sort, so we can just do nothing

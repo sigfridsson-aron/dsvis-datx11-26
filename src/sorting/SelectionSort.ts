@@ -34,7 +34,7 @@ export class SelectionSort extends BaseSorter implements Sorter {
         for (let i = 0; i < sortSize - 1; i++) {
             let minIndex = i;
 
-            // Find the index of the minimum element in the unsorted part of the array
+            // Find the index of the minimum element in the shuffleed part of the array
             for (let j = i + 1; j < sortSize; j++) {
                 // Highlight the current element and the minimum element
                 this.sortArray.setIndexHighlight(j, true);

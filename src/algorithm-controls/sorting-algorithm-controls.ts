@@ -10,7 +10,7 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
     sortSubmit: HTMLInputElement;
     pseudoCode: HTMLDivElement;
     clearSubmit: HTMLInputElement;
-    unsortSelect: HTMLSelectElement;
+    shuffleSelect: HTMLSelectElement;
     engine: Sorter;
 
     constructor(container: HTMLElement, engine: Sorter) {
@@ -44,8 +44,8 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             "input.sortSubmit",
             container
         );
-        this.unsortSelect = querySelector<HTMLSelectElement>(
-            "select.unsort",
+        this.shuffleSelect = querySelector<HTMLSelectElement>(
+            "select.shuffle",
             container
         );
 
@@ -78,8 +78,8 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             this.engine.confirmResetAll()
         );
 
-        this.unsortSelect.addEventListener("change", () => {
-            this.engine.submit(this.engine.unsort, null);
+        this.shuffleSelect.addEventListener("change", () => {
+            this.engine.submit(this.engine.shuffle, null);
         });
 
     }
