@@ -179,7 +179,9 @@ export class StapleArray extends G {
     }
 
     getStapleX(i: number): number {
-        return Number(this.x()) + (this.$stapleWidth + this.STAPLE_GAP) * i;
+        if (!this.$boundingBox)
+            throw new Error("Bounding box has not been initialized when trying to get staple x value")
+        return Number(this.$boundingBox.x()) + (this.$stapleWidth + this.STAPLE_GAP) * i;
     }
 
     getStaple(i: number): ValueStaple {
