@@ -112,7 +112,7 @@ export class StapleArray extends G {
             this.add(staple);
         }
 
-        if (hasNewMaxValue) { // TODO: probably needs to run this no matter what
+        if (hasNewMaxValue) {
             this.resizeStaples();
         }
         this.init(currentCenter.x, currentCenter.y);
