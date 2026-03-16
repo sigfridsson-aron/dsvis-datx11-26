@@ -148,6 +148,7 @@ export class StapleArray extends G {
     }
 
     delete() {
+        this.clear();
         this.remove();
     }
 
