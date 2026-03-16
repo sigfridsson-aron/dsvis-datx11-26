@@ -38,6 +38,7 @@ export class EngineGeneralControls {
     fastForwardButton: HTMLButtonElement;
     animationSpeedSelect: HTMLSelectElement;
     objectSizeSelect: HTMLSelectElement;
+    resetPanningButton: HTMLButtonElement;
 
     engine: Engine;
     debugger: Debugger;
@@ -81,6 +82,10 @@ export class EngineGeneralControls {
         );
         this.animationSpeedSelect = querySelector<HTMLSelectElement>(
             "select.animationSpeed",
+            container
+        );
+        this.resetPanningButton = querySelector<HTMLButtonElement>(
+            "button#resetPanningButton",
             container
         );
 
@@ -133,6 +138,14 @@ export class EngineGeneralControls {
                         this.engine.reset();
                     }
                 },
+            },
+            {
+                element: this.resetPanningButton,
+                type: "click",
+                condition: () => true,
+                handler: () => {
+                    this.engine.resetCanvasPanning();
+                }
             }
         );
 
@@ -186,6 +199,14 @@ export class EngineGeneralControls {
                 type: "change",
                 handler: (resolve, reject) =>
                     reject({ until: this.engine.currentStep }),
+            },
+            {
+                element: this.resetPanningButton,
+                type: "click",
+                handler: (resolve, reject) => {
+                    this.engine.resetCanvasPanning();
+                    resolve(undefined);
+                }
             }
         );
     }

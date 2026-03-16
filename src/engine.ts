@@ -1,7 +1,7 @@
 import { Element } from "@svgdotjs/svg.js";
 import { Cookies } from "~/cookies";
 import { Debugger } from "~/debugger";
-import { isValidReason, makeCanvasPannable, parseValues, querySelector } from "~/helpers";
+import { isValidReason, parseValues, querySelector } from "~/helpers";
 import { Info } from "~/info";
 import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
@@ -122,7 +122,7 @@ export class Engine {
             this.container
         );
 
-        makeCanvasPannable(this, svgContainer);
+        this.makeCanvasPannable(svgContainer);
 
         // See explanation at property declaration for _containingSvg
         this._containingSvg = new Svg(svgContainer);
@@ -491,5 +491,52 @@ export class Engine {
         } else {
             return elem;
         }
+    }
+
+    makeCanvasPannable(svgContainer: SVGSVGElement) {
+        svgContainer.addEventListener("mousedown", () => {
+            this.isPanning = true;
+        });
+
+        svgContainer.addEventListener("mouseleave", () => {
+            this.isPanning = false;
+            this.lastPointerPosition = {};
+        });
+
+        svgContainer.addEventListener("mouseup", () => {
+            this.isPanning = false;
+            this.lastPointerPosition = {};
+        });
+
+        svgContainer.addEventListener("mousemove", (e: MouseEvent) => {
+            if (this.isPanning) {
+                const pointerDelta = {
+                    x: this.lastPointerPosition.x
+                        ? e.clientX - this.lastPointerPosition.x
+                        : 0,
+                    y: this.lastPointerPosition.y
+                        ? e.clientY - this.lastPointerPosition.y
+                        : 0,
+                };
+                this.lastPointerPosition = {
+                    x: e.clientX,
+                    y: e.clientY,
+                };
+                const { x, y, width, height } = this.Svg.viewbox();
+
+                // Viewbox should change in opposite direction to the pointer movement, hence the x/y - pointerDelta.x/y
+                this.Svg.viewbox(
+                    x - pointerDelta.x,
+                    y - pointerDelta.y,
+                    width,
+                    height
+                );
+            }
+        });
+    }
+
+    resetCanvasPanning() {
+        const { width: viewBoxWith, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.Svg.viewbox(0, 0, viewBoxWith, viewBoxHeight);
     }
 }
