@@ -39,6 +39,9 @@ export const NBSP = "\u00A0";
 export class Engine {
     // Default variable names start with $
 
+    // Use separate containing Svg to hold information that shouldn't be moved when panning
+    _containingSvg: Svg;
+
     Svg: Svg;
     messages: MessagesObject = {};
 
@@ -61,6 +64,8 @@ export class Engine {
     info: Info;
 
     timeline: Timeline;
+    isPanning: boolean = false;
+    lastPointerPosition: { x?: number; y?: number } = {};
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -117,14 +122,19 @@ export class Engine {
             this.container
         );
 
-        this.Svg = new Svg(svgContainer);
+        this.makeCanvasPannable(svgContainer);
+
+        // See explanation at property declaration for _containingSvg
+        this._containingSvg = new Svg(svgContainer);
+        this._containingSvg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
+        this.Svg = this._containingSvg.nested();
         this.Svg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
         this.Svg.$engine = this;
         if (this.debugger.isEnabled()) {
             this.Svg.addClass("debug");
         }
 
-        this.info = new Info(this.Svg, this.$Svg.margin);
+        this.info = new Info(this._containingSvg, this.$Svg.margin);
 
         this.timeline = new Timeline()
     }
@@ -483,5 +493,52 @@ export class Engine {
         } else {
             return elem;
         }
+    }
+
+    makeCanvasPannable(svgContainer: SVGSVGElement) {
+        svgContainer.addEventListener("mousedown", () => {
+            this.isPanning = true;
+        });
+
+        svgContainer.addEventListener("mouseleave", () => {
+            this.isPanning = false;
+            this.lastPointerPosition = {};
+        });
+
+        svgContainer.addEventListener("mouseup", () => {
+            this.isPanning = false;
+            this.lastPointerPosition = {};
+        });
+
+        svgContainer.addEventListener("mousemove", (e: MouseEvent) => {
+            if (this.isPanning) {
+                const pointerDelta = {
+                    x: this.lastPointerPosition.x
+                        ? e.clientX - this.lastPointerPosition.x
+                        : 0,
+                    y: this.lastPointerPosition.y
+                        ? e.clientY - this.lastPointerPosition.y
+                        : 0,
+                };
+                this.lastPointerPosition = {
+                    x: e.clientX,
+                    y: e.clientY,
+                };
+                const { x, y, width, height } = this.Svg.viewbox();
+
+                // Viewbox should change in opposite direction to the pointer movement, hence the x/y - pointerDelta.x/y
+                this.Svg.viewbox(
+                    x - pointerDelta.x,
+                    y - pointerDelta.y,
+                    width,
+                    height
+                );
+            }
+        });
+    }
+
+    resetCanvasPanning() {
+        const { width: viewBoxWith, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.Svg.viewbox(0, 0, viewBoxWith, viewBoxHeight);
     }
 }

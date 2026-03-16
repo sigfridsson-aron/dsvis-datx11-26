@@ -323,3 +323,12 @@ svg .secondaryHighlight {
 svg .tertiaryHighlight {
 	fill: orange;
 }
+/* For pannable canvas */
+svg * {
+	user-select: none;
+	-moz-user-select: none;
+}
+
+body > main svg {
+	cursor: move;
+}
