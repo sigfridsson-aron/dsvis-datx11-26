@@ -12,7 +12,7 @@ export class StapleArray extends G {
 
     /**
      * @constructor
-     * @description Creates a staple array object. Also call {@link init()} to finalize initialization. 
+     * @description Creates a staple array object. Also call {@link init()} to finalize initialization.
      * Note that init() needs to be called after the staple
      * is added to the DOM.
      * @param values Values to create the staples from
@@ -51,7 +51,7 @@ export class StapleArray extends G {
      * which is why this separate method is needed.
      */
     init(centerX: number, centerY: number): this {
-        this.$boundingBox?.remove()
+        this.$boundingBox?.remove();
         this.$boundingBox = this.rect(
             Math.max(
                 0, // Prevent negative widths when there are no staples in the array
@@ -144,9 +144,9 @@ export class StapleArray extends G {
     }
 
     reset() {
-        this.removeValues(0, this.$staples.length)
+        this.removeValues(0, this.$staples.length);
     }
-    
+
     delete() {
         this.remove();
     }
@@ -209,17 +209,23 @@ export class StapleArray extends G {
         return staples;
     }
 
-    setStapleHighlight(i: number, type: 'primary' | 'secondary' | 'tertiary' = 'primary') {
+    setStapleHighlight(
+        i: number,
+        type: "primary" | "secondary" | "tertiary" = "primary"
+    ) {
         this.$staples[i].$rect.addClass(`${type}Highlight`);
     }
 
-    clearStapleHighlight(i: number, type: 'primary' | 'secondary' | 'tertiary' | 'all' = 'primary') {
-        if (type === 'all') {
-            this.$staples[i].$rect.removeClass(`primaryHighlight`)
-            this.$staples[i].$rect.removeClass(`secondaryHighlight`)
-            this.$staples[i].$rect.removeClass(`tertiaryHighlight`)
+    clearStapleHighlight(
+        i: number,
+        type: "primary" | "secondary" | "tertiary" | "all" = "primary"
+    ) {
+        if (type === "all") {
+            this.$staples[i].$rect.removeClass(`primaryHighlight`);
+            this.$staples[i].$rect.removeClass(`secondaryHighlight`);
+            this.$staples[i].$rect.removeClass(`tertiaryHighlight`);
         } else {
-            this.$staples[i].$rect.removeClass(`${type}Highlight`)
+            this.$staples[i].$rect.removeClass(`${type}Highlight`);
         }
     }
 
