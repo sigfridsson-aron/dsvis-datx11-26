@@ -7,7 +7,6 @@ import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { EngineGeneralControls } from "./general-controls/engine-general-controls";
-import { Timeline } from "@svgdotjs/svg.js";
 
 export type SubmitFunction = (...args: (string | number)[]) => Promise<void>;
 
@@ -63,7 +62,6 @@ export class Engine {
     state: State;
     info: Info;
 
-    timeline: Timeline;
     isPanning: boolean = false;
     lastPointerPosition: { x?: number; y?: number } = {};
 
@@ -135,8 +133,6 @@ export class Engine {
         }
 
         this.info = new Info(this._containingSvg, this.$Svg.margin);
-
-        this.timeline = new Timeline();
     }
 
     initialise(): void {
