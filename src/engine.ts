@@ -496,6 +496,7 @@ export class Engine {
     }
 
     makeCanvasPannable(svgContainer: SVGSVGElement) {
+        // TODO: Prevent user from panning when following recursion
         svgContainer.addEventListener("mousedown", () => {
             this.isPanning = true;
         });
