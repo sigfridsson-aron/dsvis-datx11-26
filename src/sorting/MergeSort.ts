@@ -65,19 +65,29 @@ export class MergeSort extends BaseSorter implements Sorter {
                 arr.setStaplesDisabled(0, mid);
 
                 // Move the new array down and slightly to the left to show split step
+                const leftSubArrDeltaMove = { x: -this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_SEPARATION }
                 this.animate(leftSubArr)
-                    .dx(-this.getObjectSize())
-                    .dy(Number(arr.height()) + this.VERTICAL_SEPARATION);
-
+                    .dx(leftSubArrDeltaMove.x)
+                    .dy(leftSubArrDeltaMove.y);
+                
+                // Move the viewbox to follow recursion to the left
+                // Skip first iteration to prevent disjointed transition
+                if (iteration > 1)
+                    this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+                                
                 await this.pause(
                     "merge.split",
                     leftSubArr.getValues(),
                     arr.getValues()
                 );
-
+                
                 // Sort left subarray recursively
                 leftSubArr = await this.mergeSort(leftSubArr, iteration + 1);
-
+                
+                // Move the viewbox to follow recursion to the right
+                this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+                await this.pause(undefined);
+                                
                 // Create a copy of the right part of the array an place it on top of the existing
                 let rightSubArr: StapleArray = this.Svg.put(
                     new StapleArray(
@@ -92,10 +102,11 @@ export class MergeSort extends BaseSorter implements Sorter {
                 arr.setStaplesDisabled(mid);
 
                 // Move the new array down and slightly to the right to show split step
+                const rightSubArrDeltaMove = { x: this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_SEPARATION }
                 this.animate(rightSubArr)
-                    .dx(this.getObjectSize())
-                    .dy(Number(arr.height()) + this.VERTICAL_SEPARATION);
-
+                    .dx(rightSubArrDeltaMove.x)
+                    .dy(rightSubArrDeltaMove.y);
+                                
                 await this.pause(
                     "merge.split",
                     rightSubArr.getValues(),
@@ -105,6 +116,13 @@ export class MergeSort extends BaseSorter implements Sorter {
                 // Sort right subarray recursively
                 rightSubArr = await this.mergeSort(rightSubArr, iteration + 1);
 
+                // Move viewbox to follow merging subarrays
+                // If it is the first iteration, reset to starting position
+                if (iteration === 1)
+                    this.resetViewBoxPosition()
+                else
+                    this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+                
                 // Merge the two now sorted subarrays
                 return await this.merge(arr, leftSubArr, rightSubArr);
             }
