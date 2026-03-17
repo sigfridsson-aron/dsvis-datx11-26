@@ -79,7 +79,8 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
         );
 
         this.shuffleSelect.addEventListener("change", () => {
-            this.engine.submit(this.engine.shuffle, null);
+            this.engine.submit(this.engine.shuffle, this.shuffleSelect.value); 
+            this.shuffleSelect.value = "";
         });
 
     }

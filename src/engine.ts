@@ -256,7 +256,7 @@ export class Engine {
      */
     async submit(
         method: SubmitFunction,
-        field: HTMLInputElement | null
+        field: HTMLInputElement | null | string
     ): Promise<boolean> {
         let rawValue: string = "";
         try {
@@ -371,7 +371,7 @@ export class Engine {
             this.debugger.log(
                 `CALL ${nAction}: ${title}, ${JSON.stringify(this.actions)}`
             );
-
+            
             this.info.setTitle(title);
             await this.pause("");
 

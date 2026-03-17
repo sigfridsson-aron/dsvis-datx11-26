@@ -123,10 +123,14 @@ export class BaseSorter extends Engine implements Sorter {
 
     async submit(
         method: SubmitFunction,
-        field: HTMLInputElement | null
+        field: HTMLInputElement | null | string
     ): Promise<boolean> {
         let rawValue: string = "";
         try {
+            if (typeof(field) === "string") {
+                this.execute(method, [field]);
+                return true;
+            }
             if (field !== null) {
                 rawValue = field.value;
                 field.value = "";
@@ -166,14 +170,14 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async shuffle(args?: string | number) {
-        const shuffleSelect = document.querySelector<HTMLSelectElement>("select.shuffle");
-        const shuffleType = shuffleSelect?.value;
+        console.log(`shuffling with argument ${args}`)
+        const shuffleType = args;
         if (shuffleType === "shuffleRandom") {
                 this.sortArray.shuffle();
-                shuffleSelect!.value = "";
+                console.log("shuffling randomly");
         } else if (shuffleType === "shuffleReversed") {
                 this.sortArray.reverseShuffle(); 
-                shuffleSelect!.value = "";
+                console.log("shuffling in reverse order");
         } 
     }
 }

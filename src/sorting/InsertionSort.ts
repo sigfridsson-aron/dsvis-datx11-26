@@ -20,6 +20,7 @@ export class InsertionSort extends BaseSorter implements Sorter {
     );
 
     async sort() {
+        console.log("Sorting with insertion sort");
         let sortSize = this.sortArray.length();
 
         if (sortSize <= 1) {
@@ -73,5 +74,6 @@ export class InsertionSort extends BaseSorter implements Sorter {
                 j -= 1;
             }
         }
+    console.log("Sorting finished");
     }
 }
