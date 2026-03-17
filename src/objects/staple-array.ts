@@ -52,9 +52,11 @@ export class StapleArray extends G {
      */
     init(centerX: number, centerY: number): this {
         this.$boundingBox?.remove();
+        // Width of bounding box can not be 0, then the array
+        // won't be positioned in the center when there are no staples in the array
         this.$boundingBox = this.rect(
             Math.max(
-                0, // Prevent negative widths when there are no staples in the array
+                1,
                 this.$staples.length * (this.$stapleWidth + this.STAPLE_GAP) -
                     this.STAPLE_GAP // Remove one staple gap to avoid extra gap at the end.
             ),
