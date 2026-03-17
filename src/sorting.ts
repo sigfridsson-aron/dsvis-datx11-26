@@ -6,6 +6,7 @@ import { MergeSort } from "./sorting/MergeSort";
 import { QuickSort } from "./sorting/QuickSort";
 import { SelectionSort } from "./sorting/SelectionSort";
 import { BubbleSort } from "./sorting/BubbleSort";
+import { HeapSort } from "./sorting/HeapSort";
 
 let right: number = 0;
 let down: number = 0;
@@ -25,6 +26,7 @@ const SORTING_CLASSES = {
     MergeSort: MergeSort,
     QuickSort: QuickSort,
     BubbleSort: BubbleSort,
+    HeapSort: HeapSort,
 } as const satisfies RecordOfEngines<Sorter>;
 
 const { engine: SortEngine, isBaseEngine } = initialiseEngine<Sorter>(
