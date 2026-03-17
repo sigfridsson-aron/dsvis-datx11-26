@@ -308,18 +308,27 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 	stroke: none;
 }
 
+.valueStaple.disabled {
+	opacity: 0.5;
+}
+
+.valueStaple.disabled > rect {
+	fill: lightgray;
+}
+
 /* TODO: Update highlighting to be consistent across components in the library, and use proper colors */
-svg .primaryHighlight {
+svg .valueStaple.primaryHighlight > rect {
 	fill: blue;	
 }
 
-svg .secondaryHighlight {
+svg .valueStaple.secondaryHighlight > rect {
 	fill: green
 }
 
-svg .tertiaryHighlight {
+svg .valueStaple.tertiaryHighlight > rect {
 	fill: orange;
 }
+
 /* For pannable canvas */
 svg * {
 	user-select: none;
