@@ -229,6 +229,16 @@ export class StapleArray extends G {
             this.$staples[i].removeClass(`${type}Highlight`);
         }
     }
+
+    setStaplesDisabled(start: number, end: number = this.length()) {
+        for (let i = start; i < end; i++) {
+            this.$staples[i].addClass("disabled")
+        }
+    }
+
+    clearStaplesDisabled(start: number, end: number = this.length()) {
+        for (let i = start; i < end; i++) {
+            this.$staples[i].removeClass("disabled")
         }
     }
 
