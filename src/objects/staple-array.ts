@@ -214,7 +214,7 @@ export class StapleArray extends G {
         i: number,
         type: "primary" | "secondary" | "tertiary" = "primary"
     ) {
-        this.$staples[i].$rect.addClass(`${type}Highlight`);
+        this.$staples[i].addClass(`${type}Highlight`);
     }
 
     clearStapleHighlight(
@@ -222,11 +222,13 @@ export class StapleArray extends G {
         type: "primary" | "secondary" | "tertiary" | "all" = "primary"
     ) {
         if (type === "all") {
-            this.$staples[i].$rect.removeClass(`primaryHighlight`);
-            this.$staples[i].$rect.removeClass(`secondaryHighlight`);
-            this.$staples[i].$rect.removeClass(`tertiaryHighlight`);
+            this.$staples[i].removeClass(`primaryHighlight`);
+            this.$staples[i].removeClass(`secondaryHighlight`);
+            this.$staples[i].removeClass(`tertiaryHighlight`);
         } else {
-            this.$staples[i].$rect.removeClass(`${type}Highlight`);
+            this.$staples[i].removeClass(`${type}Highlight`);
+        }
+    }
         }
     }
 
