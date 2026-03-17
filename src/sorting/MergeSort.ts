@@ -43,6 +43,7 @@ export class MergeSort extends BaseSorter implements Sorter {
     async mergeSort(arr: StapleArray, iteration: number) {
         {
             if (arr.length() === 1) {
+                await this.pause("sort.singleElement", arr.getValue(0))
                 return arr;
             }
 
