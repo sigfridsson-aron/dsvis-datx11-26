@@ -4,6 +4,7 @@ import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "./BaseSorter";
 import { StapleArray } from "~/objects/staple-array";
 import { ValueStaple } from "~/objects/value-staple";
+import { RecursiveSortingGeneralControls } from "~/general-controls/recursive-sorting-general-controls";
 
 export const MergeSortMessages = {
     sort: {
@@ -21,6 +22,13 @@ export class MergeSort extends BaseSorter implements Sorter {
     VERTICAL_SEPARATION = 10; // TODO: Depend on object size
 
     messages: MessagesObject = updateDefault(MergeSortMessages, SortMessages);
+    followRecursion: boolean = true;
+
+    constructor(containerSelector: string) {
+        super(containerSelector);
+
+        this.generalControls = new RecursiveSortingGeneralControls(this.container, this);
+    }
 
     async sort() {
         //Check if array is empty
@@ -72,7 +80,7 @@ export class MergeSort extends BaseSorter implements Sorter {
                 
                 // Move the viewbox to follow recursion to the left
                 // Skip first iteration to prevent disjointed transition
-                if (iteration > 1)
+                if (this.followRecursion && iteration > 1)
                     this.setViewBoxCenter(arr.cx(), arr.cy(), true)
                                 
                 await this.pause(
@@ -85,7 +93,9 @@ export class MergeSort extends BaseSorter implements Sorter {
                 leftSubArr = await this.mergeSort(leftSubArr, iteration + 1);
                 
                 // Move the viewbox to follow recursion to the right
-                this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+                if (this.followRecursion)
+                    this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+
                 await this.pause(undefined);
                                 
                 // Create a copy of the right part of the array an place it on top of the existing
@@ -118,10 +128,12 @@ export class MergeSort extends BaseSorter implements Sorter {
 
                 // Move viewbox to follow merging subarrays
                 // If it is the first iteration, reset to starting position
-                if (iteration === 1)
-                    this.resetViewBoxPosition()
-                else
-                    this.setViewBoxCenter(arr.cx(), arr.cy(), true)
+                if (this.followRecursion) {
+                    if (iteration === 1) 
+                        this.resetViewBoxPosition();
+                    else 
+                        this.setViewBoxCenter(arr.cx(), arr.cy(), true);
+                }
                 
                 // Merge the two now sorted subarrays
                 return await this.merge(arr, leftSubArr, rightSubArr);
