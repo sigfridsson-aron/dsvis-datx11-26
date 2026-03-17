@@ -524,21 +524,25 @@ export class Engine {
                     x: e.clientX,
                     y: e.clientY,
                 };
-                const { x, y, width, height } = this.Svg.viewbox();
 
-                // Viewbox should change in opposite direction to the pointer movement, hence the x/y - pointerDelta.x/y
-                this.Svg.viewbox(
-                    x - pointerDelta.x,
-                    y - pointerDelta.y,
-                    width,
-                    height
-                );
+                // Viewbox should change in opposite direction to the pointer movement, hence -pointerDelta.x/y
+                this.moveViewBox(-pointerDelta.x, -pointerDelta.y);
             }
         });
     }
 
-    resetCanvasPanning() {
-        const { width: viewBoxWith, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
-        this.Svg.viewbox(0, 0, viewBoxWith, viewBoxHeight);
+    resetViewBoxPosition() {
+        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.setViewBoxCenter(viewBoxWidth / 2, viewBoxHeight / 2, true)
+    }
+    
+    moveViewBox(dx: number, dy: number, animate: boolean = false) {
+        const { x: viewBoxX, y: viewBoxY, width: viewBoxWith, height: viewBoxHeight } = this.Svg.viewbox();
+        this.animate(this.Svg, animate).viewbox(viewBoxX + dx, viewBoxY + dy, viewBoxWith, viewBoxHeight)
+    }
+    
+    setViewBoxCenter(x: number, y: number, animate: boolean = false) {
+        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.animate(this.Svg, animate).viewbox(x - viewBoxWidth / 2, y - viewBoxHeight / 2, viewBoxWidth, viewBoxHeight)
     }
 }
