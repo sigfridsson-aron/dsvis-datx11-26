@@ -483,7 +483,7 @@ export class Engine {
         return title;
     }
 
-    animate(elem: Element, animate = true) {
+    animate<T extends Element>(elem: T, animate = true) {
         if (this.state.isAnimating() && animate) {
             this.info.setStatus("running");
             this.info.setStatus("paused", this.getAnimationSpeed());
