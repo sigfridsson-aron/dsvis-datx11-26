@@ -36,6 +36,10 @@ const config = {
     devServer: {
         open: true,
         host: "localhost",
+        client: {
+            overlay: false,
+            logging: "none"
+        }
     },
     plugins: [
         ...htmlPageNames.map(
