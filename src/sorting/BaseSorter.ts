@@ -81,10 +81,10 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async swapNoAnm(arr: StapleArray, j: number, k: number) {
+        if (j === k) return;
         arr.swap(j, k);
-        arr.clearStapleHighlight(j);
-        this.sortArray.getValue(j),
-        this.sortArray.getValue(k)
+        // this.sortArray.getValue(j),
+        // this.sortArray.getValue(k)
     }
 
     // Kommenterade ut animeringeringen till arrayen.
@@ -168,27 +168,12 @@ export class BaseSorter extends Engine implements Sorter {
     async shuffle(args?: string | number) {
         const shuffleSelect = document.querySelector<HTMLSelectElement>("select.shuffle");
         const shuffleType = shuffleSelect?.value;
-        const sortingMethodSelect = document.querySelector<HTMLSelectElement>("select.sortingMethod");
         if (shuffleType === "shuffleRandom") {
-            for (let i = this.sortArray.length() - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                await this.swapNoAnm(this.sortArray, i, j);
-            }
+                this.sortArray.shuffle();
+                shuffleSelect!.value = "";
         } else if (shuffleType === "shuffleReversed") {
-            for (let i = 0; i < Math.floor(this.sortArray.length() / 2); i++) {
-                await this.swapNoAnm(this.sortArray, i, this.sortArray.length() - 1 - i);
-            }
-        } else if (shuffleType === "shuffleGood") {
-            // I aint happy with all the if statements, should be changed
-            if (sortingMethodSelect?.value === "selectionSort") {
-                // an already sorted array is the best case for selection sort, so we can just do nothing
-            } else if (sortingMethodSelect?.value === "insertionSort") {
-                // ?
-            } else if (sortingMethodSelect?.value === "mergeSort") {
-                // ?
-            } else if (sortingMethodSelect?.value === "quickSort") {
-                // ?
-            }
-        }
+                this.sortArray.reverseShuffle(); 
+                shuffleSelect!.value = "";
+        } 
     }
 }

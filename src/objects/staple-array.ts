@@ -56,6 +56,11 @@ export class StapleArray extends G {
         this.init(this.cx(), this.cy());
     }
 
+    reverseShuffle() {
+        this.$staples.reverse();
+        this.init(this.cx(), this.cy());
+    }
+
     swap(i: number, j: number) {
         const iStaple = this.$staples[i];
         const jStaple = this.$staples[j];
