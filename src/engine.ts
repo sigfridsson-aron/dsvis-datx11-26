@@ -120,9 +120,6 @@ export class Engine {
             this.container
         );
 
-        this.initializeViewBoxPanning(svgContainer);
-        this.initializeViewBoxZooming(svgContainer);
-
         // See explanation at property declaration for _containingSvg
         this._containingSvg = new Svg(svgContainer);
         this._containingSvg.viewbox(0, 0, this.$Svg.width, this.$Svg.height);
@@ -133,6 +130,9 @@ export class Engine {
             this.Svg.addClass("debug");
         }
 
+        this.initializeViewBoxPanning(svgContainer);
+        this.initializeViewBoxZooming(svgContainer);
+        
         this.info = new Info(this._containingSvg, this.$Svg.margin);
     }
 
