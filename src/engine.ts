@@ -479,7 +479,7 @@ export class Engine {
         return title;
     }
 
-    animate(elem: Element, animate = true) {
+    animate<T extends Element>(elem: T, animate = true) {
         if (this.state.isAnimating() && animate) {
             this.info.setStatus("running");
             this.info.setStatus("paused", this.getAnimationSpeed());
@@ -490,9 +490,12 @@ export class Engine {
     }
 
     makeCanvasPannable(svgContainer: SVGSVGElement) {
-        svgContainer.addEventListener("mousedown", () => {
-            this.isPanning = true;
-        });
+        const that = this;
+        function enablePanningOnMouseDown() {
+            that.isPanning = true;
+        }
+
+        svgContainer.addEventListener("mousedown", enablePanningOnMouseDown);
 
         svgContainer.addEventListener("mouseleave", () => {
             this.isPanning = false;
@@ -518,21 +521,39 @@ export class Engine {
                     x: e.clientX,
                     y: e.clientY,
                 };
-                const { x, y, width, height } = this.Svg.viewbox();
 
-                // Viewbox should change in opposite direction to the pointer movement, hence the x/y - pointerDelta.x/y
-                this.Svg.viewbox(
-                    x - pointerDelta.x,
-                    y - pointerDelta.y,
-                    width,
-                    height
-                );
+                // Viewbox should change in opposite direction to the pointer movement, hence -pointerDelta.x/y
+                this.moveViewBox(-pointerDelta.x, -pointerDelta.y);
             }
         });
+
+        this.disablePanning = () => {
+            svgContainer.removeEventListener("mousedown", enablePanningOnMouseDown)
+            this.isPanning = false
+        }
+        this.enablePanning = () => svgContainer.addEventListener("mousedown", enablePanningOnMouseDown)
     }
 
-    resetCanvasPanning() {
-        const { width: viewBoxWith, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
-        this.Svg.viewbox(0, 0, viewBoxWith, viewBoxHeight);
+    enablePanning() {
+        throw new Error("Panning has not been initialized")
+    }
+
+    disablePanning() {
+        throw new Error("Panning has not been initialized")
+    }
+
+    resetViewBoxPosition() {
+        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.setViewBoxCenter(viewBoxWidth / 2, viewBoxHeight / 2, true)
+    }
+    
+    moveViewBox(dx: number, dy: number, animate: boolean = false) {
+        const { x: viewBoxX, y: viewBoxY, width: viewBoxWith, height: viewBoxHeight } = this.Svg.viewbox();
+        this.animate(this.Svg, animate).viewbox(viewBoxX + dx, viewBoxY + dy, viewBoxWith, viewBoxHeight)
+    }
+    
+    setViewBoxCenter(x: number, y: number, animate: boolean = false) {
+        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        this.animate(this.Svg, animate).viewbox(x - viewBoxWidth / 2, y - viewBoxHeight / 2, viewBoxWidth, viewBoxHeight)
     }
 }
