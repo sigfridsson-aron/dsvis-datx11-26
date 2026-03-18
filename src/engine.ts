@@ -121,6 +121,7 @@ export class Engine {
         );
 
         this.initializeViewBoxPanning(svgContainer);
+        this.initializeViewBoxZooming(svgContainer);
 
         // See explanation at property declaration for _containingSvg
         this._containingSvg = new Svg(svgContainer);
@@ -523,7 +524,8 @@ export class Engine {
                 };
 
                 // Viewbox should change in opposite direction to the pointer movement, hence -pointerDelta.x/y
-                this.moveViewBox(-pointerDelta.x, -pointerDelta.y);
+                const zoomScale: { x: number, y: number } = this.getZoomScale();
+                this.moveViewBox(-pointerDelta.x * zoomScale.x, -pointerDelta.y * zoomScale.y);
             }
         });
 
@@ -543,7 +545,7 @@ export class Engine {
     }
 
     resetViewBoxPosition() {
-        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
         this.setViewBoxCenter(viewBoxWidth / 2, viewBoxHeight / 2, true)
     }
     
@@ -553,7 +555,68 @@ export class Engine {
     }
     
     setViewBoxCenter(x: number, y: number, animate: boolean = false) {
-        const { width: viewBoxWidth, height: viewBoxHeight, ..._ } = this.Svg.viewbox();
+        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
         this.animate(this.Svg, animate).viewbox(x - viewBoxWidth / 2, y - viewBoxHeight / 2, viewBoxWidth, viewBoxHeight)
+    }
+
+    initializeViewBoxZooming(svgContainer: SVGSVGElement) {
+        this.setViewBoxSize = (width: number, height: number, animate: boolean = false) => {
+            const { x: viewBoxX, y: viewBoxY, width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox()
+            const widthDiff: number = viewBoxWidth - width;
+            const heightDiff: number = viewBoxHeight - height;
+            this.animate(this.Svg, animate).viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
+        }
+
+        this.changeViewBoxSize = (dWidth: number, dHeight: number, animate: boolean = false) => {
+            const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
+            this.setViewBoxSize(viewBoxWidth + dWidth, viewBoxHeight + dHeight, animate);
+        }
+
+        this.zoomInViewBox = (direction: 'in' | 'out', steps: number = 1) => {
+            const stepSize: number = 30;
+            let sizeChange: number;
+            if (direction === 'in') {
+                sizeChange = -steps * stepSize
+            } else if (direction === 'out') {
+                sizeChange = steps * stepSize;
+            } else {
+                throw new Error(`direction must be 'in' or 'out', was ${direction}`)
+            }
+
+            console.log(`Changing vb size with sizeChange: ${sizeChange}`)
+
+            this.changeViewBoxSize(sizeChange, sizeChange, true);
+        }
+
+        
+        svgContainer.addEventListener("wheel", (event: WheelEvent) => {
+            event.preventDefault();
+            if (event.ctrlKey) {
+                if (event.deltaY > 0) {
+                    this.zoomInViewBox('out', 1, true)
+                }
+                if (event.deltaY < 0) {
+                    this.zoomInViewBox('in', 1, true)
+                }
+            }
+        })
+
+    }
+
+    private setViewBoxSize(width: number, height: number, animate: boolean = false) {
+        throw new Error("Zoom has not been initialized");
+    }
+
+    private changeViewBoxSize(dWidth: number, dHeight: number, animate: boolean = false) {
+        throw new Error("Zoom has not been initialized");
+    }
+
+    private getZoomScale(): { x: number, y: number } {
+        const { width, height } = this.Svg.viewbox();
+        return { x: width / this.$Svg.width, y: height / this.$Svg.height }
+    }
+
+    zoomInViewBox(direction: 'in' | 'out', steps: number = 1, animate: boolean = false) {
+        throw new Error("Zoom has not been initialized")
     }
 }
