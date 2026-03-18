@@ -120,7 +120,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
                     new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
                 ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
 
-                let newIndex = this.hashString(val) % newArray.getSize();
+                let newIndex = await this.hash(val);
 
                 await this.pause("copy.index", newIndex);
 
@@ -181,7 +181,8 @@ export class HashTableLinearProbing extends Engine implements Collection {
         ).init(...this.getNodeStart());
         await this.pause("insert.value", value);
 
-        let currentIndex = this.hashString(value) % this.sortArray.getSize();
+        let currentIndex = await this.hash(value);
+
         this.sortArray.setIndexHighlight(currentIndex, true);
         await this.pause("find.lookStart", currentIndex);
         while(this.metadataArray[currentIndex] == 2){
@@ -221,7 +222,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     async findOne(value: string | number): Promise<number | null> {
         await this.pause("find.start", value); //start the search
         value = String(value)
-        let curIndex = this.hashString(value) % this.sortArray.getSize();
+        let curIndex = await this.hash(value);
         this.sortArray.setIndexHighlight(curIndex, true);
         await this.pause("find.read", curIndex);
         while(this.metadataArray[curIndex] != 0 ){
@@ -261,6 +262,32 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     }
     
+
+    async hash(value: string): Promise<number> {
+        const hashingText = this.Svg.text(String(this.hashString(value)))
+        hashingText.font({size: this.getObjectSize() * 0.37});
+        hashingText.fill("#C00"); 
+        hashingText.center(this.getNodeStart()[0], this.getNodeStart()[1]);
+        this.animate(hashingText, !this.state.isResetting()).center(this.getNodeStart()[0], this.getNodeStart()[1] + this.getObjectSize() * 2);
+
+        await this.pause(undefined)
+        let currentIndex = this.hashString(value) % this.sortArray.getSize();
+
+        hashingText.text(String(currentIndex));
+        hashingText.center(this.getNodeStart()[0], this.getNodeStart()[1] + this.getObjectSize() * 2);
+
+        
+        await this.pause(undefined)
+
+        this.animate(hashingText, !this.state.isResetting()).center(this.sortArray.getCX(currentIndex), this.sortArray.getCY(currentIndex) + this.getObjectSize() * 0.8);
+
+        await this.pause(undefined)
+        
+        hashingText.remove();
+
+        return currentIndex;
+    }
+
     async print() {
         throw new Error("Print not implemented");
     }
