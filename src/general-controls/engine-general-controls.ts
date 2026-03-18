@@ -144,7 +144,7 @@ export class EngineGeneralControls {
                 type: "click",
                 condition: () => true,
                 handler: () => {
-                    this.engine.resetCanvasPanning();
+                    this.engine.resetViewBoxPosition();
                 }
             }
         );
@@ -204,7 +204,7 @@ export class EngineGeneralControls {
                 element: this.resetPanningButton,
                 type: "click",
                 handler: (resolve, reject) => {
-                    this.engine.resetCanvasPanning();
+                    this.engine.resetViewBoxPosition();
                     resolve(undefined);
                 }
             }

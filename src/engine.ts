@@ -120,7 +120,7 @@ export class Engine {
             this.container
         );
 
-        this.makeCanvasPannable(svgContainer);
+        this.initializeViewBoxPanning(svgContainer);
 
         // See explanation at property declaration for _containingSvg
         this._containingSvg = new Svg(svgContainer);
@@ -489,7 +489,7 @@ export class Engine {
         }
     }
 
-    makeCanvasPannable(svgContainer: SVGSVGElement) {
+    initializeViewBoxPanning(svgContainer: SVGSVGElement) {
         const that = this;
         function enablePanningOnMouseDown() {
             that.isPanning = true;
@@ -527,18 +527,18 @@ export class Engine {
             }
         });
 
-        this.disablePanning = () => {
+        this.disableViewBoxPanning = () => {
             svgContainer.removeEventListener("mousedown", enablePanningOnMouseDown)
             this.isPanning = false
         }
-        this.enablePanning = () => svgContainer.addEventListener("mousedown", enablePanningOnMouseDown)
+        this.enableViewBoxPanning = () => svgContainer.addEventListener("mousedown", enablePanningOnMouseDown)
     }
 
-    enablePanning() {
+    enableViewBoxPanning() {
         throw new Error("Panning has not been initialized")
     }
 
-    disablePanning() {
+    disableViewBoxPanning() {
         throw new Error("Panning has not been initialized")
     }
 
