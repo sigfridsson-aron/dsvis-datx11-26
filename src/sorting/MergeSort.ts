@@ -22,7 +22,7 @@ export class MergeSort extends BaseSorter implements Sorter {
     VERTICAL_SEPARATION = 10; // TODO: Depend on object size
 
     messages: MessagesObject = updateDefault(MergeSortMessages, SortMessages);
-    followRecursion: boolean = true;
+    isFollowingRecursion: boolean = true;
 
     constructor(containerSelector: string) {
         super(containerSelector);
@@ -80,7 +80,7 @@ export class MergeSort extends BaseSorter implements Sorter {
                 
                 // Move the viewbox to follow recursion to the left
                 // Skip first iteration to prevent disjointed transition
-                if (this.followRecursion && iteration > 1)
+                if (this.isFollowingRecursion && iteration > 1)
                     this.setViewBoxCenter(arr.cx(), arr.cy(), true)
                                 
                 await this.pause(
@@ -93,7 +93,7 @@ export class MergeSort extends BaseSorter implements Sorter {
                 leftSubArr = await this.mergeSort(leftSubArr, iteration + 1);
                 
                 // Move the viewbox to follow recursion to the right
-                if (this.followRecursion)
+                if (this.isFollowingRecursion)
                     this.setViewBoxCenter(arr.cx(), arr.cy(), true)
 
                 await this.pause(undefined);
@@ -128,7 +128,7 @@ export class MergeSort extends BaseSorter implements Sorter {
 
                 // Move viewbox to follow merging subarrays
                 // If it is the first iteration, reset to starting position
-                if (this.followRecursion) {
+                if (this.isFollowingRecursion) {
                     if (iteration === 1) 
                         this.resetViewBoxPosition();
                     else 
@@ -250,5 +250,15 @@ export class MergeSort extends BaseSorter implements Sorter {
         await this.pause("sort.mergeComplete")
 
         return mergedArray;
+    }
+
+    followRecursion() {
+        this.disablePanning();
+        this.isFollowingRecursion = true;
+    }
+
+    doNotFollowRecursion() {
+        this.enablePanning();
+        this.isFollowingRecursion = false;
     }
 }

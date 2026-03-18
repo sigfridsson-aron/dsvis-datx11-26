@@ -25,7 +25,11 @@ export class RecursiveSortingGeneralControls extends EngineGeneralControls {
         );
 
         this.followRecursionCheckbox.addEventListener("change", () => {
-            this.engine.followRecursion = this.followRecursionCheckbox.checked;
+            if (this.followRecursionCheckbox.checked)
+                this.engine.followRecursion();
+            else this.engine.doNotFollowRecursion();
         });
+
+        this.engine.disablePanning();
     }
 }

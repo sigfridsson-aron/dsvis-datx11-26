@@ -496,10 +496,12 @@ export class Engine {
     }
 
     makeCanvasPannable(svgContainer: SVGSVGElement) {
-        // TODO: Prevent user from panning when following recursion
-        svgContainer.addEventListener("mousedown", () => {
-            this.isPanning = true;
-        });
+        const that = this;
+        function enablePanningOnMouseDown() {
+            that.isPanning = true;
+        }
+
+        svgContainer.addEventListener("mousedown", enablePanningOnMouseDown);
 
         svgContainer.addEventListener("mouseleave", () => {
             this.isPanning = false;
@@ -530,6 +532,20 @@ export class Engine {
                 this.moveViewBox(-pointerDelta.x, -pointerDelta.y);
             }
         });
+
+        this.disablePanning = () => {
+            svgContainer.removeEventListener("mousedown", enablePanningOnMouseDown)
+            this.isPanning = false
+        }
+        this.enablePanning = () => svgContainer.addEventListener("mousedown", enablePanningOnMouseDown)
+    }
+
+    enablePanning() {
+        throw new Error("Panning has not been initialized")
+    }
+
+    disablePanning() {
+        throw new Error("Panning has not been initialized")
     }
 
     resetViewBoxPosition() {
