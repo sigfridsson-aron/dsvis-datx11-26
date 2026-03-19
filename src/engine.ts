@@ -559,33 +559,41 @@ export class Engine {
         this.animate(this.Svg, animate).viewbox(x - viewBoxWidth / 2, y - viewBoxHeight / 2, viewBoxWidth, viewBoxHeight)
     }
 
+    getViewBoxWToHAspectRatio(): number {
+        return this.$Svg.width / this.$Svg.height;
+    }
+
     initializeViewBoxZooming(svgContainer: SVGSVGElement) {
         this.setViewBoxSize = (width: number, height: number, animate: boolean = false) => {
+            if (height <= 0 || width <= 0) {
+                throw new Error(`Width and height must be greater than 0, was: width = ${width}, height = ${height}`)
+            }
             const { x: viewBoxX, y: viewBoxY, width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox()
             const widthDiff: number = viewBoxWidth - width;
             const heightDiff: number = viewBoxHeight - height;
-            this.animate(this.Svg, animate).viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
-        }
-
-        this.changeViewBoxSize = (dWidth: number, dHeight: number, animate: boolean = false) => {
-            const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
-            this.setViewBoxSize(viewBoxWidth + dWidth, viewBoxHeight + dHeight, animate);
+            if (animate) {
+                this.Svg.animate(10).viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
+            } else {
+                this.Svg.viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
+            }
         }
 
         this.zoomInViewBox = (direction: 'in' | 'out', steps: number = 1) => {
             const stepSize: number = 30;
-            let sizeChange: number;
+            let yChange: number;
             if (direction === 'in') {
-                sizeChange = -steps * stepSize
+                yChange = -steps * stepSize
             } else if (direction === 'out') {
-                sizeChange = steps * stepSize;
+                yChange = steps * stepSize;
             } else {
                 throw new Error(`direction must be 'in' or 'out', was ${direction}`)
             }
 
-            console.log(`Changing vb size with sizeChange: ${sizeChange}`)
+            const { height: viewBoxHeight } = this.Svg.viewbox();
+            const height = Math.max(1, viewBoxHeight + yChange);
+            const width = height * this.getViewBoxWToHAspectRatio();
 
-            this.changeViewBoxSize(sizeChange, sizeChange, true);
+            this.setViewBoxSize(width, height, true);
         }
 
         
@@ -607,13 +615,11 @@ export class Engine {
         throw new Error("Zoom has not been initialized");
     }
 
-    private changeViewBoxSize(dWidth: number, dHeight: number, animate: boolean = false) {
-        throw new Error("Zoom has not been initialized");
-    }
-
     private getZoomScale(): { x: number, y: number } {
-        const { width, height } = this.Svg.viewbox();
-        return { x: width / this.$Svg.width, y: height / this.$Svg.height }
+        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
+        const renderedWidth: number = this._containingSvg.node.clientWidth;
+        const renderedHeight: number = this._containingSvg.node.clientHeight;
+        return { x: viewBoxWidth / renderedWidth, y: viewBoxHeight / renderedHeight }
     }
 
     zoomInViewBox(direction: 'in' | 'out', steps: number = 1, animate: boolean = false) {
