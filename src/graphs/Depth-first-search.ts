@@ -6,8 +6,8 @@ import { GraphNode } from "~/objects/graph-node";
 import { BaseGraph } from "./base-graph";
 
 export const DepthMessages = {
-    example: {
-        here: "test"
+    error: {
+        nullGraph: "Please choose a graph first"
     }
     //the messages we put somewhere on the canvas
     //to be implemented I think this is in the form of json file
@@ -18,21 +18,14 @@ export class Depth extends BaseGraph implements Graph {
     messages: MessagesObject = DepthMessages;
 
     override async start() {
-        await this.resetAlgorithm()
-        const nodes = this.treeGraph()
-        
-        const result = this.searchGraph(nodes[0])
+        if (!this.graph) {
+            await this.pause("error.nullGraph")
+            return
+        }
+        const result = this.searchGraph(this.graph)
         console.log(result)
         await this.nodeTraversalVisualisation(result)
     }
-
-
-    
-
- 
-
-
-
 
     //search through the graph starting from "startNode". returns a list of chronological order of traversal
     searchGraph(startNode:WeightedGraphNode):WeightedConnection<WeightedGraphNode>[] {
@@ -41,8 +34,6 @@ export class Depth extends BaseGraph implements Graph {
         this.searchGraphRecursion(startNode,visitedNodes,result)
         return result
     }
-
-
 
     private searchGraphRecursion(currNode:WeightedGraphNode,visitedNodes:WeightedGraphNode[],result:WeightedConnection<GraphNode>[]):void {
         
@@ -60,27 +51,21 @@ export class Depth extends BaseGraph implements Graph {
                 this.searchGraphRecursion(connectedNode, visitedNodes,result)
             }
         }
-    } 
+    }   
 
-  
-    
+    //returns all outgoing edges from the provided nodes
+    private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
+        const edges:WeightedConnection<WeightedGraphNode>[] = []
+        for (const node of nodes) {
+            for (const key in node.$outgoing) {
+                
+                const edge = node.$outgoing[key];
+                
+                if (!edge) continue;
 
-//returns all outgoing edges from the provided nodes
-private getEdges(nodes:WeightedGraphNode[]):WeightedConnection<WeightedGraphNode>[] {
-    const edges:WeightedConnection<WeightedGraphNode>[] = []
-    for (const node of nodes) {
-        for (const key in node.$outgoing) {
-            
-            const edge = node.$outgoing[key];
-            
-            if (!edge) continue;
-
-            edges.push(edge);
+                edges.push(edge);
+            }
         }
+        return edges
     }
-    return edges
-
-}
-
-
 }

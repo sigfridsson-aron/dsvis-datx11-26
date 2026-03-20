@@ -204,6 +204,35 @@ private drawRow(
     return rowGroup;
 }
 
+    async reset() {
+        for (const k of this.createdNodes) {
+            const inc = k.$incoming
+            const out = k.$outgoing
+            for (const c in inc) {
+                inc[c]?.setHighlight(false)
+            }
+            for (const c in out) {
+                out[c]?.setHighlight(false)
+            }
+            k.setHighlight(false)
+        }
+        this.graph?.setHighlight(true)
+        this.edgeTable.clear()
+    }
+
+    async startNode(value: string | number) {
+        this.graph?.setHighlight(false)
+        for (const k of this.createdNodes) {
+            if (k.getText() === value) {
+                this.graph = k
+                this.graph.setHighlight(true)
+                return
+            }
+        }
+        await this.pause(`could not find ${value}; current start node is ${this.graph}`)
+        this.graph?.setHighlight(true)
+    }
+
     async chosenGraph(graf: string | number) {
         if (graf === "") {
             await this.resetAlgorithm()
@@ -260,6 +289,8 @@ private drawRow(
         //initialValues will probably only be used if we can make it so
         //that you can construct your own graph, in other classes it's
         //used like this.initialise(["k"]) and you start with a k node
+
+        //the current code is just copied and pretty much does nothing
         this.initialValues = parseValues(initialValues);
         super.initialise()
         return this;
@@ -289,11 +320,12 @@ private drawRow(
             }
         }
         this.createdNodes = []
+        this.edgeTable.clear()
     }
 
     //This is just the connect function but i didn't wanna bother with
     //sending along a unique key to every node.
-    link(
+    private link(
         ourNode: WeightedGraphNode, 
         theirNode: WeightedGraphNode,
         weight: number,
@@ -310,7 +342,7 @@ private drawRow(
     //Puts a Node a 100(px not sure what unit we have) away from
     //another node at a degree(not radians!)
     //does not have animation implemented
-    putAtDeg(
+    private putAtDeg(
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
         degree: number,
@@ -332,7 +364,7 @@ private drawRow(
     //Implement default graphs below
 
     //New bug putAtDeg seems to cause issues if you redraw a graph (only in animation)
-    async bugExample() {
+    private async bugExample() {
         const midW = this.$Svg.width/2
         const midH = this.$Svg.height/2
         const A = this.newNode("A")
@@ -347,7 +379,7 @@ private drawRow(
         await this.pause("example.here")
     }
 
-    undirectedGraph():WeightedGraphNode[] {
+    private undirectedGraph():WeightedGraphNode[] {
         // i am happy with this but feel free to add to it
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 100
@@ -401,7 +433,7 @@ private drawRow(
         
     }
 
-    directedGraph(): WeightedGraphNode[] {
+    private directedGraph(): WeightedGraphNode[] {
         //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 100
@@ -454,7 +486,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H,I,J]
     }
 
-    mixedGraph(): WeightedGraphNode[] {
+    private mixedGraph(): WeightedGraphNode[] {
         //Looks pretty ugly if you've got suggestions please tell me
         //or feel free to make them yourself
         const midW = this.$Svg.width/2 - 100
@@ -512,7 +544,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H,I,J]
     }
 
-    treeGraph(): WeightedGraphNode[] {
+    private treeGraph(): WeightedGraphNode[] {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 - 200
 
@@ -571,7 +603,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
     }
 
-    cyclicGraph(): WeightedGraphNode[] {
+    private cyclicGraph(): WeightedGraphNode[] {
         //Neutered sign
         const midW = this.$Svg.width/2 + 100
         const midH = this.$Svg.height/2 - 25
@@ -631,7 +663,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H,I,J,K]
     }
 
-    acyclicGraph(): WeightedGraphNode[] {
+    private acyclicGraph(): WeightedGraphNode[] {
         //Somewhat basic
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 + 100
@@ -675,7 +707,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H]
     }
 
-    DAGraph(): WeightedGraphNode[] {
+    private DAGraph(): WeightedGraphNode[] {
         const midW = this.$Svg.width/2 - 300
         const midH = this.$Svg.height/2 - 150
 
@@ -719,7 +751,7 @@ private drawRow(
         return [A,B,C,D,E,F,G,H]
     }
 
-    weaklyConnectedGraph(): WeightedGraphNode[] {
+    private weaklyConnectedGraph(): WeightedGraphNode[] {
         //Somewhat small but I thought it might be better to
         //focus on it being weakly connected
         const midW = this.$Svg.width/2 - 100
@@ -751,7 +783,7 @@ private drawRow(
         return [A,B,C,D,E]
     }
 
-    stronglyConnectedGraph(): WeightedGraphNode[] {
+    private stronglyConnectedGraph(): WeightedGraphNode[] {
         //Somewhat small but I thought it might be better to
         //focus on it being strongly connected
         const midW = this.$Svg.width/2 - 100
@@ -783,7 +815,7 @@ private drawRow(
         return [A,B,C,D,E]
     }
 
-    eulerianGraph(): WeightedGraphNode[] {
+    private eulerianGraph(): WeightedGraphNode[] {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2
 
@@ -822,7 +854,7 @@ private drawRow(
         return [A,B,C,D,E,F]
     }
 
-    hamiltonianGraph(): WeightedGraphNode[] {
+    private hamiltonianGraph(): WeightedGraphNode[] {
         //Very simple could probably be expanded
         const midW = this.$Svg.width/2 - 150
         const midH = this.$Svg.height/2
@@ -855,7 +887,7 @@ private drawRow(
         return [A,B,C,D,E]
     }
 
-    chordalGraph(): WeightedGraphNode[] {
+    private chordalGraph(): WeightedGraphNode[] {
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 50
 
