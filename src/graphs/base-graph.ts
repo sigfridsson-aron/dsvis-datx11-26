@@ -1,5 +1,5 @@
 import { G } from "@svgdotjs/svg.js";
-import { Engine } from "~/engine";
+import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { parseValues } from "~/helpers";
@@ -7,6 +7,17 @@ import { HighlightCircle } from "~/objects/highlight-circle";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 
+export const BaseGraphMessages = {
+    error: {
+        nullGraph: "Please choose a graph first"
+      , incorrectStart: (value: string, graph: string) => 
+            `could not find ${value}; current start node is ${graph}`
+    }
+    , traversal: {
+        atNode: (value: string) => `At node ${value}`
+      , complete: "Done!"
+    }
+} as const satisfies MessagesObject
 
 export class BaseGraph extends Engine implements Graph {
     edgeTable: G;
@@ -68,10 +79,7 @@ async nodeTraversalVisualisation(
                 )
             }
 
-
-            
-
-            await this.pause(`At node ${startNode.getText()}`)
+            await this.pause(`traversal.atNode`, startNode.getText())
         }
 
         visitedEdges.add(edge)
@@ -107,14 +115,14 @@ async nodeTraversalVisualisation(
             this.getAnimationSpeed()
         )
 
-        await this.pause(`At node ${endNode.getText()}`)
+        await this.pause("traversal.atNode", endNode.getText())
 
         lastNode = endNode
     }
 
     pointer?.remove()
 
-    await this.pause("Done!")
+    await this.pause("traversal.complete")
 }
 
 updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>, highlightEdge?:WeightedConnection<WeightedGraphNode>) {
@@ -229,7 +237,7 @@ private drawRow(
                 return
             }
         }
-        await this.pause(`could not find ${value}; current start node is ${this.graph}`)
+        await this.pause("error.incorrectStart", value, this.graph?.getText())
         this.graph?.setHighlight(true)
     }
 

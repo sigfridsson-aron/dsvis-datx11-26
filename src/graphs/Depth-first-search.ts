@@ -3,28 +3,32 @@ import { Graph } from "~/graph";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 import { GraphNode } from "~/objects/graph-node";
-import { BaseGraph } from "./base-graph";
+import { BaseGraph, BaseGraphMessages } from "./base-graph";
+import { updateDefault } from "~/helpers";
 
 export const DepthMessages = {
-    error: {
-        nullGraph: "Please choose a graph first"
-    }
-    //the messages we put somewhere on the canvas
-    //to be implemented I think this is in the form of json file
-    //seems to be used when you put "this.pause(example.here)"
+    //if you want to change messages that already exist in
+    //BaseGraph you can define something like
+    // error: {
+    //    nullGraph: "you are man"
+    // }
+    //and it will overwrite the BaseGraph's error.nullGraph
+    //message
 } as const satisfies MessagesObject
 
 export class Depth extends BaseGraph implements Graph {
-    messages: MessagesObject = DepthMessages;
+    messages: MessagesObject = updateDefault(DepthMessages, BaseGraphMessages);
 
     override async start() {
         if (!this.graph) {
             await this.pause("error.nullGraph")
             return
         }
+        this.graph.setHighlight(false)
         const result = this.searchGraph(this.graph)
         console.log(result)
         await this.nodeTraversalVisualisation(result)
+        this.graph.setHighlight(true)
     }
 
     //search through the graph starting from "startNode". returns a list of chronological order of traversal
