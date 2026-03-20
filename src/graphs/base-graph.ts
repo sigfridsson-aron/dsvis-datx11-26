@@ -20,7 +20,7 @@ export class BaseGraph extends Engine implements Graph {
 
         this.generalControls = new EngineGeneralControls(this.container, this)
         this.edgeTable = this.Svg.group()
-        this.edgeTable.addClass("edge-table")
+       
     }
 
     async start() {
@@ -38,8 +38,8 @@ async nodeTraversalVisualisation(
 
     let pointer: HighlightCircle | null = null
 
-    for (const edge of graphTraversal) {
-
+    for (let i = 0; i < graphTraversal.length;i++) {
+        const edge = graphTraversal[i]
         const startNode = edge.$start
         
         // discover outgoing edges
@@ -48,7 +48,7 @@ async nodeTraversalVisualisation(
                     knownEdges.add(currEdge)
                 }
             }
-        this.updateEdgeTable(knownEdges)
+        this.updateEdgeTable(knownEdges,edge)
         if (lastNode !== startNode) {
 
             // create pointer on first visit
@@ -69,7 +69,7 @@ async nodeTraversalVisualisation(
             }
 
 
-            this.updateEdgeTable(knownEdges)
+            
 
             await this.pause(`At node ${startNode.getText()}`)
         }
@@ -87,7 +87,15 @@ async nodeTraversalVisualisation(
                     knownEdges.add(currEdge)
                 }
             }
-        this.updateEdgeTable(knownEdges)
+       
+
+        //highlight the next edge
+        if (i + 1 <= graphTraversal.length -1) {
+            this.updateEdgeTable(knownEdges,graphTraversal[i+1])
+        }
+        else { 
+        this.updateEdgeTable(knownEdges,edge)}
+
 
         // highlight the traversed edge
         edge.setHighlight(true)
@@ -109,7 +117,7 @@ async nodeTraversalVisualisation(
     await this.pause("Done!")
 }
 
-updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
+updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>, highlightEdge?:WeightedConnection<WeightedGraphNode>) {
     
 
     const columns = ["From", "To", "Weight"];
@@ -131,14 +139,15 @@ updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>) {
         const currEdge = edge
         const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
     
-
+        
         this.drawRow(
             rowData,
             k + 1,
             startX,
             startY,
             cellWidth,
-            cellHeight
+            cellHeight,
+            edge === highlightEdge
         );
         k++
     }           
@@ -153,22 +162,36 @@ private drawRow(
     startY: number,
     cellWidth: number,
     cellHeight: number,
-
+    highlight?: boolean
 ) {
+    const rowY = startY + rowIndex * cellHeight;
+    const rowWidth = rowData.length * cellWidth;
+
+    // Create a group for the row
+    const rowGroup = this.edgeTable.group();
+
+    // Background highlight (CSS class)
+    const rowRect = rowGroup
+        .rect(rowWidth, cellHeight)
+        .move(startX, rowY)
+
+    if (highlight) rowRect.addClass('row-highlight');
+    else rowRect.addClass("row-normal")
+
+    // Send highlight to back so cells and text appear on top
     
 
+    // Draw cells and text on top
     for (let col = 0; col < rowData.length; col++) {
-
         const x = startX + col * cellWidth;
-        const y = startY + rowIndex * cellHeight;
+        const y = rowY;
 
-        const rect = this.edgeTable
+        rowGroup
             .rect(cellWidth, cellHeight)
-            .move(x, y);
+            .move(x, y)
+            .addClass('cell');
 
-       
-
-        this.edgeTable
+        rowGroup
             .text(rowData[col])
             .font({
                 anchor: 'middle',
@@ -177,6 +200,8 @@ private drawRow(
             })
             .center(x + cellWidth / 2, y + cellHeight / 2);
     }
+    rowRect.front();
+    return rowGroup;
 }
 
     async chosenGraph(graf: string | number) {
