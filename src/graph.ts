@@ -3,6 +3,7 @@ import { initialiseEngine, RecordOfEngines } from "./helpers";
 import { Depth } from "./graphs/Depth-first-search";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { GraphAlgorithmControl } from "./algorithm-controls/graph-algorithmcontrols";
+import { Breadth } from "./graphs/Breadth-first-search";
 
 export interface Graph extends Engine {
     start: SubmitFunction;
@@ -19,7 +20,8 @@ export interface Graph extends Engine {
 }
 
 const GRAPH_CLASSES = {
-    Depth: Depth, //define the searching algorithms
+    Breadth: Breadth,
+    Depth: Depth //define the searching algorithms
     // I think its used so the program can find classes
     // in the html
 } as const satisfies RecordOfEngines<Graph>;
