@@ -108,6 +108,11 @@ async nodeTraversalVisualisation(
         // highlight the traversed edge
         edge.setHighlight(true)
 
+        // if edge is undirected highlight the path back as well
+        if (edge.$end.$outgoing[edge.$start.getText()]
+         && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
+            edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
+        
         // animate pointer to next node
         pointer?.setCenter(
             endNode.cx(),
