@@ -42,7 +42,9 @@ export class HashTableLinearProbing extends Engine implements Collection {
     metadataArray: number[] = []; // metadata array of the same length as the hash table. 0 = empty, 1 = removed, 2 = filled
     loadFactor: number = 0;
     baseSize: number = 28;
+    usinghash: number = 0;
     messages: MessagesObject = SortMessages;
+    
 
     constructor(containerSelector: string) {
         super(containerSelector);
@@ -56,6 +58,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     async resetAlgorithm() {
         await super.resetAlgorithm();
+        this.usinghash = 0;
         this.loadFactor = 0;
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
@@ -95,6 +98,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     }
 
     async resize(length: number){
+
         const [xRoot, yRoot] = this.getTreeRoot();
         let newArray = 
         this.Svg.put(
@@ -120,7 +124,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
                     new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
                 ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
 
-                let newIndex = await this.hash(val);
+                let newIndex = await this.hash(val, newArray);
 
                 await this.pause("copy.index", newIndex);
 
@@ -170,7 +174,16 @@ export class HashTableLinearProbing extends Engine implements Collection {
         await this.pause(undefined);
     }
 
+    async giveEngineLength(): Promise<number> {
+        const dropdown = document.getElementById("hashFunction") as HTMLSelectElement;
+        console.log("bruh: " + dropdown.value);
+        this.usinghash = Number(dropdown.value);
+
+        return this.sortArray.getSize();
+        
+    }
     async insertOne(value: number | string) {
+        
         if(this.loadFactor >= this.sortArray.getSize() * 0.75){
             await this.pause("Load Factor exceeded!");
             await this.resize(this.sortArray.getSize() * 2);
@@ -181,7 +194,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
         ).init(...this.getNodeStart());
         await this.pause("insert.value", value);
 
-        let currentIndex = await this.hash(value);
+        let currentIndex = await this.hash(value, this.sortArray);
 
         this.sortArray.setIndexHighlight(currentIndex, true);
         await this.pause("find.lookStart", currentIndex);
@@ -222,7 +235,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     async findOne(value: string | number): Promise<number | null> {
         await this.pause("find.start", value); //start the search
         value = String(value)
-        let curIndex = await this.hash(value);
+        let curIndex = await this.hash(value, this.sortArray);
         this.sortArray.setIndexHighlight(curIndex, true);
         await this.pause("find.read", curIndex);
         while(this.metadataArray[curIndex] != 0 ){
@@ -263,7 +276,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     }
     
 
-    async hash(value: string): Promise<number> {
+    async hash(value: string, arr: hashTable): Promise<number> {
         const hashingText = this.Svg.text(String(this.hashString(value)))
         hashingText.font({size: this.getObjectSize() * 0.37});
         hashingText.fill("#C00"); 
@@ -271,7 +284,8 @@ export class HashTableLinearProbing extends Engine implements Collection {
         this.animate(hashingText, !this.state.isResetting()).center(this.getNodeStart()[0], this.getNodeStart()[1] + this.getObjectSize() * 2);
 
         await this.pause(undefined)
-        let currentIndex = this.hashString(value) % this.sortArray.getSize();
+        
+        let currentIndex = this.hashString(value) % arr.getSize();
 
         hashingText.text(String(currentIndex));
         hashingText.center(this.getNodeStart()[0], this.getNodeStart()[1] + this.getObjectSize() * 2);
@@ -279,7 +293,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
         
         await this.pause(undefined)
 
-        this.animate(hashingText, !this.state.isResetting()).center(this.sortArray.getCX(currentIndex), this.sortArray.getCY(currentIndex) + this.getObjectSize() * 0.8);
+        this.animate(hashingText, !this.state.isResetting()).center(arr.getCX(currentIndex), arr.getCY(currentIndex) + this.getObjectSize() * 0.8);
 
         await this.pause(undefined)
         
@@ -294,8 +308,18 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     hashString(str: string): number {
         let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-          hash = (hash * 31 + str.charCodeAt(i)) | 0; 
+        if(this.usinghash == 0){
+            for (let i = 0; i < str.length; i++) {
+              hash = (hash * 31 + str.charCodeAt(i)); 
+            }
+        }
+        else if(this.usinghash == 1){
+            hash = str.charCodeAt(0);
+        }
+        else if(this.usinghash == 2){
+            for (let i = 0; i < str.length; i++) {
+              hash = hash + str.charCodeAt(i); 
+            }
         }
         return hash;
     }
