@@ -1,12 +1,14 @@
 import { G, Rect, Text } from "@svgdotjs/svg.js";
 import { NBSP } from "~/engine";
 import { Polyline } from "@svgdotjs/svg.js";
+import LinkedList from "./LinkedList";
 
 export class hashTable extends G {
     $horizontal: boolean;
     $rect: Rect;
     $backgrounds: Rect[] = [];
     $values: Text[] = [];
+    //$values: LinkedList<Text>[] = [];
     $indices: Text[] = [];
 
     constructor(size: number, objectSize: number, horizontal: boolean = true) {

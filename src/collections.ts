@@ -14,6 +14,8 @@ import { StackDynamicArrayAnim } from "~/basic/StackDynamicArrayAnim";
 import { QueueDynamicArrayAnim } from "~/basic/QueueDynamicArrayAnim";
 import { QueueLinkedListAnim } from "~/basic/QueueLinkedListAnim";
 import { HashTableLinearProbing } from "~/basic/HashTableLinearProbing";
+import { HashTableSeparateChaining } from "~/basic/HashTableSeparateChaining";
+
 import { initialiseEngine, RecordOfEngines } from "./helpers";
 
 export interface Collection extends Engine {
@@ -35,7 +37,8 @@ const COLLECTIONS_CLASSES = {
     StackDynamicArrayAnim: StackDynamicArrayAnim,
     QueueDynamicArrayAnim: QueueDynamicArrayAnim,
     QueueLinkedListAnim: QueueLinkedListAnim,
-    HashTableLinearProbing: HashTableLinearProbing
+    HashTableLinearProbing: HashTableLinearProbing,
+    HashTableSeparateChaining : HashTableSeparateChaining
 } as const satisfies RecordOfEngines<Collection>;
 
 const { engine, isBaseEngine } = initialiseEngine<Collection>(
