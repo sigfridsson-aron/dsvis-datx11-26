@@ -15,9 +15,16 @@ export class hashTable extends G {
         super();
         this.$horizontal = horizontal; 
         this.$values = new Array(size);
-        this.$rect = this.rect(objectSize * size, 3 * objectSize)
+        if(horizontal){
+            this.$rect = this.rect(objectSize * size, 3 * objectSize)
             .addClass("invisible")
             .center(0, 0);
+        }else{
+            this.$rect = this.rect(3 * objectSize, objectSize * size)
+            .addClass("invisible")
+            .center(0, 0);
+        }
+        
     }
 
     /** What it do?*/
@@ -35,15 +42,16 @@ export class hashTable extends G {
         return Math.floor((this.engine().$Svg.width - this.engine().$Svg.margin) / (this.engine().getObjectSize() * 2));
     }
 
-    /** Calculates the x-coordinate for an object based on its index*/ 
+    /** Calculates the x-coordinate for a value based on its index*/ 
     getCX(i: number): number {
         return (
-            this.cx() +
-            this.engine().getObjectSize() * 2 * (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
+            this.cx() + 
+            this.engine().getObjectSize() * 2 * 
+            (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
         );
     }
 
-    /** Calculates the y-coordinate for an object based on its index*/ 
+    /** Calculates the y-coordinate for a value based on its index*/ 
     getCY(i: number): number {
         return (
             Number(this.y()) + this.engine().getObjectSize() * 1.5 + 
@@ -69,12 +77,14 @@ export class hashTable extends G {
         const rowWidth = Math.min(size, this.getRowWidth());
         const stroke = this.engine().getStrokeWidth();
 
+        /* Rect is actually never used for anything other than x and y position?
         if(size <= this.getRowWidth()){
             this.$rect.width(cellWidth * size);
         }
         else{
-            this.$rect.width(this.engine().$Svg.width - this.engine().$Svg.margin); // Magic numbers (this.engine().$Svg.width - this.engine().$Svg.margin)
+            this.$rect.width(this.engine().$Svg.width - this.engine().$Svg.margin);
         }
+        */
 
         const cx = this.$rect.cx();
         let cy = this.$rect.cy();
