@@ -9,7 +9,6 @@ export const HeapSortMessages = {
     },
 } as const satisfies MessagesObject;
 
-
 export class HeapSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(HeapSortMessages, SortMessages);
     async sort() {
@@ -55,7 +54,7 @@ export class HeapSort extends BaseSorter implements Sorter {
         if (
             right < n &&
             Number(this.sortArray.getValue(right)) >
-            Number(this.sortArray.getValue(largest))
+                Number(this.sortArray.getValue(largest))
         ) {
             largest = right;
         }

@@ -7,6 +7,7 @@ import { QuickSort } from "./sorting/QuickSort";
 import { SelectionSort } from "./sorting/SelectionSort";
 import { BubbleSort } from "./sorting/BubbleSort";
 import { HeapSort } from "./sorting/HeapSort";
+import { RadixSort } from "./sorting/RadixSort";
 
 let right: number = 0;
 let down: number = 0;
@@ -27,6 +28,7 @@ const SORTING_CLASSES = {
     QuickSort: QuickSort,
     BubbleSort: BubbleSort,
     HeapSort: HeapSort,
+    RadixSort: RadixSort,
 } as const satisfies RecordOfEngines<Sorter>;
 
 const { engine: SortEngine, isBaseEngine } = initialiseEngine<Sorter>(
@@ -35,10 +37,7 @@ const { engine: SortEngine, isBaseEngine } = initialiseEngine<Sorter>(
 );
 
 if (!isBaseEngine) {
-    const algorithmControls: SortingAlgorithmControls = new SortingAlgorithmControls(
-        SortEngine.container,
-        SortEngine
-    );
+    const algorithmControls: SortingAlgorithmControls =
+        new SortingAlgorithmControls(SortEngine.container, SortEngine);
     SortEngine.algorithmControls = algorithmControls;
 }
-
