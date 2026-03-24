@@ -6,6 +6,7 @@ import { RedBlack } from "~/trees/RedBlack";
 import { SplayTree } from "~/trees/SplayTree";
 import { BTreeAlgorithmControl } from "./algorithm-controls/BTree-algorithm-controls";
 import { CollectionAlgorithmControl } from "./algorithm-controls/collection-algorithm-controls";
+import { HashTableAlgorithmControl } from "./algorithm-controls/HashTable-algorithm-controls";
 import { StackAlgorithmControl } from "./algorithm-controls/Stack-algorithm-controls";
 import { QueueAlgorithmControl } from "./algorithm-controls/Queue-algorithm-controls";
 import { LinkedListAnim } from "~/basic/LinkedListAnim";
@@ -61,6 +62,12 @@ if (!isBaseEngine) {
     }
     else if(engine instanceof StackDynamicArrayAnim || engine instanceof StackLinkedListAnim){
         engine.algorithmControls = new StackAlgorithmControl(
+            engine.container,
+            engine
+        );
+    } 
+    else if(engine instanceof HashTableLinearProbing){
+        engine.algorithmControls = new HashTableAlgorithmControl(
             engine.container,
             engine
         );

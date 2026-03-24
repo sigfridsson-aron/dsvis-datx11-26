@@ -152,6 +152,24 @@ export class Engine {
         /* Allow subclasses to use this function */
     }
 
+    //////////// WIP
+
+    async resizeHashtable(str: string | number): Promise<void>{
+        let length = await this.giveEngineLength();
+        await this.resize(length);
+    }
+
+    async giveEngineLength(): Promise<number> {
+        return 0;
+        /* Allow subclasses to use this function */
+    }
+
+    async resize(length: number): Promise<void> {
+        /* Allow subclasses to use this function */
+    }
+
+    /////////////
+
     clearCanvas(): void {
         this.Svg.clear();
 
