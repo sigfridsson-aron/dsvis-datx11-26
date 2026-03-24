@@ -5,7 +5,6 @@ import { updateDefault } from "~/helpers";
 import { WeightedConnection } from "~/objects/weigted-connection";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import Queue from "~/basic/Queue"
-import { HighlightCircle } from "~/objects/highlight-circle";
 
 export const BreadthMessages = {
     //if you want to change messages that already exist in
@@ -28,30 +27,29 @@ export class Breadth extends BaseGraph implements Graph {
         this.graph.setHighlight(false)
         const result = this.breadthSearch()
         await this.nodeTraversalVisualisation(result)
-        this.graph.setHighlight(false)
+        this.graph.setHighlight(true)
     }
 
     breadthSearch(): WeightedConnection<WeightedGraphNode>[] {
         const visitOrder: Queue<WeightedGraphNode> = new Queue();
         const edges: WeightedConnection<WeightedGraphNode>[] = [];
-        const visitedNodes: WeightedGraphNode[] = []
-        const toVisit: WeightedGraphNode[] = []
+        const visitedNodes = new Set<WeightedGraphNode>()
 
         visitOrder.enqueue(this.graph!)
 
         while(visitOrder.size() > 0) {
             const currNode  = visitOrder.dequeue()
             const currEdges = currNode?.$outgoing
-            visitedNodes.push(currNode!)
+            visitedNodes.add(currNode!)
 
             if (!currEdges) continue
 
             for (const k of Object.values(currEdges)) {
-                if (toVisit.includes(k!.$end) || visitedNodes.includes(k!.$end)) 
+                if (visitedNodes.has(k!.$end)) 
                     continue
                 visitOrder.enqueue(k!.$end)
                 edges[edges.length] = k!
-                toVisit.push(k!.$end)
+                visitedNodes.add(k!.$end)
             }
         }
         return edges

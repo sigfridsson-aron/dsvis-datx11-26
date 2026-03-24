@@ -14,7 +14,11 @@ export const BaseGraphMessages = {
             `could not find ${value}; current start node is ${graph}`
     }
     , traversal: {
-        atNode: (value: string) => `At node ${value}`
+        start: (value: string) => `Starting search at ${value}`
+      , atNode: (value: string) => `At node ${value}`
+      , cleanUp: (value: string) => `Remove edges that visit ${value}`
+      , edgeUpdate: (value: string) => `Add ${value}'s edges`
+      , chooseEdge: "Choose next edge based on remaining depth"
       , complete: "Done!"
     }
 } as const satisfies MessagesObject
@@ -44,65 +48,78 @@ async nodeTraversalVisualisation(
 ) {
     let lastNode: WeightedGraphNode | null = null
 
-    const knownEdges = new Set<WeightedConnection<WeightedGraphNode>>()
+    const knownEdges   = new Set<WeightedConnection<WeightedGraphNode>>()
     const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
+    const visitedNodes = new Set<WeightedGraphNode>()
 
     let pointer: HighlightCircle | null = null
+
+    pointer = this.Svg.put(new HighlightCircle()).init(
+                    graphTraversal[0].$start.cx(),
+                    graphTraversal[0].$start.cy(),
+                    this.getObjectSize(),
+                    this.getStrokeWidth()
+    )
+
+    await this.pause("traversal.start", graphTraversal[0].$start.getText())
+
+    await this.pause("traversal.edgeUpdate", graphTraversal[0].$start.getText())
+    // discover outgoing edges
+    for (const currEdge of Object.values(graphTraversal[0].$start.$outgoing)) {
+        if (currEdge && !visitedEdges.has(currEdge)
+            && !visitedNodes.has(currEdge.$end)) {
+            knownEdges.add(currEdge)
+        }
+    }
 
     for (let i = 0; i < graphTraversal.length;i++) {
         const edge = graphTraversal[i]
         const startNode = edge.$start
-        
-        // discover outgoing edges
-        for (const currEdge of Object.values(startNode.$outgoing)) {
-                if (currEdge && !visitedEdges.has(currEdge)) {
-                    knownEdges.add(currEdge)
-                }
-            }
-        this.updateEdgeTable(knownEdges,edge)
+        visitedNodes.add(startNode)
+
+        this.updateEdgeTable(knownEdges)
+        await this.pause("traversal.chooseEdge")
+        this.updateEdgeTable(knownEdges, edge)
+        await this.pause("")
+        visitedNodes.add(edge.$end)
         if (lastNode !== startNode) {
 
+            // i put the first update of the edgetable outside
+            // the for loop, do you think this was right?
+
             // create pointer on first visit
-            if (!pointer) {
-                pointer = this.Svg.put(new HighlightCircle()).init(
-                    startNode.cx(),
-                    startNode.cy(),
-                    this.getObjectSize(),
-                    this.getStrokeWidth()
-                )
-            } else {
+            // if (!pointer) {
+            //     pointer = this.Svg.put(new HighlightCircle()).init(
+            //         startNode.cx(),
+            //         startNode.cy(),
+            //         this.getObjectSize(),
+            //         this.getStrokeWidth()
+            //     )
+            // } else {
                 // animate pointer to node
                 pointer.setCenter(
                     startNode.cx(),
                     startNode.cy(),
                     this.getAnimationSpeed()
                 )
-            }
+            // }
 
             await this.pause(`traversal.atNode`, startNode.getText())
         }
 
         visitedEdges.add(edge)
-
-        // remove edge from known edges
-        knownEdges.delete(edge)
-        
-
-        const endNode = edge.$end
-        // discover outgoing edges
-        for (const currEdge of Object.values(endNode.$outgoing)) {
-                if (currEdge && !visitedEdges.has(currEdge)) {
-                    knownEdges.add(currEdge)
-                }
-            }
        
 
+        // i highligt the edge below this code but i am
+        // unsure if i am missing a case where i should
+        // highlight something different
+
         //highlight the next edge
-        if (i + 1 <= graphTraversal.length -1) {
-            this.updateEdgeTable(knownEdges,graphTraversal[i+1])
-        }
-        else { 
-        this.updateEdgeTable(knownEdges,edge)}
+        // if (i + 1 <= graphTraversal.length -1) {
+        //     this.updateEdgeTable(knownEdges,graphTraversal[i+1])
+        // }
+        // else { 
+        // this.updateEdgeTable(knownEdges,edge)}
 
 
         // highlight the traversed edge
@@ -112,6 +129,8 @@ async nodeTraversalVisualisation(
         if (edge.$end.$outgoing[edge.$start.getText()]
          && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
             edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
+
+        const endNode = edge.$end
         
         // animate pointer to next node
         pointer?.setCenter(
@@ -122,15 +141,39 @@ async nodeTraversalVisualisation(
 
         await this.pause("traversal.atNode", endNode.getText())
 
+        // remove edge from known edges
+        await this.pause("traversal.cleanUp", endNode.getText())
+        for (const currEdge of knownEdges) {
+            if (visitedNodes.has(currEdge.$end)) {
+                knownEdges.delete(currEdge)
+            }
+        }
+        this.updateEdgeTable(knownEdges)
+        
+        // discover outgoing edges
+        for (const currEdge of Object.values(endNode.$outgoing)) {
+                if (currEdge && !visitedEdges.has(currEdge)
+                    && !visitedNodes.has(currEdge.$end)) {
+                    knownEdges.add(currEdge)
+                }
+            }
+
+        await this.pause("traversal.edgeUpdate", endNode.getText())
+
         lastNode = endNode
     }
 
     pointer?.remove()
 
+    this.edgeTable.clear()
+
     await this.pause("traversal.complete")
 }
 
-updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>, highlightEdge?:WeightedConnection<WeightedGraphNode>) {
+async updateEdgeTable(
+    knownEdges:Set<WeightedConnection<WeightedGraphNode>>
+  , highlightEdge?:WeightedConnection<WeightedGraphNode>
+) {
     
 
     const columns = ["From", "To", "Weight"];
@@ -150,7 +193,9 @@ updateEdgeTable(knownEdges:Set<WeightedConnection<WeightedGraphNode>>, highlight
     let k = 0
      for (const edge of edges) {
         const currEdge = edge
-        const rowData = [currEdge.$start.getText(),currEdge.$end.getText(),currEdge.$weight.toString()]
+        const rowData = [currEdge.$start.getText()
+                        ,currEdge.$end.getText()
+                        ,currEdge.$weight.toString()]
     
         
         this.drawRow(
@@ -392,7 +437,7 @@ private drawRow(
         await this.pause("example.here")
     }
 
-    private undirectedGraph():WeightedGraphNode[] {
+    private undirectedGraph(): void {
         // i am happy with this but feel free to add to it
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 100
@@ -441,12 +486,9 @@ private drawRow(
 
         this.putAtDeg(J, G, 45)
         this.link(G, J, 8, "both")
-
-        return [A,B,C,D,E,F,G,H,I,J]
-        
     }
 
-    private directedGraph(): WeightedGraphNode[] {
+    private directedGraph(): void {
         //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 100
@@ -495,11 +537,9 @@ private drawRow(
 
         this.putAtDeg(J, G, 45)
         this.link(G, J, 8, "to")
-        
-        return [A,B,C,D,E,F,G,H,I,J]
     }
 
-    private mixedGraph(): WeightedGraphNode[] {
+    private mixedGraph(): void {
         //Looks pretty ugly if you've got suggestions please tell me
         //or feel free to make them yourself
         const midW = this.$Svg.width/2 - 100
@@ -554,10 +594,9 @@ private drawRow(
         this.link(J, D, 2, "from")
         this.link(J, A, 1, "from")
         this.link(D, B, 4, "from")
-        return [A,B,C,D,E,F,G,H,I,J]
     }
 
-    private treeGraph(): WeightedGraphNode[] {
+    private treeGraph(): void {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 - 200
 
@@ -612,11 +651,9 @@ private drawRow(
 
         this.putAtDeg(N, D, -90, 100)
         this.link(D, N, 10, "to")
-        
-        return [A,B,C,D,E,F,G,H,I,J,K,L,M,N]
     }
 
-    private cyclicGraph(): WeightedGraphNode[] {
+    private cyclicGraph(): void {
         //Neutered sign
         const midW = this.$Svg.width/2 + 100
         const midH = this.$Svg.height/2 - 25
@@ -671,12 +708,9 @@ private drawRow(
         this.putAtDeg(K, D, 220)
 
         this.link(K, D, 13, "both")
-
-
-        return [A,B,C,D,E,F,G,H,I,J,K]
     }
 
-    private acyclicGraph(): WeightedGraphNode[] {
+    private acyclicGraph(): void {
         //Somewhat basic
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 + 100
@@ -716,11 +750,9 @@ private drawRow(
 
         this.link(H, F, 1, "from")
         this.putAtDeg(H, F, 0)
-
-        return [A,B,C,D,E,F,G,H]
     }
 
-    private DAGraph(): WeightedGraphNode[] {
+    private DAGraph(): void {
         const midW = this.$Svg.width/2 - 300
         const midH = this.$Svg.height/2 - 150
 
@@ -760,11 +792,9 @@ private drawRow(
         this.link(H, F, 2, "from")
         this.link(H, G, 1, "to")
         this.putAtDeg(H, F, -150)
-
-        return [A,B,C,D,E,F,G,H]
     }
 
-    private weaklyConnectedGraph(): WeightedGraphNode[] {
+    private weaklyConnectedGraph(): void {
         //Somewhat small but I thought it might be better to
         //focus on it being weakly connected
         const midW = this.$Svg.width/2 - 100
@@ -792,11 +822,9 @@ private drawRow(
         this.link(E, C, 1, "from")
         this.link(E, A, 3, "to")
         this.putAtDeg(E, C, -120)
-
-        return [A,B,C,D,E]
     }
 
-    private stronglyConnectedGraph(): WeightedGraphNode[] {
+    private stronglyConnectedGraph(): void {
         //Somewhat small but I thought it might be better to
         //focus on it being strongly connected
         const midW = this.$Svg.width/2 - 100
@@ -824,11 +852,9 @@ private drawRow(
         this.link(E, C, 1, "from")
         this.link(E, A, 3, "to")
         this.putAtDeg(E, C, -120)
-
-        return [A,B,C,D,E]
     }
 
-    private eulerianGraph(): WeightedGraphNode[] {
+    private eulerianGraph(): void {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2
 
@@ -863,11 +889,9 @@ private drawRow(
         this.link(F, D, 7, "to")
         this.link(F, A, 8, "to")
         this.putAtDeg(F, B, 135)
-
-        return [A,B,C,D,E,F]
     }
 
-    private hamiltonianGraph(): WeightedGraphNode[] {
+    private hamiltonianGraph(): void {
         //Very simple could probably be expanded
         const midW = this.$Svg.width/2 - 150
         const midH = this.$Svg.height/2
@@ -896,11 +920,9 @@ private drawRow(
         this.link(E, B, 8, "to")
         this.link(E, A, 1, "to")
         this.putAtDeg(E, A, -135)
-
-        return [A,B,C,D,E]
     }
 
-    private chordalGraph(): WeightedGraphNode[] {
+    private chordalGraph(): void {
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 50
 
@@ -959,7 +981,5 @@ private drawRow(
         this.link(L, K, 1, "from")
         this.link(L, C, 3, "to")
         this.putAtDeg(L, K, 190)
-
-        return [A,B,C,D,E,F,G,H,I,J,K,L]
-    }    
+    }
 }
