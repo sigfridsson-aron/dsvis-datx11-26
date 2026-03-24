@@ -239,7 +239,7 @@ private drawRow(
     return rowGroup;
 }
 
-    async reset() {
+    async resetHighlights() {
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing

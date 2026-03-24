@@ -10,7 +10,7 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
                                    //Chosen Graph will be displayed
     insertNode: HTMLInputElement;
     startNode: HTMLInputElement;
-    reset: HTMLInputElement;
+    resetHighlights: HTMLInputElement;
     chooseGraphI: HTMLSelectElement;
     engine: Graph;
     
@@ -44,8 +44,8 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
             container
         )
 
-        this.reset = querySelector<HTMLInputElement> (
-            "input.reset",
+        this.resetHighlights = querySelector<HTMLInputElement> (
+            "input.resetHighlights",
             container
         )
 
@@ -73,8 +73,8 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
             this.engine.submit(this.engine.startNode, this.insertNode)
         })
 
-        this.reset.addEventListener("click", () => {
-            this.engine.submit(this.engine.reset, null)
+        this.resetHighlights.addEventListener("click", () => {
+            this.engine.submit(this.engine.resetHighlights, null)
         })
     }
 }
