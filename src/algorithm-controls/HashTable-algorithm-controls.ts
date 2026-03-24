@@ -5,9 +5,11 @@ import { CollectionAlgorithmControl } from "./collection-algorithm-controls";
 
 export class HashTableAlgorithmControl extends CollectionAlgorithmControl {
     HashFunctionSelector: HTMLSelectElement;
+    previousValue: string;
 
     constructor(container: HTMLElement, engine: Collection) {
         super(container, engine);
+        this.previousValue = "0";
 
         this.engine = engine;
 
@@ -16,7 +18,7 @@ export class HashTableAlgorithmControl extends CollectionAlgorithmControl {
             `<span class="formgroup"><label>
                 Hash Function:
                 <select id="hashFunction" class="HashFunctionSelector disableWhenRunning">
-                <option value="0">Rolling Hash</option>
+                <option value="0">Java HashCode</option>
                 <option value="1">First Character</option>
                 <option value="2">Sum of Characters</option>
                 </select>
@@ -28,8 +30,17 @@ export class HashTableAlgorithmControl extends CollectionAlgorithmControl {
             container
         );
 
-        this.HashFunctionSelector.addEventListener("change", () =>
-            this.engine.submit(this.engine.resizeHashtable, null)
+        this.HashFunctionSelector.addEventListener("change", () => {
+                if(!this.engine.confirmResetAll()){
+                    this.HashFunctionSelector.value = this.previousValue;
+                }
+            }
+        );
+
+        this.HashFunctionSelector.addEventListener("focus", () => {
+                this.previousValue = this.HashFunctionSelector.value;
+            }
         );
     }
 }
+

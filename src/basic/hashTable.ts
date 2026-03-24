@@ -39,7 +39,7 @@ export class hashTable extends G {
 
     /** Returns number of elements that fit in a row*/ 
     getRowWidth() : number {
-        return Math.floor((this.engine().$Svg.width - this.engine().$Svg.margin) / (this.engine().getObjectSize() * 2));
+        return Math.floor((this.engine().$Svg.width - 7 * this.engine().$Svg.margin + 10) / (this.engine().getObjectSize() * 2));
     }
 
     /** Calculates the x-coordinate for a value based on its index*/ 

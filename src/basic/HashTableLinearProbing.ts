@@ -49,6 +49,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     constructor(containerSelector: string) {
         super(containerSelector);
         this.sortArray = new hashTable(0, this.getObjectSize()); // Only added to make sure that sortArray never is null
+        
     }
 
     initialise(initialValues = []) {
@@ -58,7 +59,8 @@ export class HashTableLinearProbing extends Engine implements Collection {
 
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.usinghash = 0;
+        const dropdown = document.getElementById("hashFunction") as HTMLSelectElement;
+        this.usinghash = Number(dropdown.value);
         this.loadFactor = 0;
         const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
@@ -133,7 +135,6 @@ export class HashTableLinearProbing extends Engine implements Collection {
                 await this.pause("find.lookStart", newIndex);
                 while(newmetaArray[newIndex] == 2){
                     await this.pause("find.notEmpty", newIndex);
-                    console.log(newArray.getValue(newIndex));
                     newArray.setIndexHighlight(newIndex, false);
                     newIndex = (newIndex + 1) % newArray.getSize();
                     newArray.setIndexHighlight(newIndex, true);
@@ -174,20 +175,22 @@ export class HashTableLinearProbing extends Engine implements Collection {
         await this.pause(undefined);
     }
 
-    async giveEngineLength(): Promise<number> {
-        const dropdown = document.getElementById("hashFunction") as HTMLSelectElement;
-        console.log("bruh: " + dropdown.value);
-        this.usinghash = Number(dropdown.value);
+    // async giveEngineLength(): Promise<number> {
+    //     const dropdown = document.getElementById("hashFunction") as HTMLSelectElement;
+    //     console.log("bruh: " + dropdown.value);
+    //     this.usinghash = Number(dropdown.value);
 
-        return this.sortArray.getSize();
+    //     return this.sortArray.getSize();
         
-    }
+    // }
+
     async insertOne(value: number | string) {
         
         if(this.loadFactor >= this.sortArray.getSize() * 0.75){
             await this.pause("Load Factor exceeded!");
             await this.resize(this.sortArray.getSize() * 2);
         }
+
         value = String(value);
         const arrayLabel = this.Svg.put(
             new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
@@ -200,13 +203,14 @@ export class HashTableLinearProbing extends Engine implements Collection {
         await this.pause("find.lookStart", currentIndex);
         while(this.metadataArray[currentIndex] == 2){
             await this.pause("find.notEmpty", currentIndex);
-            console.log(this.sortArray.getValue(currentIndex));
             this.sortArray.setIndexHighlight(currentIndex, false);
             currentIndex = (currentIndex + 1) % this.sortArray.getSize();
             this.sortArray.setIndexHighlight(currentIndex, true);
             await this.pause("find.look", currentIndex);
         }
+
         await this.pause("Found empty index");
+        
         arrayLabel.setCenter(
             this.sortArray.getCX(currentIndex),
             this.sortArray.getCY(currentIndex),
