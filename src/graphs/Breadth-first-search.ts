@@ -7,13 +7,9 @@ import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import Queue from "~/basic/Queue"
 
 export const BreadthMessages = {
-    //if you want to change messages that already exist in
-    //BaseGraph you can define something like
-    // error: {
-    //    nullGraph: "you are man"
-    // }
-    //and it will overwrite the BaseGraph's error.nullGraph
-    //message
+    traversal: {
+        chooseEdge: (value: string) => `Exploring all of ${value}'s edges`
+    }
 } as const satisfies MessagesObject
 
 export class Breadth extends BaseGraph implements Graph {
