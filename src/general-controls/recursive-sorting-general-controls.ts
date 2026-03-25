@@ -30,6 +30,6 @@ export class RecursiveSortingGeneralControls extends EngineGeneralControls {
             else this.engine.doNotFollowRecursion();
         });
 
-        this.engine.disablePanning();
+        this.engine.disableViewBoxPanning();
     }
 }

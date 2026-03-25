@@ -205,7 +205,7 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
         animate: boolean = false
     ) {
         if (animate) {
-            this.engine.Svg.animate(10).viewbox(x, y, width, height);
+            this.engine.Svg.animate(this.engine.getAnimationSpeed()).viewbox(x, y, width, height);
         } else {
             this.engine.Svg.viewbox(x, y, width, height);
         }
