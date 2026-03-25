@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+export {};
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -35,3 +36,20 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add(
+    "selectAlgorithm",
+    (optionValue: string, optionText?: string) => {
+        cy.get(".algorithmSelector").select(optionText ?? optionValue);
+        cy.url().should("include", `algorithm=${optionValue}`);
+        cy.get(".algorithmSelector").should("have.value", optionValue);
+    }
+);
+
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            selectAlgorithm(value: string, text?: string): Chainable<void>;
+        }
+    }
+}
