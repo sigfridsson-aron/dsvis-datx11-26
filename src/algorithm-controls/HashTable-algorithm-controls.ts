@@ -25,6 +25,14 @@ export class HashTableAlgorithmControl extends CollectionAlgorithmControl {
             </label></span>`
         );
 
+        const insertvalues = document.querySelector<HTMLSelectElement>(".insertSelect");
+        if(insertvalues){
+            insertvalues.options[2].value = "AA AB AC AD AE AF";
+            insertvalues.options[2].text = "AA AB AC AD AE AF";
+            insertvalues.options[3].value = "ABC ACB BCA BAC CAB CBA";
+            insertvalues.options[3].text = "ABC ACB ... CBA";
+        }
+
         this.HashFunctionSelector = querySelector<HTMLSelectElement>(
             "select.HashFunctionSelector",
             container
