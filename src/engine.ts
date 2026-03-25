@@ -7,6 +7,8 @@ import { Svg } from "~/objects"; // NOT THE SAME Svg as in @svgdotjs/svg.js!!!
 import { State } from "~/state";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { EngineGeneralControls } from "./general-controls/engine-general-controls";
+import PannableAndZoomable from "~/util/PannableAndZoomable";
+import PanAndZoomHelper from "~/util/PanAndZoomHelper";
 
 export type SubmitFunction = (...args: (string | number)[]) => Promise<void>;
 
@@ -35,7 +37,7 @@ type Action = {
  */
 export const NBSP = "\u00A0";
 
-export class Engine {
+export class Engine implements PannableAndZoomable {
     // Default variable names start with $
 
     // Use separate containing Svg to hold information that shouldn't be moved when panning
@@ -62,8 +64,7 @@ export class Engine {
     state: State;
     info: Info;
 
-    isPanning: boolean = false;
-    lastPointerPosition: { x?: number; y?: number } = {};
+    panAndZoomHelper: PanAndZoomHelper;
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -130,10 +131,33 @@ export class Engine {
             this.Svg.addClass("debug");
         }
 
-        this.initializeViewBoxPanning(svgContainer);
-        this.initializeViewBoxZooming(svgContainer);
+        this.panAndZoomHelper = new PanAndZoomHelper(this, svgContainer)
         
         this.info = new Info(this._containingSvg, this.$Svg.margin);
+    }
+    enableViewBoxPanning(): void {
+        return this.panAndZoomHelper.enableViewBoxPanning();
+    }
+    disableViewBoxPanning(): void {
+        return this.panAndZoomHelper.disableViewBoxPanning();
+    }
+    resetViewBox(): void {
+        return this.panAndZoomHelper.resetViewBox();
+    }
+    resetViewBoxPosition(): void {
+        return this.panAndZoomHelper.resetViewBoxPosition();
+    }
+    moveViewBox(dx: number, dy: number, animate: boolean): void {
+        return this.panAndZoomHelper.moveViewBox(dx, dy, animate);
+    }
+    setViewBoxPosition(x: number, y: number, animate: boolean): void {
+        return this.panAndZoomHelper.setViewBoxPosition(x, y, animate);
+    }
+    setViewBoxCenter(x: number, y: number, animate: boolean): void {
+        return this.panAndZoomHelper.setViewBoxCenter(x, y, animate);
+    }
+    zoomViewBox(direction: "in" | "out", pointerLocation: { x: number; y: number; }, steps: number, animate: boolean): void {
+        return this.panAndZoomHelper.zoomViewBox(direction, pointerLocation, steps, animate);
     }
 
     initialise(): void {
@@ -156,6 +180,7 @@ export class Engine {
 
     async reset(): Promise<void> {
         this.clearCanvas();
+        this.panAndZoomHelper.resetViewBox();
         await this.resetAlgorithm();
         this.resetListeners(false);
     }
@@ -490,139 +515,4 @@ export class Engine {
         }
     }
 
-    initializeViewBoxPanning(svgContainer: SVGSVGElement) {
-        const that = this;
-        function enablePanningOnMouseDown() {
-            that.isPanning = true;
-        }
-
-        svgContainer.addEventListener("mousedown", enablePanningOnMouseDown);
-
-        svgContainer.addEventListener("mouseleave", () => {
-            this.isPanning = false;
-            this.lastPointerPosition = {};
-        });
-
-        svgContainer.addEventListener("mouseup", () => {
-            this.isPanning = false;
-            this.lastPointerPosition = {};
-        });
-
-        svgContainer.addEventListener("mousemove", (e: MouseEvent) => {
-            if (this.isPanning) {
-                const pointerDelta = {
-                    x: this.lastPointerPosition.x
-                        ? e.clientX - this.lastPointerPosition.x
-                        : 0,
-                    y: this.lastPointerPosition.y
-                        ? e.clientY - this.lastPointerPosition.y
-                        : 0,
-                };
-                this.lastPointerPosition = {
-                    x: e.clientX,
-                    y: e.clientY,
-                };
-
-                // Viewbox should change in opposite direction to the pointer movement, hence -pointerDelta.x/y
-                const zoomScale: { x: number, y: number } = this.getZoomScale();
-                this.moveViewBox(-pointerDelta.x * zoomScale.x, -pointerDelta.y * zoomScale.y);
-            }
-        });
-
-        this.disableViewBoxPanning = () => {
-            svgContainer.removeEventListener("mousedown", enablePanningOnMouseDown)
-            this.isPanning = false
-        }
-        this.enableViewBoxPanning = () => svgContainer.addEventListener("mousedown", enablePanningOnMouseDown)
-    }
-
-    enableViewBoxPanning() {
-        throw new Error("Panning has not been initialized")
-    }
-
-    disableViewBoxPanning() {
-        throw new Error("Panning has not been initialized")
-    }
-
-    resetViewBoxPosition() {
-        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
-        this.setViewBoxCenter(viewBoxWidth / 2, viewBoxHeight / 2, true)
-    }
-    
-    moveViewBox(dx: number, dy: number, animate: boolean = false) {
-        const { x: viewBoxX, y: viewBoxY, width: viewBoxWith, height: viewBoxHeight } = this.Svg.viewbox();
-        this.animate(this.Svg, animate).viewbox(viewBoxX + dx, viewBoxY + dy, viewBoxWith, viewBoxHeight)
-    }
-    
-    setViewBoxCenter(x: number, y: number, animate: boolean = false) {
-        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
-        this.animate(this.Svg, animate).viewbox(x - viewBoxWidth / 2, y - viewBoxHeight / 2, viewBoxWidth, viewBoxHeight)
-    }
-
-    getViewBoxWToHAspectRatio(): number {
-        return this.$Svg.width / this.$Svg.height;
-    }
-
-    initializeViewBoxZooming(svgContainer: SVGSVGElement) {
-        this.setViewBoxSize = (width: number, height: number, animate: boolean = false) => {
-            if (height <= 0 || width <= 0) {
-                throw new Error(`Width and height must be greater than 0, was: width = ${width}, height = ${height}`)
-            }
-            const { x: viewBoxX, y: viewBoxY, width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox()
-            const widthDiff: number = viewBoxWidth - width;
-            const heightDiff: number = viewBoxHeight - height;
-            if (animate) {
-                this.Svg.animate(10).viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
-            } else {
-                this.Svg.viewbox(viewBoxX + widthDiff / 2, viewBoxY + heightDiff / 2, width, height)
-            }
-        }
-
-        this.zoomInViewBox = (direction: 'in' | 'out', steps: number = 1) => {
-            const stepSize: number = 30;
-            let yChange: number;
-            if (direction === 'in') {
-                yChange = -steps * stepSize
-            } else if (direction === 'out') {
-                yChange = steps * stepSize;
-            } else {
-                throw new Error(`direction must be 'in' or 'out', was ${direction}`)
-            }
-
-            const { height: viewBoxHeight } = this.Svg.viewbox();
-            const height = Math.max(1, viewBoxHeight + yChange);
-            const width = height * this.getViewBoxWToHAspectRatio();
-
-            this.setViewBoxSize(width, height, true);
-        }
-
-        
-        svgContainer.addEventListener("wheel", (event: WheelEvent) => {
-            event.preventDefault();
-            if (event.ctrlKey) {
-                if (event.deltaY > 0) {
-                    this.zoomInViewBox('out', 1, true)
-                }
-                if (event.deltaY < 0) {
-                    this.zoomInViewBox('in', 1, true)
-                }
-            }
-        })
-
-    }
-
-    private setViewBoxSize(width: number, height: number, animate: boolean = false) {
-        throw new Error("Zoom has not been initialized");
-    }
-
-    private getZoomScale(): { x: number, y: number } {
-        const { width: viewBoxWidth, height: viewBoxHeight } = this.Svg.viewbox();
-        const renderedWidth: number = this._containingSvg.node.clientWidth;
-        const renderedHeight: number = this._containingSvg.node.clientHeight;
-        return { x: viewBoxWidth / renderedWidth, y: viewBoxHeight / renderedHeight }
-    }
-
-    zoomInViewBox(direction: 'in' | 'out', steps: number = 1, animate: boolean = false) {
-        throw new Error("Zoom has not been initialized")
-    }
 }
