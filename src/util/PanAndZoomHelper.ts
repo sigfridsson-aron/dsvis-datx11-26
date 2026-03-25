@@ -92,16 +92,20 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
             }
         });
     }
+    
     enableViewBoxPanning(): void {
         this.svgContainer.addEventListener("mousedown", this.startPanning);
     }
+
     disableViewBoxPanning(): void {
         this.svgContainer.removeEventListener("mousedown", this.startPanning);
         this.isPanning = false;
     }
+    
     resetViewBox(): void {
         this.setViewBox(0, 0, this.engine.$Svg.width, this.engine.$Svg.height)
     }
+
     resetViewBoxPosition(): void {
         const {
             width: containingViewBoxWidth,
@@ -117,6 +121,7 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
             true
         );
     }
+
     moveViewBox(dx: number, dy: number, animate: boolean): void {
         const { x: viewBoxX, y: viewBoxY } = this.engine.Svg.viewbox();
         const zoomScale: { x: number; y: number } = this.getZoomScale();
@@ -126,11 +131,13 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
             animate
         );
     }
+
     setViewBoxPosition(x: number, y: number, animate: boolean): void {
         const { width: viewBoxWidth, height: viewBoxHeight } =
             this.engine.Svg.viewbox();
         this.setViewBox(x, y, viewBoxWidth, viewBoxHeight, animate);
     }
+
     setViewBoxCenter(x: number, y: number, animate: boolean): void {
         const { width: viewBoxWidth, height: viewBoxHeight } =
             this.engine.Svg.viewbox();
@@ -140,9 +147,7 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
             animate
         );
     }
-    initializeViewBoxZooming(svgContainer: SVGSVGElement): void {
-        throw new Error("Panning and zooming has not been initialized.");
-    }
+
     zoomViewBox(
         direction: "in" | "out",
         pointerLocation: { x: number; y: number },
