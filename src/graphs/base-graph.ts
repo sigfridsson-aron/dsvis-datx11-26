@@ -18,7 +18,8 @@ export const BaseGraphMessages = {
       , atNode: (value: string) => `At node ${value}`
       , cleanUp: (value: string) => `Remove edges that visit ${value}`
       , edgeUpdate: (value: string) => `Add ${value}'s edges`
-      , chooseEdge: "Choose next edge based on remaining depth"
+      , move: (value: string) => `move to start node ${value}`
+      , chooseEdge: "Choose next edge based on its remaining depth"
       , complete: "Done!"
     }
 } as const satisfies MessagesObject
@@ -54,18 +55,20 @@ async nodeTraversalVisualisation(
 
     let pointer: HighlightCircle | null = null
 
+    const firstNode = graphTraversal[0].$start
+
     pointer = this.Svg.put(new HighlightCircle()).init(
-                    graphTraversal[0].$start.cx(),
-                    graphTraversal[0].$start.cy(),
+                    firstNode.cx(),
+                    firstNode.cy(),
                     this.getObjectSize(),
                     this.getStrokeWidth()
     )
 
-    await this.pause("traversal.start", graphTraversal[0].$start.getText())
+    await this.pause("traversal.start", firstNode.getText())
 
-    await this.pause("traversal.edgeUpdate", graphTraversal[0].$start.getText())
+    await this.pause("traversal.edgeUpdate", firstNode.getText())
     // discover outgoing edges
-    for (const currEdge of Object.values(graphTraversal[0].$start.$outgoing)) {
+    for (const currEdge of Object.values(firstNode.$outgoing)) {
         if (currEdge && !visitedEdges.has(currEdge)
             && !visitedNodes.has(currEdge.$end)) {
             knownEdges.add(currEdge)
@@ -78,49 +81,23 @@ async nodeTraversalVisualisation(
         visitedNodes.add(startNode)
 
         this.updateEdgeTable(knownEdges)
-        await this.pause("traversal.chooseEdge")
+        await this.pause("traversal.chooseEdge", startNode.getText())
         this.updateEdgeTable(knownEdges, edge)
-        await this.pause("")
+        await this.pause("traversal.move", startNode.getText())
+
         visitedNodes.add(edge.$end)
         if (lastNode !== startNode) {
-
-            // i put the first update of the edgetable outside
-            // the for loop, do you think this was right?
-
-            // create pointer on first visit
-            // if (!pointer) {
-            //     pointer = this.Svg.put(new HighlightCircle()).init(
-            //         startNode.cx(),
-            //         startNode.cy(),
-            //         this.getObjectSize(),
-            //         this.getStrokeWidth()
-            //     )
-            // } else {
-                // animate pointer to node
-                pointer.setCenter(
-                    startNode.cx(),
-                    startNode.cy(),
-                    this.getAnimationSpeed()
-                )
-            // }
+            // animate pointer to node
+            pointer.setCenter(
+                startNode.cx(),
+                startNode.cy(),
+                this.getAnimationSpeed()
+            )
 
             await this.pause(`traversal.atNode`, startNode.getText())
         }
 
         visitedEdges.add(edge)
-       
-
-        // i highligt the edge below this code but i am
-        // unsure if i am missing a case where i should
-        // highlight something different
-
-        //highlight the next edge
-        // if (i + 1 <= graphTraversal.length -1) {
-        //     this.updateEdgeTable(knownEdges,graphTraversal[i+1])
-        // }
-        // else { 
-        // this.updateEdgeTable(knownEdges,edge)}
-
 
         // highlight the traversed edge
         edge.setHighlight(true)
@@ -263,7 +240,7 @@ private drawRow(
     return rowGroup;
 }
 
-    async reset() {
+    async resetHighlights() {
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing
