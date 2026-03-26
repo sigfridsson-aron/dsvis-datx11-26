@@ -176,7 +176,7 @@ async updateEdgeTable(
 ) {
     
 
-    const columns = ["From", "To", "Weight"];
+    const columns = ["From", "Weight", "To"];
     const edges = knownEdges
     
     const cellHeight = 40;
@@ -185,6 +185,7 @@ async updateEdgeTable(
     const startX = this.$Svg.width-cellWidth*columns.length;
     const startY = 0;
     
+
     // Clear previous content
     this.edgeTable.clear();
 
@@ -194,8 +195,8 @@ async updateEdgeTable(
      for (const edge of edges) {
         const currEdge = edge
         const rowData = [currEdge.$start.getText()
-                        ,currEdge.$end.getText()
-                        ,currEdge.$weight.toString()]
+                        ,currEdge.$weight.toString()
+                        ,currEdge.$end.getText()]
     
         
         this.drawRow(
