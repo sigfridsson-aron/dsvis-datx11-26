@@ -10,8 +10,9 @@ import { MinPriorityStack } from "~/basic/MinPriorityStack";
 
 
 export class Dijkstras_algorithm extends BaseGraph implements Graph {
+    
 
-    private knownEdges:Set<WeightedConnection<WeightedGraphNode>> = new Set
+  
     private distanceMap:Map<WeightedGraphNode, number> = new Map
    
     override async start() {
@@ -25,9 +26,12 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 
         
         
-    }
+    }   
+    
 
-
+    nodeTraversalVisualisation(): void {
+            throw new Error("Method not implemented.");
+        }
     searchGraph(startNode:WeightedGraphNode) {
 
    

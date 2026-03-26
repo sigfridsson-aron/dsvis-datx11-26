@@ -5,6 +5,7 @@ import { WeightedConnection } from "~/objects/weigted-connection";
 import { GraphNode } from "~/objects/graph-node";
 import { BaseGraph, BaseGraphMessages } from "./base-graph";
 import { updateDefault } from "~/helpers";
+import { HighlightCircle } from "~/objects/highlight-circle";
 
 export const DepthMessages = {
     //if you want to change messages that already exist in
@@ -18,6 +19,7 @@ export const DepthMessages = {
 
 export class Depth extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(DepthMessages, BaseGraphMessages);
+    private graphTraversal: WeightedConnection<WeightedGraphNode>[] = []
 
     override async start() {
         if (!this.graph) {
@@ -25,9 +27,9 @@ export class Depth extends BaseGraph implements Graph {
             return
         }
         this.graph.setHighlight(false)
-        const result = this.searchGraph(this.graph)
-        console.log(result)
-        await this.nodeTraversalVisualisation(result)
+        this.graphTraversal = this.searchGraph(this.graph)
+       
+        await this.nodeTraversalVisualisation()
         this.graph.setHighlight(true)
     }
 
@@ -72,4 +74,106 @@ export class Depth extends BaseGraph implements Graph {
         }
         return edges
     }
+
+    async nodeTraversalVisualisation(
+) {
+    let lastNode: WeightedGraphNode | null = null
+
+    const knownEdges   = new Set<WeightedConnection<WeightedGraphNode>>()
+    const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
+    const visitedNodes = new Set<WeightedGraphNode>()
+
+    let pointer: HighlightCircle | null = null
+
+    const firstNode = this.graphTraversal[0].$start
+
+    pointer = this.Svg.put(new HighlightCircle()).init(
+                    firstNode.cx(),
+                    firstNode.cy(),
+                    this.getObjectSize(),
+                    this.getStrokeWidth()
+    )
+
+    await this.pause("traversal.start", firstNode.getText())
+
+    await this.pause("traversal.edgeUpdate", firstNode.getText())
+    // discover outgoing edges
+    for (const currEdge of Object.values(firstNode.$outgoing)) {
+        if (currEdge && !visitedEdges.has(currEdge)
+            && !visitedNodes.has(currEdge.$end)) {
+            knownEdges.add(currEdge)
+        }
+    }
+
+    for (let i = 0; i < this.graphTraversal.length;i++) {
+        const edge = this.graphTraversal[i]
+        const startNode = edge.$start
+        visitedNodes.add(startNode)
+
+        this.updateEdgeTable(knownEdges)
+        await this.pause("traversal.chooseEdge", startNode.getText())
+        this.updateEdgeTable(knownEdges, edge)
+        await this.pause("traversal.move", startNode.getText())
+
+        visitedNodes.add(edge.$end)
+        if (lastNode !== startNode) {
+            // animate pointer to node
+            pointer.setCenter(
+                startNode.cx(),
+                startNode.cy(),
+                this.getAnimationSpeed()
+            )
+
+            await this.pause(`traversal.atNode`, startNode.getText())
+        }
+
+        visitedEdges.add(edge)
+
+        // highlight the traversed edge
+        edge.setHighlight(true)
+
+        // if edge is undirected highlight the path back as well
+        if (edge.$end.$outgoing[edge.$start.getText()]
+         && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
+            edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
+
+        const endNode = edge.$end
+        
+        // animate pointer to next node
+        pointer?.setCenter(
+            endNode.cx(),
+            endNode.cy(),
+            this.getAnimationSpeed()
+        )
+
+        await this.pause("traversal.atNode", endNode.getText())
+
+        // remove edge from known edges
+        await this.pause("traversal.cleanUp", endNode.getText())
+        for (const currEdge of knownEdges) {
+            if (visitedNodes.has(currEdge.$end)) {
+                knownEdges.delete(currEdge)
+            }
+        }
+        this.updateEdgeTable(knownEdges)
+        
+        // discover outgoing edges
+        for (const currEdge of Object.values(endNode.$outgoing)) {
+                if (currEdge && !visitedEdges.has(currEdge)
+                    && !visitedNodes.has(currEdge.$end)) {
+                    knownEdges.add(currEdge)
+                }
+            }
+
+        await this.pause("traversal.edgeUpdate", endNode.getText())
+
+        lastNode = endNode
+    }
+
+    pointer?.remove()
+
+    this.edgeTable.clear()
+
+    await this.pause("traversal.complete")
+}
 }
