@@ -46,10 +46,37 @@ Cypress.Commands.add(
     }
 );
 
+Cypress.Commands.add("checkForAllAlgorithms", (check: () => void) => {
+    cy.get(".algorithmSelector").then((algorithmSelector) => {
+        algorithmSelector.find("option").each(function () {
+            if (this instanceof HTMLOptionElement) {
+                cy.selectAlgorithm(this.value);
+                check();
+            }
+        });
+    });
+});
+
+Cypress.Commands.add("checkForAllPages", (check: () => void) => {
+    cy.visit("/");
+    cy.get("ul")
+        .find("a")
+        .each((a) => {
+            cy.log(a..constructor)
+            if (a instanceof HTMLAnchorElement) {
+                cy.visit(`localhost:8080/${a.href}`);
+                cy.url().should("include", a.href);
+                check();
+            }
+        });
+});
+
 declare global {
     namespace Cypress {
         interface Chainable {
             selectAlgorithm(value: string, text?: string): Chainable<void>;
+            checkForAllAlgorithms(check: () => void): Chainable<void>;
+            checkForAllPages(check: () => void): Chainable<void>;
         }
     }
 }
