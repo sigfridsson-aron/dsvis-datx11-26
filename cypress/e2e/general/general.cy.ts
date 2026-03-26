@@ -18,22 +18,11 @@ describe("Index.html", () => {
 
 describe("General controls", () => {
     it("Node size and animation speed has values", () => {
-        cy.visit("/");
-        cy.get("ul")
-            .find("a")
-            .each((a) => {
-                cy.wrap(a)
-                    .invoke("attr", "href")
-                    .then((href: string | undefined) => {
-                        if (href) {
-                            cy.visit(`localhost:8080/${href}`);
-                            cy.get(".objectSize").should("not.have.value", "");
-                            cy.get(".animationSpeed").should(
-                                "not.have.value",
-                                ""
-                            );
-                        }
-                    });
+        cy.checkForAllPages(() => {
+            cy.checkForAllAlgorithms(() => {
+                cy.get(".objectSize").should("not.have.value", "");
+                cy.get(".animationSpeed").should("not.have.value", "");
             });
+        });
     });
 });
