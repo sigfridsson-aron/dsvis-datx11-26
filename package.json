@@ -29,7 +29,10 @@
     "build": "webpack --mode production --node-env=production",
     "build:dev": "webpack --mode=development",
     "serve": "webpack serve",
-    "dev": "npm run serve"
+    "dev": "npm run serve",
+    "cy:run": "cypress run",
+    "cy:open": "cypress open",
+    "test": "cypress run"
   },
   "author": "",
   "license": "ISC"
