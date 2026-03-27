@@ -24,7 +24,7 @@ export const BaseGraphMessages = {
     }
 } as const satisfies MessagesObject
 
-export class BaseGraph extends Engine implements Graph {
+export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
     graph: WeightedGraphNode | null = null;
     createdNodes: WeightedGraphNode[] = [];
@@ -44,108 +44,9 @@ export class BaseGraph extends Engine implements Graph {
     }
 
 
-async nodeTraversalVisualisation(
-    graphTraversal: WeightedConnection<WeightedGraphNode>[]
-) {
-    let lastNode: WeightedGraphNode | null = null
+    abstract nodeTraversalVisualisation():void
 
-    const knownEdges   = new Set<WeightedConnection<WeightedGraphNode>>()
-    const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
-    const visitedNodes = new Set<WeightedGraphNode>()
 
-    let pointer: HighlightCircle | null = null
-
-    const firstNode = graphTraversal[0].$start
-
-    pointer = this.Svg.put(new HighlightCircle()).init(
-                    firstNode.cx(),
-                    firstNode.cy(),
-                    this.getObjectSize(),
-                    this.getStrokeWidth()
-    )
-
-    await this.pause("traversal.start", firstNode.getText())
-
-    await this.pause("traversal.edgeUpdate", firstNode.getText())
-    // discover outgoing edges
-    for (const currEdge of Object.values(firstNode.$outgoing)) {
-        if (currEdge && !visitedEdges.has(currEdge)
-            && !visitedNodes.has(currEdge.$end)) {
-            knownEdges.add(currEdge)
-        }
-    }
-
-    for (let i = 0; i < graphTraversal.length;i++) {
-        const edge = graphTraversal[i]
-        const startNode = edge.$start
-        visitedNodes.add(startNode)
-
-        this.updateEdgeTable(knownEdges)
-        await this.pause("traversal.chooseEdge", startNode.getText())
-        this.updateEdgeTable(knownEdges, edge)
-        await this.pause("traversal.move", startNode.getText())
-
-        visitedNodes.add(edge.$end)
-        if (lastNode !== startNode) {
-            // animate pointer to node
-            pointer.setCenter(
-                startNode.cx(),
-                startNode.cy(),
-                this.getAnimationSpeed()
-            )
-
-            await this.pause(`traversal.atNode`, startNode.getText())
-        }
-
-        visitedEdges.add(edge)
-
-        // highlight the traversed edge
-        edge.setHighlight(true)
-
-        // if edge is undirected highlight the path back as well
-        if (edge.$end.$outgoing[edge.$start.getText()]
-         && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
-            edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
-
-        const endNode = edge.$end
-        
-        // animate pointer to next node
-        pointer?.setCenter(
-            endNode.cx(),
-            endNode.cy(),
-            this.getAnimationSpeed()
-        )
-
-        await this.pause("traversal.atNode", endNode.getText())
-
-        // remove edge from known edges
-        await this.pause("traversal.cleanUp", endNode.getText())
-        for (const currEdge of knownEdges) {
-            if (visitedNodes.has(currEdge.$end)) {
-                knownEdges.delete(currEdge)
-            }
-        }
-        this.updateEdgeTable(knownEdges)
-        
-        // discover outgoing edges
-        for (const currEdge of Object.values(endNode.$outgoing)) {
-                if (currEdge && !visitedEdges.has(currEdge)
-                    && !visitedNodes.has(currEdge.$end)) {
-                    knownEdges.add(currEdge)
-                }
-            }
-
-        await this.pause("traversal.edgeUpdate", endNode.getText())
-
-        lastNode = endNode
-    }
-
-    pointer?.remove()
-
-    this.edgeTable.clear()
-
-    await this.pause("traversal.complete")
-}
 
 async updateEdgeTable(
     knownEdges:Set<WeightedConnection<WeightedGraphNode>>
@@ -153,7 +54,7 @@ async updateEdgeTable(
 ) {
     
 
-    const columns = ["From", "To", "Weight"];
+    const columns = ["From", "Weight", "To"];
     const edges = knownEdges
     
     const cellHeight = 40;
@@ -162,6 +63,7 @@ async updateEdgeTable(
     const startX = this.$Svg.width-cellWidth*columns.length;
     const startY = 0;
     
+
     // Clear previous content
     this.edgeTable.clear();
 
@@ -171,8 +73,8 @@ async updateEdgeTable(
      for (const edge of edges) {
         const currEdge = edge
         const rowData = [currEdge.$start.getText()
-                        ,currEdge.$end.getText()
-                        ,currEdge.$weight.toString()]
+                        ,currEdge.$weight.toString()
+                        ,currEdge.$end.getText()]
     
         
         this.drawRow(

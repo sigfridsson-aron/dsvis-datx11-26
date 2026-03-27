@@ -5,6 +5,7 @@ import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-co
 import { GraphAlgorithmControl } from "./algorithm-controls/graph-algorithmcontrols";
 import { Breadth } from "./graphs/Breadth-first-search";
 import { FloydWarshall } from "./graphs/Floyd-Warshall";
+import { Dijkstras_algorithm } from "./graphs/Dijkstras-algoritm";
 
 export interface Graph extends Engine {
     start: SubmitFunction;
@@ -23,7 +24,8 @@ export interface Graph extends Engine {
 const GRAPH_CLASSES = {
     FloydWarshall: FloydWarshall,
     Breadth: Breadth,
-    Depth: Depth //define the searching algorithms
+    Depth: Depth,
+    Dijkstras_algorithm:Dijkstras_algorithm //define the searching algorithms
     // I think its used so the program can find classes
     // in the html
 } as const satisfies RecordOfEngines<Graph>;

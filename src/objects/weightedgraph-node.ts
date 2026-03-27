@@ -5,7 +5,7 @@ export class WeightedGraphNode extends GraphNode {
     $outgoing: Record<string, WeightedConnection<this> | null> = {};
     $incoming: Record<string, WeightedConnection<this> | null> = {};
     $weights: Record<string, number | null> = {};
-
+    
 
     constructor(text: string, size: number, strokeWidth: number) {
         super(text, size, strokeWidth);

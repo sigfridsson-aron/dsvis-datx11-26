@@ -97,4 +97,8 @@ export class FloydWarshall extends BaseGraph implements Graph {
         }
         return paths
     }
+
+    async nodeTraversalVisualisation(): Promise<void> {
+
+    }
 }
