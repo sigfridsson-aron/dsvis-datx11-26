@@ -77,9 +77,16 @@ export class Depth extends BaseGraph implements Graph {
 
     async nodeTraversalVisualisation(
 ) {
+    if(this.graphTraversal.length === 0) {
+        await this.pause("traversal.start", this.graph!.getText())
+        await this.pause("traversal.edgeUpdate", this.graph!.getText())
+        await this.pause("traversal.complete")
+        return
+    }
+
     let lastNode: WeightedGraphNode | null = null
 
-     const knownEdges = new Set<tableInformation>
+    const knownEdges = new Set<tableInformation>
     const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
     const visitedNodes = new Set<GraphNode>()
 
