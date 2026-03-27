@@ -3,6 +3,7 @@ import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { parseValues } from "~/helpers";
+import { GraphNode } from "~/objects/graph-node";
 import { HighlightCircle } from "~/objects/highlight-circle";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
@@ -24,12 +25,16 @@ export const BaseGraphMessages = {
     }
 } as const satisfies MessagesObject
 
+export type tableInformation = {node:GraphNode,weight:number,node2?:GraphNode}
+
 export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
     graph: WeightedGraphNode | null = null;
     createdNodes: WeightedGraphNode[] = [];
     initialValues: (String | Number)[] = [];
     generalControls: EngineGeneralControls;
+    
+    
 
     constructor(containorSelector: string) {
         super(containorSelector)
@@ -47,52 +52,13 @@ export abstract class BaseGraph extends Engine implements Graph {
     abstract nodeTraversalVisualisation():void
 
 
-
-async updateEdgeTable(
-    knownEdges:Set<WeightedConnection<WeightedGraphNode>>
+//knownEdges:Set<WeightedConnection<WeightedGraphNode>>
+abstract updateTable(
+    tableInformation:tableInformation[]
   , highlightEdge?:WeightedConnection<WeightedGraphNode>
-) {
-    
+)  : Promise<void>
 
-    const columns = ["From", "Weight", "To"];
-    const edges = knownEdges
-    
-    const cellHeight = 40;
-    const cellWidth = 80;
-
-    const startX = this.$Svg.width-cellWidth*columns.length;
-    const startY = 0;
-    
-
-    // Clear previous content
-    this.edgeTable.clear();
-
-    this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
-
-    let k = 0
-     for (const edge of edges) {
-        const currEdge = edge
-        const rowData = [currEdge.$start.getText()
-                        ,currEdge.$weight.toString()
-                        ,currEdge.$end.getText()]
-    
-        
-        this.drawRow(
-            rowData,
-            k + 1,
-            startX,
-            startY,
-            cellWidth,
-            cellHeight,
-            edge === highlightEdge
-        );
-        k++
-    }           
-
-    this.Svg.add(this.edgeTable)
-}
-
-private drawRow(
+ drawRow(
     rowData: string[],
     rowIndex: number,
     startX: number,
