@@ -4,6 +4,7 @@ import { Depth } from "./graphs/Depth-first-search";
 import { EngineAlgorithmControl } from "./algorithm-controls/engine-algorithm-controls";
 import { GraphAlgorithmControl } from "./algorithm-controls/graph-algorithmcontrols";
 import { Breadth } from "./graphs/Breadth-first-search";
+import { FloydWarshall } from "./graphs/Floyd-Warshall";
 
 export interface Graph extends Engine {
     start: SubmitFunction;
@@ -20,6 +21,7 @@ export interface Graph extends Engine {
 }
 
 const GRAPH_CLASSES = {
+    FloydWarshall: FloydWarshall,
     Breadth: Breadth,
     Depth: Depth //define the searching algorithms
     // I think its used so the program can find classes
