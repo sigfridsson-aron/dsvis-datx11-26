@@ -10,7 +10,7 @@ export const SortMessages = {
         finished: "Finished",
     },
     insert: {
-        value: (value: string) => `Insert value: ${value}`,
+        value: (value: string) => `Enqueue value: ${value}, at index after tail`,
         movePointer: (value: string) => `Moving ${value} pointer`
     },
     sort: {
@@ -19,7 +19,8 @@ export const SortMessages = {
     },
     copy: {
         index: (index: number) => `Copying index: ${index}`,
-        newSize: (size: number) => `Creating new Dynamic Array of length:  ${size}`,
+        start: "Copy values to the new array, starting at head",
+        newSize: (size: number) => `Creating new Dynamic Array of length: ${size}`,
     },
     find: {
         start: (element: string | number) => `Searching for ${element}`,
@@ -33,7 +34,7 @@ export const SortMessages = {
             `Element ${element} does not exist`,
     },
     delete: {
-        delete: (value: string) => `Deleting value at head`,
+        delete: `Dequeueing value at head pointer`,
         removePointer: (value: string) => `Removing ${value} pointer`,
         movePointer: (value: string) => `Moving ${value} pointer`
     },
@@ -45,8 +46,8 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
     sortArray: DynamicArray;
     indexLength: number = 0;
     baseSize: number = 28;
-    head: number = 0;
     tail: number = 0;
+    head: number = 0;
     messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
@@ -81,16 +82,6 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         }
     }
 
-    async swap(arr: DynamicArray, j: number, k: number) {
-        arr.swap(j, k, true);
-        arr.setIndexHighlight(j, true);
-        await this.pause(
-            "sort.swap",
-            this.sortArray.getValue(j),
-            this.sortArray.getValue(k)
-        );
-    }
-
     async resize(length: number){
         const [xRoot, yRoot] = this.getTreeRoot();
         let newArray = 
@@ -107,9 +98,9 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         await this.pause("copy.newSize", length);
 
 
-        await this.pause("Copy values to the new array");
+        await this.pause("copy.start");
 
-        let i = this.tail;
+        let i = this.head;
         for(let ii = 0; ii < this.indexLength; ii++){
             console.log(i);
             let val = this.sortArray.getValue(i)
@@ -134,13 +125,13 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         }
 
         if(length != 1){ //only resizes if it has an arrow
-            newArray.addArrow(this.indexLength - 1, "Head",  "#C00");
-            this.head = this.indexLength - 1;
-            await this.pause("Copy Head pointer");
-
-            newArray.addArrow(0, "Tail",  "#4C0");
-            this.tail = 0;
-            await this.pause("Copy Tail pointer");
+            newArray.addArrow(0, "head",  "#C00");
+            this.tail = this.indexLength - 1;
+            await this.pause("Copy head pointer");
+            
+            newArray.addArrow(this.indexLength - 1, "tail",  "#4C0");
+            this.head = 0;
+            await this.pause("Copy tail pointer");
         }
 
         this.sortArray.remove();
@@ -167,7 +158,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
             new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
         ).init(...this.getNodeStart());
         await this.pause("insert.value", value);
-        let currentIndex = (this.head + 1) % this.sortArray.getSize()
+        let currentIndex = (this.tail + 1) % this.sortArray.getSize()
         if(this.indexLength == 0){
             currentIndex = 0;
         }
@@ -179,17 +170,17 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
         await this.pause(undefined);
         if(this.indexLength == 0){
             
-            this.sortArray.addArrow(0, "Head", "#C00");
-            this.head = 0;
-            await this.pause("Creating Head pointer");
-            this.sortArray.addArrow(0, "Tail", "#4F0");
+            this.sortArray.addArrow(0, "tail", "#C00");
             this.tail = 0;
-            await this.pause("Creating Head pointer");
+            await this.pause("Creating tail pointer");
+            this.sortArray.addArrow(0, "head", "#4F0");
+            this.head = 0;
+            await this.pause("Creating head pointer");
         }
         else{
-            this.head = currentIndex;
-            this.sortArray.moveArrow("Head", currentIndex);
-            await this.pause("insert.movePointer", "Head");
+            this.tail = currentIndex;
+            this.sortArray.moveArrow("tail", currentIndex);
+            await this.pause("insert.movePointer", "tail");
         }
 
         arrayLabel.remove();
@@ -233,7 +224,7 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
     }
 
     async delete(value: string | number): Promise<void> {
-        const index = this.tail;
+        const index = this.head;
         if(index >= 0){
             await this.pause("delete.delete");
             this.sortArray.setIndexHighlight(index, true);
@@ -241,19 +232,19 @@ export class QueueDynamicArrayAnim extends Engine implements Collection {
             this.sortArray.setValue(index, "");
             this.indexLength--;
             if(this.indexLength != 0){
-                await this.pause("delete.movePointer", "Tail");
-                this.sortArray.moveArrow("Tail", (index + 1) % this.sortArray.getSize());
+                await this.pause("delete.movePointer", "head");
+                this.sortArray.moveArrow("head", (index + 1) % this.sortArray.getSize());
             }
             else{
-                await this.pause("delete.removePointer", "Head");
-                this.head = 0;
-                this.sortArray.removeArrow("Head");
-                await this.pause("delete.removePointer", "Tail");
+                await this.pause("delete.removePointer", "tail");
                 this.tail = 0;
-                this.sortArray.removeArrow("Tail");
+                this.sortArray.removeArrow("tail");
+                await this.pause("delete.removePointer", "head");
+                this.head = 0;
+                this.sortArray.removeArrow("head");
             }
             
-            this.tail = (this.tail + 1) % this.sortArray.getSize();
+            this.head = (this.head + 1) % this.sortArray.getSize();
             if(this.indexLength != 0 && this.indexLength <= this.sortArray.getSize() / 4){
                 await this.pause("Array is less than 1/4 full!");
                 await this.resize(this.sortArray.getSize() / 2);
