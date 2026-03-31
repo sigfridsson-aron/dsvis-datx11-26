@@ -67,7 +67,7 @@ export class hashTable extends G {
         if (this.$horizontal) {
             // Horizontal
             const row = Math.floor(i / maxPerLine);
-            return Number(this.y()) + objectSize *2 * row;
+            return Number(this.y()) + objectSize * 0.5 + objectSize * 2 * row;
         } else {
             // Vertical
             // return Number(this.y()) + this.engine().getObjectSize() * 1.5 + objectSize * i/2;
