@@ -11,6 +11,7 @@ export const SortMessages = {
     },
     insert: {
         value: (value: string) => `Pushing value: ${value}`,
+        traverse: () => 'Find end of bucket'
     },
     find: {
         start: (element: string | number) => `Searching for ${element}`,
@@ -39,10 +40,9 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     initialValues: Array<string> = [];
     compensate: number = 0;
     sortArray: hashTable;
-    metadataArray: number[] = []; // metadata array of the same length as the hash table. 0 = empty, 1 = removed, 2 = filled
-    loadFactor: number = 0;
     baseSize: number = 28;
     messages: MessagesObject = SortMessages;
+    elementCounter: number = 0
 
     constructor(containerSelector: string) {
         super(containerSelector);
@@ -56,26 +56,37 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        this.loadFactor = 0;
-        const [xRoot, yRoot] = this.getTreeRoot();
+        const [x, y] = this.getTreeRoot();
+        /* this.sortArray.$center = [x, y - this.$Svg.margin * 1.5]; */
+        this.elementCounter = 0;
+        //const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
             new hashTable(8, this.getObjectSize(), false)
-        ).init(1, xRoot, yRoot + this.$Svg.margin * 1.5).setSize(8);
-        this.sortArray.center(
-        this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
-        );
-        this.sortArray.y(
-        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
-        );
-        this.Svg.put(this.sortArray);
-        this.sortArray.setDisabled(0, false);
+        ).init(8, x, y /* + this.$Svg.margin * 1.5 */)//.setSize(8);
+        console.log([x, y])
+        
+        for(let i=0; i < 8; i++){
+            this.sortArray.addLinkedNode(i);
+            this.sortArray.$nodeArrays[i][0].opacity(0)
+        }
+
+        
+        /* this.sortArray.$center = [x, y - this.$Svg.margin * 1.5]; */
+        /* this.sortArray.center(
+            x,
+            y //+ this.$Svg.margin * 1.5
+        ); */
+        
+        /* this.sortArray.y(
+            this.getTreeRoot()[1] + this.$Svg.margin * 1.5
+        ); */
+        //this.Svg.put(this.sortArray);
+
         if (this.initialValues) {
             this.state.runWhileResetting(
                 async () => await this.insert(...this.initialValues)
             );
         }
-        this.metadataArray = Array(8).fill(0);
     }
 
     async insert(...values: Array<number | string>) {
@@ -84,97 +95,90 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         }
     }
 
-    async swap(arr: hashTable, j: number, k: number) {
-        arr.swap(j, k, true);
-        arr.setIndexHighlight(j, true);
-        await this.pause(
-            "sort.swap",
-            this.sortArray.getValue(j),
-            this.sortArray.getValue(k)
-        );
-    }
-
     async resize(length: number){
         const [xRoot, yRoot] = this.getTreeRoot();
-        let newArray = 
-        this.Svg.put(
-            new hashTable(this.sortArray.getSize(), this.getObjectSize())
-        ).init(0, xRoot, yRoot + this.$Svg.margin * 6);
+        const objectSize = this.getObjectSize();
+        const margin = this.$Svg.margin;
+
+        const newArray = this.Svg.put(
+            new hashTable(
+                this.sortArray.getSize(), 
+                objectSize, 
+                false
+            )
+        ).init(0, xRoot, yRoot + margin * 1.5 + objectSize + Number(this.sortArray.height()));
         newArray.setSize(length);
-        let newmetaArray = Array(length).fill(0);
-        newArray.center(
-        this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin * 4 + this.getObjectSize() * 4
-        );
-        newArray.y(this.getTreeRoot()[1] + this.$Svg.margin * 1.5 + this.getObjectSize() + Number(this.sortArray.height()));
             
         await this.pause("copy.newSize", length);
 
+        // TODO
+
+        for(let i=0; i < newArray.getSize() ; i++){
+            newArray.addLinkedNode(i);
+            newArray.$nodeArrays[i][0].opacity(0)
+        }
 
         await this.pause("Copy values to the new array");
-
+        let values:Array<string> = []
         for(let i = 0; i < this.sortArray.getSize(); i++){
-            let val = this.sortArray.getValue(i)
-            if(this.metadataArray[i] == 2){
-                const arrayLabel = this.Svg.put(
-                    new TextCircle(val, this.getObjectSize(), this.getStrokeWidth())
-                ).init(this.sortArray.getCX(i), this.sortArray.getCY(i));
-
-                let newIndex = this.hashString(val) % newArray.getSize();
-
-                await this.pause("copy.index", newIndex);
-
-                newArray.setIndexHighlight(newIndex, true); //rehash and prob when resizing
-
-                await this.pause("find.lookStart", newIndex);
-                while(newmetaArray[newIndex] == 2){
-                    await this.pause("find.notEmpty", newIndex);
-                    console.log(newArray.getValue(newIndex));
-                    newArray.setIndexHighlight(newIndex, false);
-                    newIndex = (newIndex + 1) % newArray.getSize();
-                    newArray.setIndexHighlight(newIndex, true);
-                    await this.pause("find.look", newIndex);
-                }
-                await this.pause("Found empty index");
-
-
-                newArray.setIndexHighlight(newIndex, false);
-
-                arrayLabel.setCenter(
-                newArray.getCX(newIndex),
-                newArray.getCY(newIndex),
-                this.getAnimationSpeed()
-                );
-
-                await this.pause(undefined);
-
-                arrayLabel.remove();
-                    
-                newArray.setValue(newIndex, val);
-                newmetaArray[newIndex] = 2;
-            }
+            values = values.concat(this.sortArray.getValues(i).slice(1));
         }
+
+        //////////////////////////////////
+        for(const value of values){
+            const arrayLabel = this.Svg.put(
+                new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
+            ).init(...this.getNodeStart());
+            await this.pause("insert.value", value);
+
+            let currentIndex = this.hashString(value) % newArray.getSize();
+            
+            const chainLength = newArray.$nodeArrays[currentIndex].length;
+            const spacing = this.getObjectSize() * 3;
+
+            newArray.setIndexHighlight(currentIndex, true);
+
+            await this.pause("insert.traverse");
+
+            arrayLabel.setCenter(
+                newArray.getCX(currentIndex) + spacing * (chainLength),
+                newArray.getCY(currentIndex),
+                this.getAnimationSpeed()
+            );
+            newArray.addLinkedNode(currentIndex, value);
+            await this.pause("Found empty index");
+            arrayLabel.remove();
+            
+            await this.pause(undefined);
+
+            newArray.setIndexHighlight(currentIndex, false);
+
+            await this.pause(undefined);
+
+        }
+        
+        //////////////////////
 
         this.sortArray.remove();
         this.sortArray = newArray;
-        this.metadataArray = newmetaArray;
+        //const [x, y] = this.getTreeRoot();
+        //this.sortArray.$center = [x, y + this.$Svg.margin * 1.5]; 
+
         this.animate(this.sortArray, !this.state.isResetting()).center(
-        this.getTreeRoot()[0],
-        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
-        );
-        this.animate(this.sortArray, !this.state.isResetting()).y(
-        this.getTreeRoot()[1] + this.$Svg.margin * 1.5
-        );
-
-
+            xRoot,
+            yRoot + this.$Svg.margin * 1.5
+        ); 
+        
         await this.pause(undefined);
     }
 
     async insertOne(value: number | string) {
-        if(this.loadFactor >= this.sortArray.getSize() * 0.75){
+        if(this.elementCounter >= this.sortArray.getSize() * 0.75){ // Loadfactor
             await this.pause("Load Factor exceeded!");
             await this.resize(this.sortArray.getSize() * 2);
         }
+        
+
         value = String(value);
         const arrayLabel = this.Svg.put(
             new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
@@ -182,31 +186,34 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         await this.pause("insert.value", value);
 
         let currentIndex = this.hashString(value) % this.sortArray.getSize();
+        
+        const chainLength = this.sortArray.$nodeArrays[currentIndex].length;
+        const spacing = this.getObjectSize() * 2.5;
+
         this.sortArray.setIndexHighlight(currentIndex, true);
-        await this.pause("find.lookStart", currentIndex);
-        while(this.metadataArray[currentIndex] == 2){
-            await this.pause("find.notEmpty", currentIndex);
-            console.log(this.sortArray.getValue(currentIndex));
-            this.sortArray.setIndexHighlight(currentIndex, false);
-            currentIndex = (currentIndex + 1) % this.sortArray.getSize();
-            this.sortArray.setIndexHighlight(currentIndex, true);
-            await this.pause("find.look", currentIndex);
+
+        await this.pause("insert.traverse");
+        for (let i = 0; i < this.sortArray.$nodeArrays[currentIndex].length; i++){
+            this.sortArray.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(true));
         }
-        await this.pause("Found empty index");
         arrayLabel.setCenter(
-            this.sortArray.getCX(currentIndex),
+            this.sortArray.getCX(currentIndex) + spacing * (chainLength),
             this.sortArray.getCY(currentIndex),
             this.getAnimationSpeed()
         );
+        this.sortArray.addLinkedNode(currentIndex, value);
+        this.elementCounter++
+        await this.pause("Found empty index");
+        arrayLabel.remove();
+
+        for (let i = 0; i < this.sortArray.$nodeArrays[currentIndex].length; i++){
+            this.sortArray.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
+        }
         
         await this.pause(undefined);
 
-        arrayLabel.remove();
-        this.sortArray.setDisabled(currentIndex, false);
-        this.sortArray.setValue(currentIndex, value);
-        if(this.metadataArray[currentIndex] == 0){this.loadFactor++};
-        this.metadataArray[currentIndex] = 2;
-        this.sortArray.setIndexHighlight(currentIndex, true);
+        
+
         this.sortArray.setIndexHighlight(currentIndex, false);
 
         await this.pause(undefined);
@@ -217,6 +224,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             await this.findOne(val);
         }
     }
+    
 
     async findOne(value: string | number): Promise<number | null> {
         await this.pause("find.start", value); //start the search
@@ -224,7 +232,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         let curIndex = this.hashString(value) % this.sortArray.getSize();
         this.sortArray.setIndexHighlight(curIndex, true);
         await this.pause("find.read", curIndex);
-        while(this.metadataArray[curIndex] != 0 ){
+        /* while(this.metadataArray[curIndex] != 0 ){
             if(this.metadataArray[curIndex] == 2 && value == this.sortArray.getValue(curIndex)){
                 await this.pause("find.found", value);
                 this.sortArray.setIndexHighlight(curIndex, false);
@@ -237,7 +245,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
                 this.sortArray.setIndexHighlight(curIndex, true);
                 await this.pause("find.look", curIndex);
             }
-        }
+        } */
         this.sortArray.setIndexHighlight(curIndex, false);
         await this.pause("find.nonExistent", value);
         return null;
@@ -250,9 +258,8 @@ export class HashTableSeparateChaining extends Engine implements Collection {
                 this.sortArray.setIndexHighlight(index, true);
                 await this.pause("delete.delete");
                 this.sortArray.setValue(index, "DEL");
-                this.metadataArray[index] = 1;
+                /* this.metadataArray[index] = 1; */
                 this.sortArray.setIndexHighlight(index, false);
-                this.sortArray.setDisabled(index, true);
                 
             }
             await this.pause(undefined);

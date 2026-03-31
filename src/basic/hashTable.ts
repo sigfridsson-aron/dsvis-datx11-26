@@ -1,67 +1,83 @@
-import { G, Rect, Text } from "@svgdotjs/svg.js";
+import { G, Rect, Text, Svg } from '@svgdotjs/svg.js';
 import { NBSP } from "~/engine";
 import { Polyline } from "@svgdotjs/svg.js";
-import LinkedList from "./LinkedList";
+import { LinkedNode } from "~/objects/basic-structure-objects/linked-node";
+import { LinkedConnection } from "~/objects/basic-structure-objects/node-connection";
 
 export class hashTable extends G {
     $horizontal: boolean; // Make it do stuff
-    $rect: Rect;
+    
+    $nodeArrays: LinkedNode[][] = []; // Used for vertical
+    $connections: LinkedConnection[][] = [];
+    $center: [number, number] = [0, 0];
+
     $backgrounds: Rect[] = [];
     $values: Text[] = [];
-    //$values: LinkedList<Text>[] = [];
     $indices: Text[] = [];
 
     constructor(size: number, objectSize: number, horizontal: boolean = true) {
         super();
         this.$horizontal = horizontal; 
-        this.$values = new Array(size);
-        if(horizontal){
-            this.$rect = this.rect(objectSize * size, 3 * objectSize)
-            .addClass("invisible")
-            .center(0, 0);
-        }else{
-            this.$rect = this.rect(3 * objectSize, objectSize * size)
-            .addClass("invisible")
-            .center(0, 0);
-        }
-        
+        this.$values = new Array(size)
     }
 
     /** What it do?*/
     init(size: number, x: number, y: number) {
+        this.$center = [x, y]
+        // this.getCenter();
+        //this.move(x, y);
         this.setSize(size);
         this.clear();
-        this.center(x, y);
-        this.y(y);
+        //this.y(y);
         return this;
     }
 
 
     /** Returns number of elements that fit in a row*/ 
     getRowWidth() : number {
-        return Math.floor((this.engine().$Svg.width - 7 * this.engine().$Svg.margin + 10) / (this.engine().getObjectSize() * 2));
+        if(this.$horizontal){
+            return Math.floor((this.engine().$Svg.width - 7 * this.engine().$Svg.margin + 10) / (this.engine().getObjectSize() * 2));
+        }else{
+            return 1;
+        }
+        
     }
 
-    /** Calculates the x-coordinate for a value based on its index*/ 
+    /** Calculates the x-coordinate based on index*/ 
     getCX(i: number): number {
-        return (
-            this.cx() + 
-            this.engine().getObjectSize() * 2 * 
-            (i % this.getRowWidth() - Math.min(this.getRowWidth(), this.getSize()) / 2 + 0.5)
-        );
+        const maxPerLine = this.getRowWidth();
+        const lineSize = Math.min(this.getSize(), maxPerLine);
+        const objectSize = this.engine().getObjectSize() * 2;
+
+        if (this.$horizontal) {
+            // Horizontal layout
+            const col = i % maxPerLine;
+            return this.cx() + objectSize * (col - lineSize / 2 + 0.5);
+        } else {
+            // vertical layout
+            return this.$center[0]//this.cx();
+        }
     }
 
-    /** Calculates the y-coordinate for a value based on its index*/ 
+    /** Calculates the y-coordinate based on index*/ 
     getCY(i: number): number {
-        return (
-            Number(this.y()) + this.engine().getObjectSize() * 1.5 + 
-            this.engine().getObjectSize() * 2 * (Math.floor((i / this.getRowWidth()))) 
-        );
+        const maxPerLine = this.getRowWidth();
+        const objectSize = this.engine().getObjectSize();
+
+        if (this.$horizontal) {
+            // Horizontal
+            const row = Math.floor(i / maxPerLine);
+            return Number(this.y()) + objectSize *2 * row;
+        } else {
+            // Vertical
+            // return Number(this.y()) + this.engine().getObjectSize() * 1.5 + objectSize * i/2;
+            return this.$center[1] + objectSize*i //Number(this.y()) + objectSize*i /2;
+        }
     }
 
-    /** Returns number of values currently in the table (but why have diz function if there is $vales.length?)*/
-    getSize(): number {
-        return this.$values.length;
+    /** Returns total length of array// not number of values currently in the table*/
+    getSize(): number {   
+        return this.$values.length;    
     }
 
     /** What it do?*/
@@ -77,74 +93,150 @@ export class hashTable extends G {
         const rowWidth = Math.min(size, this.getRowWidth());
         const stroke = this.engine().getStrokeWidth();
 
-        /* Rect is actually never used for anything other than x and y position?
-        if(size <= this.getRowWidth()){
-            this.$rect.width(cellWidth * size);
-        }
-        else{
-            this.$rect.width(this.engine().$Svg.width - this.engine().$Svg.margin);
-        }
-        */
+        const cx = this.cx();
+        let cy =  this.cy();
 
-        const cx = this.$rect.cx();
-        let cy = this.$rect.cy();
+        if (!this.$horizontal) {
+            this.$nodeArrays = new Array(size).fill(null).map(() => []);
+            this.$connections = new Array(size).fill(null).map(() => []);
+        }
 
         for (let i = 0; i < size; i++) {
+            const x:number = this.getCX(i);
+            const y:number = this.getCY(i);
 
-            if(i % this.getRowWidth() == 0 && i != 0){
-                cy = cy + this.engine().getObjectSize() * 2; 
-            }
-            if (!this.$backgrounds[i]) {
-                this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
-                    .stroke({ width: stroke })
-                    .addClass("background");
-            }
-            this.$backgrounds[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
-            if (!this.$values[i]) {
-                this.$values[i] = this.text(NBSP);
-            }
-            this.$values[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
-            if (!this.$indices[i]) {
-                this.$indices[i] = this.text(i.toString()).addClass(
-                    "arrayindex"
+            if(this.$horizontal){
+                if(i % this.getRowWidth() == 0 && i != 0){
+                    cy = cy + this.engine().getObjectSize() * 2; 
+                }
+
+                if (!this.$backgrounds[i]) {
+                    this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
+                        .stroke({ width: stroke })
+                        .addClass("background");
+                }
+                this.$backgrounds[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
+
+                if (!this.$values[i]) {
+                    this.$values[i] = this.text(NBSP);
+                }
+                this.$values[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
+
+                if (!this.$indices[i]) {
+                    this.$indices[i] = this.text(i.toString()).addClass(
+                        "arrayindex"
+                    );
+                }
+                this.$indices[i].center(
+                    cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5),
+                    cy + cellHeight * 0.8
                 );
-            }
-            this.$indices[i].center(
-                cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5),
-                cy + cellHeight * 0.8
-            );
+            }else{
+                /* if(i % this.getRowWidth() == 0 && i != 0){
+                    cy = cy + this.engine().getObjectSize();
+                }
+                if (!this.$backgrounds[i]) {
+                    this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
+                        .stroke({ width: stroke })
+                        .addClass("background");
+                }
+                this.$backgrounds[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
+                */
+                /* if (!this.$values[i]) {
+                    this.$values[i] = this.text(NBSP);
+                }
+                this.$values[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
+
+                if (!this.$indices[i]) {
+                    this.$indices[i] = this.text(i.toString()).addClass(
+                        "arrayindex"
+                    );
+                }
+                this.$indices[i].center(
+                    cx + cellWidth * ((i % this.getRowWidth() - rowWidth / 2 + 0.5) -0.8),
+                    cy
+                );  */
+                
+                if (!this.$backgrounds[i]) {
+                    this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
+                        .stroke({ width: stroke })
+                        .addClass("background");
+                }
+                this.$backgrounds[i].center(this.getCX(i), this.getCY(i)); 
+
+                if (!this.$values[i]) {
+                    this.$values[i] = this.text(NBSP);
+                }
+                this.$values[i].center(this.getCX(i), this.getCY(i));
+
+                if (!this.$indices[i]) {
+                    this.$indices[i] = this.text(i.toString()).addClass(
+                        "arrayindex"
+                    );
+                }
+                this.$indices[i].center(
+                    this.getCX(i) -cellWidth*0.8,
+                    this.getCY(i)
+                );
+            } 
+            
         }
         return this;
+    }
+
+    addLinkedNode(index:number, value:string =""):LinkedNode{
+        const nodeDimensions: [number, number] = [this.engine().getObjectSize() * 2, this.engine().getObjectSize()];
+        const newNode = new LinkedNode(value, nodeDimensions, this.engine().getStrokeWidth())
+        this.add(newNode);
+        newNode.center(this.getCX(index) + this.engine().getObjectSize()*3* (this.$nodeArrays[index].length), this.getCY(index));
+        
+        this.$nodeArrays[index].push(newNode);
+        if(this.$nodeArrays[index].length > 1){
+            const previousNode = this.$nodeArrays[index][this.$nodeArrays[index].length-2];
+            const linkedConnection = new LinkedConnection(
+                previousNode, 
+                newNode, 
+                nodeDimensions, 
+                this.engine().getStrokeWidth(), 
+                this.engine().Svg
+            );
+            this.add(linkedConnection);
+            this.$connections[index].push(linkedConnection);
+        }
+        return newNode;
     }
 
 
     /** What it do?*/
     clear() {
-        for (let i = 0; i < this.getSize(); i++) {
-            this.setValue(i, "");
-            this.setDisabled(i, true);
+        if(this.$horizontal){
+            for (let i = 0; i < this.getSize(); i++) {
+                this.setValue(i, "");
+                this.setDisabled(i, true);
+            }
+        }
+
+        for (let i = 0; i < this.$nodeArrays.length; i++) {
+            for (const node of this.$nodeArrays[i]) {
+                node.remove();
+            }
+            for (const conn of this.$connections[i]) {
+                conn.remove();
+        }
+        }
+        
+
+        if (!this.$horizontal) {
+            const size = this.getSize();
+            this.$nodeArrays = new Array(size).fill(null).map(() => []);
+            this.$connections = new Array(size).fill(null).map(() => []);
         }
         return this;
     }
 
-    // Are these even used?
-    /*
-    getValues(): Array<string> {
-        return this.$values.map((t) => t.text());
+    getValues(i: number): string[]{
+        return this.$nodeArrays[i].map(node => String(node.value));
     }
-
-    setValues(values: Array<string>) {
-        if (values.length !== this.getSize()) {
-            throw new Error(
-                `Wrong number of values: ${values.length} != ${this.getSize()}`
-            );
-        }
-        for (let i = 0; i < values.length; i++) {
-            this.setValue(i, values[i]);
-        }
-        return this;
-    }
-    */
 
     /** What it do?*/
     getValue(i: number): string {
@@ -153,16 +245,21 @@ export class hashTable extends G {
 
     /** What it do?*/
     setValue(i: number, text: string) {
-        if (text == null) {
-            text = "";
+        if (this.$horizontal){
+            if (text == null) {
+                text = "";
+            }
+            text = `${text}`;
+            // Non-breaking space: We need to have some text, otherwise the coordinates are reset to (0, 0)
+            if (text === "") {
+                text = NBSP;
+            }
+            this.$values[i].text(text);
+            return this;
+        }else{
+            
         }
-        text = `${text}`;
-        // Non-breaking space: We need to have some text, otherwise the coordinates are reset to (0, 0)
-        if (text === "") {
-            text = NBSP;
-        }
-        this.$values[i].text(text);
-        return this;
+        
     }
 
     /** What it do?*/
@@ -217,47 +314,4 @@ export class hashTable extends G {
         return this;
     }
 
-    // Is this even used?
-    /*
-    addArrow(index: number, arrowId: string = "arrow", color: string = "#000") {
-        const arrowSize = this.engine().getObjectSize() / 3.5;
-        const arrowOffset = 10;
-
-        const x = this.getCX(index);
-        const y = this.getCY(index) - this.engine().getObjectSize() / 2 - arrowOffset / 2;
-
-        const arrow = this.polyline([
-            [x, y],
-            [x - arrowSize, y - arrowSize],
-            [x + arrowSize, y - arrowSize],
-            [x, y],
-        ])
-            .fill("none")
-            .stroke({ width: 2 })
-            .id(arrowId);
-
-        arrow.css("stroke", color)
-        this.add(arrow);
-    }
-
-    removeArrow(arrowId: string) {
-        const arrow = this.findOne(`#${arrowId}`) as Polyline | null;
-        if (arrow) {
-            arrow.remove();
-        }
-    }
-
-    moveArrow(arrowId: string, indexTo: number) {
-        const arrowSize = this.engine().getObjectSize() / 3.5;
-        const arrowOffset = 10;
-        const arrow = this.findOne(`#${arrowId}`) as Polyline | null;
-        const x = this.getCX(indexTo);
-        const y = this.getCY(indexTo) - this.engine().getObjectSize() / 2 - arrowOffset / 2- arrowSize / 2;
-
-        if (arrow) {
-            this.engine().animate(arrow, true).cx(x);
-            this.engine().animate(arrow, true).cy(y);
-        }
-    }
-    */
 }
