@@ -19,7 +19,7 @@ export const DepthMessages = {
 
 export class Depth extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(DepthMessages, BaseGraphMessages);
-    private graphTraversal: WeightedConnection<WeightedGraphNode>[] = []
+    private graphTraversal: WeightedConnection<WeightedGraphNode>[] = [];
 
     override async start() {
         if (!this.graph) {
@@ -138,11 +138,6 @@ export class Depth extends BaseGraph implements Graph {
 
         // highlight the traversed edge
         edge.setHighlight(true)
-
-        // if edge is undirected highlight the path back as well
-        if (edge.$end.$outgoing[edge.$start.getText()]
-         && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
-            edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
 
         const endNode = edge.$end
         

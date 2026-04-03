@@ -16,7 +16,7 @@ export const BreadthMessages = {
 
 export class Breadth extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(BreadthMessages, BaseGraphMessages)
-    private graphTraversal: WeightedConnection<WeightedGraphNode>[] = []
+    private graphTraversal: WeightedConnection<WeightedGraphNode>[] = [];
 
     override async start() {
         if (!this.graph) {
@@ -67,10 +67,6 @@ export class Breadth extends BaseGraph implements Graph {
         let lastNode: WeightedGraphNode | null = null
 
         const knownEdges = new Set<tableInformation>
-
-        
-
-
         const visitedEdges = new Set<WeightedConnection<WeightedGraphNode>>()
         const visitedNodes = new Set<GraphNode>()
 
@@ -123,11 +119,6 @@ export class Breadth extends BaseGraph implements Graph {
             // highlight the traversed edge
             edge.setHighlight(true)
 
-            // if edge is undirected highlight the path back as well
-            if (edge.$end.$outgoing[edge.$start.getText()]
-            && edge.$end.$outgoing[edge.$start.getText()]?.$weight === edge.$weight)
-                edge.$end.$outgoing[edge.$start.getText()]?.setHighlight(true)
-
             const endNode = edge.$end
             
             // animate pointer to next node
@@ -173,8 +164,6 @@ export class Breadth extends BaseGraph implements Graph {
         tableInformation:tableInformation[]
     , highlightEdge?:WeightedConnection<WeightedGraphNode>
     ) {
-        
-
         const columns = ["From", "Weight", "To"];
         const edges = tableInformation
         

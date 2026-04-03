@@ -3,8 +3,6 @@ import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { parseValues } from "~/helpers";
-import { GraphNode } from "~/objects/graph-node";
-import { HighlightCircle } from "~/objects/highlight-circle";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 
@@ -25,7 +23,9 @@ export const BaseGraphMessages = {
     }
 } as const satisfies MessagesObject
 
-export type tableInformation = {node:GraphNode,weight:number,node2?:GraphNode}
+export type tableInformation = { node: WeightedGraphNode
+                               , weight: number
+                               , node2?: WeightedGraphNode}
 
 export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
@@ -107,7 +107,7 @@ abstract updateTable(
     return rowGroup;
 }
 
-    async resetHighlights() {
+    resetHighlights() {
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing
@@ -119,11 +119,10 @@ abstract updateTable(
             }
             k.setHighlight(false)
         }
-        this.graph?.setHighlight(true)
-        this.edgeTable.clear()
     }
 
     async startNode(value: string | number) {
+        this.resetHighlights()
         this.graph?.setHighlight(false)
         for (const k of this.createdNodes) {
             if (k.getText() === value) {
