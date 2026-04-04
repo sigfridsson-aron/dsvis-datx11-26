@@ -35,4 +35,16 @@ export class MinPriorityStack<T extends Weighted> {
 
     get size() : number {return this.list.size}
 
+
+     get(index:number) {
+        if (index <= this.list.size - 1) return this.list.get(index)!
+        
+        
+        else return new Error("Index out of bounds")
+        
+    }
+
+
+   
+
 }

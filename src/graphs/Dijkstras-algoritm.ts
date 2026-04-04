@@ -6,7 +6,7 @@ import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { MinPriorityStack } from "~/basic/MinPriorityStack";
 
 
-
+export type path = {node:WeightedGraphNode,weight:number,parent:WeightedGraphNode | null}
 
 
 export class Dijkstras_algorithm extends BaseGraph implements Graph {
@@ -36,29 +36,54 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     if (this.start_Node === undefined) return
 
     const visited = new Set<WeightedGraphNode>();
-    type path = {node:WeightedGraphNode,weight:number,parent:WeightedGraphNode | null}
+   
     const minStack = new MinPriorityStack<path>
-  
+    
 
     this.start_Node.setHighlight(true)
     await this.pause("Add start node to min stack")
 
     this.distanceMap.set(this.start_Node, 0);
-    
-    
+
+
     minStack.push({node:this.start_Node,weight:0,parent:null})
 
+
+    this.updateTable(this.extractUpdateTableInformation(minStack))
+
+
+    
+
     while (minStack.size > 0) {
+        await this.pause("Pop first element from stack")
         const current = minStack.pop()
+
+        this.updateTable(this.extractUpdateTableInformation(minStack))
+        
+
         if (!current) break
+
 
 
         const { node, weight: currentDist,parent} = current;
 
-        if (visited.has(node)) continue;
+        
+
+        if (visited.has(node)) {
+            await this.pause(`${node.getText()} has already been visited`)
+            continue;
+        }
+            
+        
+        
+        await this.pause(`Add ${node.getText()} to visited nodes`)
         visited.add(node);
 
+        
+        await this.pause("Search all connected nodes for a better path")
         for (const key in node.$outgoing) {
+
+
             const newDist = currentDist + node.$weights[key]!;
 
 
@@ -69,9 +94,12 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 
 
             const oldDist =  this.distanceMap.get(connectedNode);
+            await this.pause(`Current best distance to ${connectedNode.getText()} is ${oldDist} and this path has distance ${newDist}`)
             if (oldDist === undefined || newDist < oldDist) {
+                await this.pause(`Current path is shortest found yet, so we add ${connectedNode.getText()} to stack`)
                 this.distanceMap.set(connectedNode, newDist);
                 minStack.push({node:connectedNode, weight:newDist,parent:node});
+                this.updateTable(this.extractUpdateTableInformation(minStack))
             }
         }
     }
@@ -86,7 +114,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 ) {
     
 
-    const columns = ["From", "Weight", "To"];
+    const columns = ["To", "Distance"];
     const edges = tableInformation
     
     const cellHeight = 40;
@@ -105,8 +133,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
      for (const edge of edges) {
         const currEdge = edge
         const rowData = [currEdge.node.getText()
-                        ,currEdge.weight.toString()
-                        ,currEdge.node2!.getText()]
+                        ,currEdge.weight.toString()]
 
 
         //Check if this edge is the one that should be highlight
@@ -130,6 +157,26 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     this.Svg.add(this.edgeTable)
 }
    
+
+private extractUpdateTableInformation(stack:MinPriorityStack<path>):tableInformation[] {
+
+    const tableInformation:path[] = []
+
+
+    for (let i = 0; i < stack.size; i++) {
+        const value = stack.get(i)
+
+        if (value instanceof Error) { throw Error("value from stack is incorrect") }
+
+
+        tableInformation.push(value)
+    }
+
+
+
+    return tableInformation
+
+}
 
 
 }

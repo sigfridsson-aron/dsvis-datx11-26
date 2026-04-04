@@ -138,7 +138,6 @@ export class Breadth extends BaseGraph implements Graph {
             )
 
             await this.pause("traversal.atNode", endNode.getText())
-
             // remove edge from known edges
             await this.pause("traversal.cleanUp", endNode.getText())
             for (const currEdge of knownEdges) {
