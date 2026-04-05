@@ -28,7 +28,7 @@ export class MinPriorityStack<T extends Weighted> {
     }
 
 
-    get peek():(T | null) {
+    get peek():(T) {
         let listSize = this.list.size
         return this.list.get(listSize-1)
     }

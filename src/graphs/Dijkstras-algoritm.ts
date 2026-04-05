@@ -1,5 +1,5 @@
 import { Graph } from "~/graph";
-import { BaseGraph, tableInformation } from "./base-graph";
+import { BaseGraph, rowHighlight, tableInformation } from "./base-graph";
 import { GraphNode } from "~/objects/graph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
@@ -55,8 +55,12 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     
 
     while (minStack.size > 0) {
+        const current = minStack.peek
+
+        this.updateTable(this.extractUpdateTableInformation(minStack),current)
+
         await this.pause("Pop first element from stack")
-        const current = minStack.pop()
+        minStack.pop()
 
         this.updateTable(this.extractUpdateTableInformation(minStack))
         
@@ -110,12 +114,12 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 
     async updateTable(
     tableInformation: tableInformation[]
-  , highlightEdge?:WeightedConnection<WeightedGraphNode>
+  , rowHighlight?:rowHighlight
 ) {
     
 
     const columns = ["To", "Distance"];
-    const edges = tableInformation
+    const rows = tableInformation
     
     const cellHeight = 40;
     const cellWidth = 80;
@@ -130,15 +134,15 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     this.drawRow(columns,0,startX,startY,cellWidth,cellHeight)
 
     let k = 0
-     for (const edge of edges) {
-        const currEdge = edge
-        const rowData = [currEdge.node.getText()
-                        ,currEdge.weight.toString()]
+     for (const row of rows) {
+        const currRow = row
+        const rowData = [currRow.node.getText()
+                        ,currRow.weight.toString()]
 
 
         //Check if this edge is the one that should be highlight
         let bool_highlight: boolean 
-        if (highlightEdge?.$start === currEdge.node && highlightEdge.$end === currEdge.node2) bool_highlight = true
+        if (currRow === rowHighlight) bool_highlight = true
         else bool_highlight = false
     
         

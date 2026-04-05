@@ -3,7 +3,7 @@ import { Graph } from "~/graph";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 import { GraphNode } from "~/objects/graph-node";
-import { BaseGraph, BaseGraphMessages, tableInformation } from "./base-graph";
+import { BaseGraph, BaseGraphMessages, rowHighlight, tableInformation } from "./base-graph";
 import { updateDefault } from "~/helpers";
 import { HighlightCircle } from "~/objects/highlight-circle";
 
@@ -119,7 +119,7 @@ export class Depth extends BaseGraph implements Graph {
 
         this.updateTable([...knownEdges])
         await this.pause("traversal.chooseEdge", startNode.getText())
-        this.updateTable([...knownEdges], edge)
+        this.updateTable([...knownEdges], {node:startNode,weight:edge.$weight,node2:edge.$end})
         await this.pause("traversal.move", startNode.getText())
 
         visitedNodes.add(edge.$end)
@@ -186,7 +186,7 @@ export class Depth extends BaseGraph implements Graph {
 
 async updateTable(
     tableInformation:tableInformation[]
-  , highlightEdge?:WeightedConnection<WeightedGraphNode>
+  , highlightEdge?:rowHighlight
 ) {
     
 
@@ -215,7 +215,7 @@ async updateTable(
 
         //Check if this edge is the one that should be highlight
         let bool_highlight: boolean 
-        if (highlightEdge?.$start === currEdge.node && highlightEdge.$end === currEdge.node2) bool_highlight = true
+        if (highlightEdge?.node === currEdge.node && highlightEdge.node2 === currEdge.node2) bool_highlight = true
         else bool_highlight = false
     
         

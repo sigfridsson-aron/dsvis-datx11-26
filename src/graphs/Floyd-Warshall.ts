@@ -1,5 +1,5 @@
 import { MessagesObject } from "~/engine";
-import { BaseGraph, BaseGraphMessages, tableInformation } from "./base-graph";
+import { BaseGraph, BaseGraphMessages, rowHighlight, tableInformation } from "./base-graph";
 import { Graph } from "~/graph";
 import { updateDefault } from "~/helpers";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
@@ -102,7 +102,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
 
     }
 
-    async updateTable(tableInformation: tableInformation[], highlightEdge?: WeightedConnection<WeightedGraphNode>): Promise<void> {
+    async updateTable(tableInformation: tableInformation[], highlightEdge?:rowHighlight): Promise<void> {
         
     }
 }

@@ -25,6 +25,8 @@ export const BaseGraphMessages = {
     }
 } as const satisfies MessagesObject
 
+export type rowHighlight = {node:GraphNode, weight:number, node2?:GraphNode}
+
 export type tableInformation = {node:GraphNode,weight:number,node2?:GraphNode}
 
 export abstract class BaseGraph extends Engine implements Graph {
@@ -55,7 +57,7 @@ export abstract class BaseGraph extends Engine implements Graph {
 //knownEdges:Set<WeightedConnection<WeightedGraphNode>>
 abstract updateTable(
     tableInformation:tableInformation[]
-  , highlightEdge?:WeightedConnection<WeightedGraphNode>
+  , rowHighlight:rowHighlight
 )  : Promise<void>
 
  drawRow(
