@@ -58,7 +58,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     async resetAlgorithm() {
         await super.resetAlgorithm();
         const objectSize = this.getObjectSize();
-        const [x, y] = [this.$Svg.margin*2, this.$Svg.margin*3 + objectSize*this.baseSize/2];
+        const [x, y] = [this.$Svg.margin*3.5, this.$Svg.margin*3 + objectSize*this.baseSize/2];
     
         this.elementCounter = 0;
         this.sortArray = this.Svg.put(
@@ -67,7 +67,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         
         for(let i=0; i < this.baseSize; i++){
             this.sortArray.addLinkedNode(i);
-            this.sortArray.$nodeArrays[i][0].opacity(0.2)
+            this.sortArray.$nodeArrays[i][0]
         }
 
         if (this.initialValues) {
@@ -86,7 +86,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     async resize(length: number){
         const objectSize = this.getObjectSize();
         const margin = this.$Svg.margin;
-        const [xRoot, yRoot] = [margin*2, margin*3 + objectSize*length/2];
+        const [xRoot, yRoot] = [margin*3.5, margin*3 + objectSize*length/2];
 
         const newArray = this.Svg.put(
             new hashTable(
@@ -100,7 +100,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
         for(let i=0; i < newArray.getSize() ; i++){
             newArray.addLinkedNode(i);
-            newArray.$nodeArrays[i][0].opacity(0.2)
+            newArray.$nodeArrays[i][0]
         }
 
         await this.pause("Copy values to the new array");
@@ -239,8 +239,6 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             }
             await this.pause(undefined);
         }
-
-
     }
     
     async print() {

@@ -136,6 +136,15 @@ export class hashTable extends G {
                     cy + cellHeight * 0.8
                 );
             }else{
+                if (!this.$indices[i]) {
+                    this.$indices[i] = this.text(i.toString()).addClass(
+                        "arrayindex"
+                    );
+                }
+                this.$indices[i].center(
+                    this.getCX(i) - cellWidth *0.8,
+                    this.getCY(i)
+                );
             } 
             
         }
