@@ -40,7 +40,8 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     const minStack = new MinPriorityStack<path>
     
 
-    this.start_Node.setHighlight(true)
+    this.start_Node.setHighlightColor("highlight",true)
+
     await this.pause("Add start node to min stack")
 
     this.distanceMap.set(this.start_Node, 0);

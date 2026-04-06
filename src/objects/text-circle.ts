@@ -15,9 +15,22 @@ export class TextCircle extends G {
         this.$circle.center(0, 0);
         this.$text.center(0, 0);
         this.center(x, y);
-
+        
         return this;
     }
+
+    
+   
+
+    setHighlightColor(cssClass:string,bool:boolean) {
+
+        if (!bool) {this.removeClass(cssClass)}
+        else {this.addClass(cssClass)}
+
+
+
+    }
+
 
     getText(): string {
         return this.$text.text();

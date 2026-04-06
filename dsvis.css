@@ -235,6 +235,10 @@ svg .highlight, svg .highlight > * {
     stroke: #C00;
 }
 
+svg .highlight-blue, svg .highlight-blue > * {
+    stroke: blue;
+}
+
 svg .highlight.filled, svg text.highlight, svg .highlight > .filled, svg .highlight > text {
 	stroke: none;
 	fill: #C00;
