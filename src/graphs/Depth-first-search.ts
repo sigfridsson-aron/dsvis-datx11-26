@@ -22,6 +22,8 @@ export class Depth extends BaseGraph implements Graph {
     private graphTraversal: WeightedConnection<WeightedGraphNode>[] = []
 
     override async start() {
+        this.graphTraversal = []
+        this.resetHighlights()
         if (!this.graph) {
             await this.pause("error.nullGraph")
             return
@@ -38,6 +40,7 @@ export class Depth extends BaseGraph implements Graph {
         const visitedNodes: WeightedGraphNode[] = []
         const result:WeightedConnection<WeightedGraphNode>[] = []
         this.searchGraphRecursion(startNode,visitedNodes,result)
+        console.log(result)
         return result
     }
 

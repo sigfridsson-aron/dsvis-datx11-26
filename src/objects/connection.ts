@@ -141,6 +141,23 @@ export class Connection<T extends GraphNode | BTreeNode | LinkedNode> extends Pa
         return this;
     }
 
+
+     setHighlightColor(enabled: boolean,cssClass?: string, ) {
+    const highlightClasses = [
+        'highlight',
+        'highlight-blue',
+        'highlight-green'
+    ]
+
+    highlightClasses.forEach(c => this.removeClass(c))
+
+    if (enabled && cssClass) {
+        this.addClass(cssClass)
+    }
+
+    
+}
+
     _getPath(): string {
         const C = this.$coords;
         const xControl = (C.x1 + C.x2) / 2 + (C.y1 - C.y2) * this.getBend();
