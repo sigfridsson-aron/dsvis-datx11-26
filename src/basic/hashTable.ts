@@ -9,7 +9,7 @@ export class hashTable extends G {
     
     $nodeArrays: LinkedNode[][] = []; // Used for vertical
     $connections: LinkedConnection[][] = [];
-    $center: [number, number] = [0, 0];
+    $bound: Rect | undefined; // Used for coordinates
 
     $backgrounds: Rect[] = [];
     $values: Text[] = [];
@@ -19,16 +19,19 @@ export class hashTable extends G {
         super();
         this.$horizontal = horizontal; 
         this.$values = new Array(size)
+        this.$bound = new Rect();
+        if (!horizontal){
+            this.$bound = this.rect(2 * objectSize, objectSize * size)//.addClass("invisible")
+        }
     }
 
-    /** What it do?*/
+    /** */
     init(size: number, x: number, y: number) {
-        this.$center = [x, y]
-        // this.getCenter();
-        //this.move(x, y);
+        if (this.$bound){
+            this.$bound.center(x, y);
+        }
         this.setSize(size);
         this.clear();
-        //this.y(y);
         return this;
     }
 
@@ -49,13 +52,14 @@ export class hashTable extends G {
         const lineSize = Math.min(this.getSize(), maxPerLine);
         const objectSize = this.engine().getObjectSize() * 2;
 
-        if (this.$horizontal) {
+        if (this.$horizontal || !this.$bound) {
             // Horizontal layout
             const col = i % maxPerLine;
             return this.cx() + objectSize * (col - lineSize / 2 + 0.5);
         } else {
             // vertical layout
-            return this.$center[0]//this.cx();
+
+            return this.$bound.cx() /* + objectSize/2 * i*3 */;//Number(this.$bound.x()) + objectSize + objectSize*3*i //Number(this.x()) + objectSize + objectSize*3*i;
         }
     }
 
@@ -64,14 +68,13 @@ export class hashTable extends G {
         const maxPerLine = this.getRowWidth();
         const objectSize = this.engine().getObjectSize();
 
-        if (this.$horizontal) {
+        if (this.$horizontal || !this.$bound) {
             // Horizontal
             const row = Math.floor(i / maxPerLine);
-            return Number(this.y()) + objectSize * 0.5 + objectSize * 2 * row;
+            return Number(this.y()) +  objectSize * 0.5 + objectSize * 2 * row;
         } else {
             // Vertical
-            // return Number(this.y()) + this.engine().getObjectSize() * 1.5 + objectSize * i/2;
-            return this.$center[1] + objectSize*i //Number(this.y()) + objectSize*i /2;
+            return Number(this.$bound.y()) + objectSize/2 + objectSize*i//Number(this.y()) + objectSize/2 + objectSize*i;
         }
     }
 
@@ -132,32 +135,7 @@ export class hashTable extends G {
                     cy + cellHeight * 0.8
                 );
             }else{
-                /* if(i % this.getRowWidth() == 0 && i != 0){
-                    cy = cy + this.engine().getObjectSize();
-                }
-                if (!this.$backgrounds[i]) {
-                    this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
-                        .stroke({ width: stroke })
-                        .addClass("background");
-                }
-                this.$backgrounds[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
-                */
-                /* if (!this.$values[i]) {
-                    this.$values[i] = this.text(NBSP);
-                }
-                this.$values[i].center(cx + cellWidth * (i % this.getRowWidth() - rowWidth / 2 + 0.5), cy);
-
-                if (!this.$indices[i]) {
-                    this.$indices[i] = this.text(i.toString()).addClass(
-                        "arrayindex"
-                    );
-                }
-                this.$indices[i].center(
-                    cx + cellWidth * ((i % this.getRowWidth() - rowWidth / 2 + 0.5) -0.8),
-                    cy
-                );  */
-                
-                if (!this.$backgrounds[i]) {
+                /* if (!this.$backgrounds[i]) {
                     this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
                         .stroke({ width: stroke })
                         .addClass("background");
@@ -177,7 +155,7 @@ export class hashTable extends G {
                 this.$indices[i].center(
                     this.getCX(i) -cellWidth*0.8,
                     this.getCY(i)
-                );
+                ); */
             } 
             
         }
@@ -222,10 +200,9 @@ export class hashTable extends G {
             }
             for (const conn of this.$connections[i]) {
                 conn.remove();
-        }
+            }
         }
         
-
         if (!this.$horizontal) {
             const size = this.getSize();
             this.$nodeArrays = new Array(size).fill(null).map(() => []);
@@ -306,7 +283,7 @@ export class hashTable extends G {
             }
         }
 
-        for (const bg of Object.values(this.$backgrounds)) {
+        for (const bg of this.$backgrounds) {
             if (!bg.css("stroke")) {
                 bg.back();
             }

@@ -2,6 +2,7 @@ import { Engine, MessagesObject } from "~/engine";
 import { hashTable } from "~/basic/hashTable";
 import { TextCircle } from "~/objects/text-circle";
 import { Collection } from "~/collections";
+import { Svg as SvgElement } from '@svgdotjs/svg.js';
 
 export const SortMessages = {
     general: {
@@ -40,13 +41,13 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     initialValues: Array<string> = [];
     compensate: number = 0;
     sortArray: hashTable;
-    baseSize: number = 28;
+    baseSize: number = 8;
     messages: MessagesObject = SortMessages;
     elementCounter: number = 0
 
     constructor(containerSelector: string) {
         super(containerSelector);
-        this.sortArray = new hashTable(0, this.getObjectSize(), false); // Only added to make sure that sortArray never is null
+        this.sortArray = new hashTable(this.baseSize, this.getObjectSize(), false); // Only added to make sure that sortArray never is null
     }
 
     initialise(initialValues = []) {
@@ -56,31 +57,18 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
     async resetAlgorithm() {
         await super.resetAlgorithm();
-        const [x, y] = this.getTreeRoot();
-        /* this.sortArray.$center = [x, y - this.$Svg.margin * 1.5]; */
+        const objectSize = this.getObjectSize();
+        const [x, y] = [this.$Svg.margin*2, this.$Svg.margin*3 + objectSize*this.baseSize/2];
+    
         this.elementCounter = 0;
-        //const [xRoot, yRoot] = this.getTreeRoot();
         this.sortArray = this.Svg.put(
-            new hashTable(8, this.getObjectSize(), false)
-        ).init(8, x, y /* + this.$Svg.margin * 1.5 */)//.setSize(8);
-        console.log([x, y])
+            new hashTable(this.baseSize, objectSize, false)
+        ).init(this.baseSize, x, y)
         
-        for(let i=0; i < 8; i++){
+        for(let i=0; i < this.baseSize; i++){
             this.sortArray.addLinkedNode(i);
-            this.sortArray.$nodeArrays[i][0].opacity(0)
+            this.sortArray.$nodeArrays[i][0].opacity(0.2)
         }
-
-        
-        /* this.sortArray.$center = [x, y - this.$Svg.margin * 1.5]; */
-        /* this.sortArray.center(
-            x,
-            y //+ this.$Svg.margin * 1.5
-        ); */
-        
-        /* this.sortArray.y(
-            this.getTreeRoot()[1] + this.$Svg.margin * 1.5
-        ); */
-        //this.Svg.put(this.sortArray);
 
         if (this.initialValues) {
             this.state.runWhileResetting(
@@ -96,26 +84,23 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     }
 
     async resize(length: number){
-        const [xRoot, yRoot] = this.getTreeRoot();
         const objectSize = this.getObjectSize();
         const margin = this.$Svg.margin;
+        const [xRoot, yRoot] = [margin*2, margin*3 + objectSize*length/2];
 
         const newArray = this.Svg.put(
             new hashTable(
-                this.sortArray.getSize(), 
+                length, 
                 objectSize, 
                 false
             )
-        ).init(0, xRoot, yRoot + margin * 1.5 + objectSize + Number(this.sortArray.height()));
-        newArray.setSize(length);
+        ).init(length, xRoot, yRoot + objectSize*(length/2 + 1));
             
         await this.pause("copy.newSize", length);
 
-        // TODO
-
         for(let i=0; i < newArray.getSize() ; i++){
             newArray.addLinkedNode(i);
-            newArray.$nodeArrays[i][0].opacity(0)
+            newArray.$nodeArrays[i][0].opacity(0.2)
         }
 
         await this.pause("Copy values to the new array");
@@ -124,7 +109,6 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             values = values.concat(this.sortArray.getValues(i).slice(1));
         }
 
-        //////////////////////////////////
         for(const value of values){
             const arrayLabel = this.Svg.put(
                 new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
@@ -157,16 +141,13 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
         }
         
-        //////////////////////
-
         this.sortArray.remove();
         this.sortArray = newArray;
-        //const [x, y] = this.getTreeRoot();
-        //this.sortArray.$center = [x, y + this.$Svg.margin * 1.5]; 
+        await this.pause("Removed");
 
-        this.animate(this.sortArray, !this.state.isResetting()).center(
-            xRoot,
-            yRoot + this.$Svg.margin * 1.5
+        this.sortArray.dMoveCenter(
+            0,
+            -objectSize*(length/2 + 1)
         ); 
         
         await this.pause(undefined);
@@ -188,7 +169,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         let currentIndex = this.hashString(value) % this.sortArray.getSize();
         
         const chainLength = this.sortArray.$nodeArrays[currentIndex].length;
-        const spacing = this.getObjectSize() * 2.5;
+        const spacing = this.getObjectSize() * 3;
 
         this.sortArray.setIndexHighlight(currentIndex, true);
 
