@@ -6,31 +6,25 @@
 </head>
 
 <body>
-  <header>
-    <h1>
-      <a href="index.html">
-        Visualizations of data structures and algorithms
-      </a>
-    </h1>
-  </header>
+  <header class="site-header"></header>
 
-  <main>
-    <section id="graphContainer">
-      <h2>Currently unfinished testing environ for graphs</h2>
-      <label for="algorithmSelector">Choose a graph algorith:</label>
-      <h2 class="selectorWrapper">
-        <select name="algorithmSelector" class="algorithmSelector">
+  <main class="main-shell d-flex align-items-center">
+    <section id="graphContainer" class="page-content mx-auto py-4 px-3 px-md-4 text-center">
+      <h2 class="h5">Currently unfinished testing environ for graphs</h2>
+      <label for="algorithmSelector" class="form-label fw-semibold">Choose a graph algorith:</label>
+      <div class="selectorWrapper mx-auto mb-3">
+        <select name="algorithmSelector" class="algorithmSelector form-select" id="algorithmSelector">
           <option disabled value="">
             &mdash; Please choose a data structure &mdash;
           </option>
           <hr />
           <option value="Depth">Depth-first-search</option>
         </select>
-      </h2>
+      </div>
       
-      <fieldset class="algorithmControls">
-        <span class="formgroup">
-          <select class="chooseGraphI disableWhenRunning">
+      <fieldset class="algorithmControls d-flex flex-wrap justify-content-center gap-2 mb-3">
+        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
+          <select class="chooseGraphI disableWhenRunning form-select form-select-sm w-auto">
             <option value="" selected>Choose a graph</option>
             <option value="Directed">Directed graph</option>
             <option value="Undirected">Undirected graph</option>
@@ -39,8 +33,8 @@
             <option value="Tree">Tree graph</option>
           </select>
           <input class="chosengraph disableWhenRunning" type="hidden">
-          <label>Start:
-            <input class="start disableWhenRunning" type="submit" value="start" />
+          <label class="d-inline-flex align-items-center gap-2">Start:
+            <input class="start disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="start" />
           </label>
         </span>
       </fieldset>
@@ -51,17 +45,17 @@
         </svg>
       </div>
 
-      <fieldset class="generalControls">
-        <span class="formgroup">
-          <button class="fastBackward">&lt;&lt;</button>
-          <button class="stepBackward">&lt;</button>
-          <button class="toggleRunner">Run</button>
-          <button class="stepForward">&gt;</button>
-          <button class="fastForward">&gt;&gt;</button>
+      <fieldset class="generalControls d-flex flex-wrap justify-content-center gap-2 mt-3">
+        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
+          <button class="fastBackward btn btn-outline-dark btn-sm">&lt;&lt;</button>
+          <button class="stepBackward btn btn-outline-dark btn-sm">&lt;</button>
+          <button class="toggleRunner btn btn-dark btn-sm">Run</button>
+          <button class="stepForward btn btn-outline-dark btn-sm">&gt;</button>
+          <button class="fastForward btn btn-outline-dark btn-sm">&gt;&gt;</button>
         </span>
-        <span class="formgroup">
+        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <label>Speed:
-            <select class="animationSpeed">
+            <select class="animationSpeed form-select form-select-sm w-auto d-inline-block">
               <option value="1200">Slowest</option>
               <option value="700" selected>Slow</option>
               <option value="300">Fast</option>
@@ -69,9 +63,9 @@
             </select>
           </label>
         </span>
-        <span class="formgroup">
+        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <label>Node size:
-            <select class="objectSize">
+            <select class="objectSize form-select form-select-sm w-auto d-inline-block">
               <option value="12">Tiny</option>
               <option value="20">Small</option>
               <option value="28">Medium</option>
@@ -84,12 +78,14 @@
     </section>
   </main>
 
-  <footer>
-    <p>
-      &copy;2024 <a href="https://github.com/heatherleaf">Peter Ljunglöf</a>,
-      open source code
-      <a href="https://github.com/ChalmersGU-data-structure-courses/dsvis">on GitHub</a>
-    </p>
+  <footer class="site-footer py-3">
+    <div class="container">
+      <p class="mb-0 text-center">
+        &copy;2024 <a href="https://github.com/heatherleaf">Peter Ljunglöf</a>,
+        open source code
+        <a href="https://github.com/ChalmersGU-data-structure-courses/dsvis">on GitHub</a>
+      </p>
+    </div>
   </footer>
 </body>
 

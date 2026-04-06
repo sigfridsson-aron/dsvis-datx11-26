@@ -1,162 +1,300 @@
 @charset "utf-8";
+@import "bootstrap/dist/css/bootstrap.min.css";
 
-/* A mixture of the following two CSS resets:
-   - Josh Comeau: https://www.joshwcomeau.com/css/custom-css-reset/
-   - Andy Bell: https://piccalil.li/blog/a-more-modern-css-reset/
-*/
+:root {
+	--dsvis-maroon: #70171f;
+	--dsvis-cream: #fff8dc;
+	--dsvis-white: #ffffff;
+	--dsvis-page-bg: #70171f;
+	--dsvis-main-bg: #fff8dc;
+	--dsvis-main-fg: #1f2328;
+	--dsvis-header-bg: #70171f;
+	--dsvis-header-fg: #fff8dc;
+	--dsvis-surface-bg: #70171f;
+	--dsvis-surface-fg: #fff8dc;
+	--dsvis-link-active: #ffffff;
+	--dsvis-disabled-fg: #6c757d;
+	--dsvis-btn-outline-fg: #1f2328;
+	--dsvis-btn-outline-border: #1f2328;
+	--dsvis-btn-solid-bg: #70171f;
+	--dsvis-btn-solid-fg: #fff8dc;
+	--dsvis-svg-bg: #ffffff;
+	--dsvis-svg-border: #70171f;
+	--dsvis-status-fg: #808080;
+	--dsvis-status-paused: #a52a2a;
+	--dsvis-status-running: #008000;
+	--dsvis-title-fg: #a52a2a;
+	--dsvis-printer-fg: #0000ff;
+	--dsvis-shape-stroke: #000000;
+	--dsvis-shape-fill: #fff8dc;
+	--dsvis-edge-fill: #ffffff;
+	--dsvis-edge-stroke: #000000;
+	--dsvis-line-stroke: #000000;
+	--dsvis-filled: #000000;
+	--dsvis-marked: #008000;
+	--dsvis-highlight: #cc0000;
+	--dsvis-node-text: #000000;
+	--dsvis-red-node: #ffc0cb;
+	--dsvis-red-black-node: #d3d3d3;
+	--dsvis-disabled-fill: #d3d3d3;
+	--dsvis-nullnode-fill: #000000;
+	--dsvis-gridline-debug: #d3d3d3;
+	--dsvis-highlight-blue: #04d9ff;
+	--node-font-size: 100%;
+}
 
-*, *::before, *::after {
-	box-sizing: border-box;
-}
-* {
-	margin: 0;
-	padding: 0;
-}
-input, button, textarea, select {
-	font: inherit;
-}
 body {
-	line-height: 1.5;
-	-webkit-font-smoothing: antialiased;
-}
-h1, h2, h3, h4, button, input, label {
-  	line-height: 1.1;
-}
-p, h1, h2, h3, h4, h5, h6 {
-	overflow-wrap: break-word;
-}
-img, picture, video, canvas, svg {
-	display: block;
-	max-width: 100%;
+	min-height: 100vh;
+	background-color: var(--dsvis-page-bg);
+	color: var(--dsvis-main-fg);
+	--bs-body-color: var(--dsvis-main-fg);
+	--bs-body-bg: var(--dsvis-main-bg);
+	padding-top: 56px;
 }
 
-/* End CSS reset */
+body.theme-dark {
+	--dsvis-maroon: #70171f;
+	--dsvis-cream: #fff8dc;
+	--dsvis-white: #ffffff;
+	--dsvis-page-bg: #111418;
+	--dsvis-main-bg: #1c2026;
+	--dsvis-main-fg: #e8ebef;
+	--dsvis-header-bg: #0d0f12;
+	--dsvis-header-fg: #e8ebef;
+	--dsvis-surface-bg: #0d0f12;
+	--dsvis-surface-fg: #e8ebef;
+	--dsvis-link-active: #f7fafc;
+	--dsvis-disabled-fg: #9aa4af;
+	--dsvis-btn-outline-fg: #e8ebef;
+	--dsvis-btn-outline-border: #e8ebef;
+	--dsvis-btn-solid-bg: #2b3440;
+	--dsvis-btn-solid-fg: #e8ebef;
+	--dsvis-svg-bg: #232933;
+	--dsvis-svg-border: #e8ebef;
+	--dsvis-status-fg: #b0bac5;
+	--dsvis-status-paused: #ffb4a2;
+	--dsvis-status-running: #84e296;
+	--dsvis-title-fg: #ffb4a2;
+	--dsvis-printer-fg: #9ec5ff;
+	--dsvis-shape-stroke: #e8ebef;
+	--dsvis-shape-fill: #2f3642;
+	--dsvis-edge-fill: #2f3642;
+	--dsvis-edge-stroke: #e8ebef;
+	--dsvis-line-stroke: #e8ebef;
+	--dsvis-filled: #e8ebef;
+	--dsvis-marked: #84e296;
+	--dsvis-highlight: #ff8a80;
+	--dsvis-node-text: #e8ebef;
+	--dsvis-red-node: #b56576;
+	--dsvis-red-black-node: #8d99ae;
+	--dsvis-disabled-fill: #6c757d;
+	--dsvis-nullnode-fill: #e8ebef;
+	--dsvis-gridline-debug: #6c757d;
+	--dsvis-highlight-blue: #7bdff2;
+}
 
-body {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 100%;
-	background-color: maroon;
+body.theme-colorblind {
+	--dsvis-maroon: #70171f;
+	--dsvis-cream: #fff8dc;
+	--dsvis-white: #ffffff;
+	--dsvis-page-bg: #0f2d4f;
+	--dsvis-main-bg: #f4f7fb;
+	--dsvis-main-fg: #102a43;
+	--dsvis-header-bg: #0f2d4f;
+	--dsvis-header-fg: #f4f7fb;
+	--dsvis-surface-bg: #0f2d4f;
+	--dsvis-surface-fg: #f4f7fb;
+	--dsvis-link-active: #ffd166;
+	--dsvis-disabled-fg: #486581;
+	--dsvis-btn-outline-fg: #102a43;
+	--dsvis-btn-outline-border: #102a43;
+	--dsvis-btn-solid-bg: #0f2d4f;
+	--dsvis-btn-solid-fg: #f4f7fb;
+	--dsvis-svg-bg: #ffffff;
+	--dsvis-svg-border: #0f2d4f;
+	--dsvis-status-fg: #486581;
+	--dsvis-status-paused: #d97706;
+	--dsvis-status-running: #0f766e;
+	--dsvis-title-fg: #b45309;
+	--dsvis-printer-fg: #1d4ed8;
+	--dsvis-shape-stroke: #102a43;
+	--dsvis-shape-fill: #fff8dc;
+	--dsvis-edge-fill: #ffffff;
+	--dsvis-edge-stroke: #102a43;
+	--dsvis-line-stroke: #102a43;
+	--dsvis-filled: #102a43;
+	--dsvis-marked: #0f766e;
+	--dsvis-highlight: #b91c1c;
+	--dsvis-node-text: #102a43;
+	--dsvis-red-node: #ffc0cb;
+	--dsvis-red-black-node: #d3d3d3;
+	--dsvis-disabled-fill: #d3d3d3;
+	--dsvis-nullnode-fill: #102a43;
+	--dsvis-gridline-debug: #9fb3c8;
+	--dsvis-highlight-blue: #2563eb;
+}
+
+body.theme-dark.theme-colorblind {
+	--dsvis-maroon: #70171f;
+	--dsvis-cream: #fff8dc;
+	--dsvis-white: #ffffff;
+	--dsvis-page-bg: #111418;
+	--dsvis-main-bg: #1c2026;
+	--dsvis-main-fg: #e8ebef;
+	--dsvis-header-bg: #0d0f12;
+	--dsvis-header-fg: #e8ebef;
+	--dsvis-surface-bg: #0d0f12;
+	--dsvis-surface-fg: #e8ebef;
+	--dsvis-link-active: #ffd166;
+	--dsvis-disabled-fg: #9aa4af;
+	--dsvis-btn-outline-fg: #e8ebef;
+	--dsvis-btn-outline-border: #e8ebef;
+	--dsvis-btn-solid-bg: #2b3440;
+	--dsvis-btn-solid-fg: #e8ebef;
+	--dsvis-svg-bg: #232933;
+	--dsvis-svg-border: #e8ebef;
+	--dsvis-status-fg: #b0bac5;
+	--dsvis-status-paused: #ffd166;
+	--dsvis-status-running: #57cc99;
+	--dsvis-title-fg: #ffd166;
+	--dsvis-printer-fg: #90cdf4;
+	--dsvis-shape-stroke: #e8ebef;
+	--dsvis-shape-fill: #2f3642;
+	--dsvis-edge-fill: #2f3642;
+	--dsvis-edge-stroke: #e8ebef;
+	--dsvis-line-stroke: #e8ebef;
+	--dsvis-filled: #e8ebef;
+	--dsvis-marked: #57cc99;
+	--dsvis-highlight: #ff8a80;
+	--dsvis-node-text: #e8ebef;
+	--dsvis-red-node: #b56576;
+	--dsvis-red-black-node: #8d99ae;
+	--dsvis-disabled-fill: #6c757d;
+	--dsvis-nullnode-fill: #e8ebef;
+	--dsvis-gridline-debug: #6c757d;
+	--dsvis-highlight-blue: #90cdf4;
+}
+
+.site-header,
+.site-footer {
+	background-color: var(--dsvis-header-bg);
+	color: var(--dsvis-header-fg);
+}
+
+.site-header-title {
+	margin-bottom: 0;
+	text-align: center;
+}
+
+.dsvis-navbar,
+.dsvis-offcanvas {
+	background-color: var(--dsvis-surface-bg);
+	color: var(--dsvis-surface-fg);
+}
+
+.dsvis-offcanvas .nav-link,
+.dsvis-offcanvas .offcanvas-title {
+	color: var(--dsvis-surface-fg);
+}
+
+.dsvis-offcanvas .list-group-item {
+	background-color: transparent;
+	border-color: var(--dsvis-surface-fg);
+	color: var(--dsvis-surface-fg);
+}
+
+.dsvis-offcanvas .list-group-item:hover,
+.dsvis-offcanvas .list-group-item:focus {
+	background-color: var(--dsvis-surface-fg);
+	color: var(--dsvis-surface-bg);
+}
+
+.dsvis-offcanvas .list-group-item.active {
+	background-color: var(--dsvis-link-active);
+	border-color: var(--dsvis-link-active);
+	color: var(--dsvis-surface-bg);
+}
+
+.dsvis-offcanvas .nav-link.active,
+.dsvis-offcanvas .nav-link:hover,
+.dsvis-offcanvas .nav-link:focus {
+	color: var(--dsvis-link-active);
+}
+
+.btn-outline-dark {
+	--bs-btn-color: var(--dsvis-btn-outline-fg);
+	--bs-btn-border-color: var(--dsvis-btn-outline-border);
+	--bs-btn-hover-color: var(--dsvis-btn-solid-fg);
+	--bs-btn-hover-bg: var(--dsvis-btn-solid-bg);
+	--bs-btn-hover-border-color: var(--dsvis-btn-solid-bg);
+	--bs-btn-active-color: var(--dsvis-btn-solid-fg);
+	--bs-btn-active-bg: var(--dsvis-btn-solid-bg);
+	--bs-btn-active-border-color: var(--dsvis-btn-solid-bg);
+}
+
+.btn-dark {
+	--bs-btn-color: var(--dsvis-btn-solid-fg);
+	--bs-btn-bg: var(--dsvis-btn-solid-bg);
+	--bs-btn-border-color: var(--dsvis-btn-solid-bg);
+	--bs-btn-hover-color: var(--dsvis-btn-solid-fg);
+	--bs-btn-hover-bg: var(--dsvis-btn-solid-bg);
+	--bs-btn-hover-border-color: var(--dsvis-btn-solid-bg);
+	--bs-btn-active-color: var(--dsvis-btn-solid-fg);
+	--bs-btn-active-bg: var(--dsvis-btn-solid-bg);
+	--bs-btn-active-border-color: var(--dsvis-btn-solid-bg);
 }
 
 main {
-	background-color: lemonchiffon;
+	background-color: var(--dsvis-main-bg);
+	color: var(--dsvis-main-fg);
 }
 
-section, p, h1, h2, h3, h4, h5, h6, ul, ol, dl {
-	padding-bottom: 1rem;
+.main-shell {
+	min-height: calc(100vh - 56px - 4.5rem);
 }
 
-h1 { font-size: 1.6rem; }
-h2 { font-size: 1.2rem; }
-h3 { font-size: 1.1rem; }
-
-body > * {
-	padding-top: 1rem;
-	padding-left: 5%;
-	padding-right: 5%;
+.page-content {
+	width: min(100%, 1000px);
 }
 
-ul, ol {
-	padding-left: 2em;
-}
-
-header, footer {
-	color: lemonchiffon;
-	background-color: maroon;
-}
-
-a {
+.site-title-link {
 	color: inherit;
-}
-
-h1 a {
 	text-decoration: none;
 }
 
-
-.selectorWrapper > select {
-	appearance: none;
-	padding: 6px 12px;
-	background-color: inherit;
-}
-
-svg, .selectorWrapper > select {
-	border: solid 1px maroon;
-	border-radius: 5px;
-	width: 100%;
-}
-
 .selectorWrapper {
-	position: relative;
+	width: 100%;
 	max-width: 1000px;
 }
 
-.selectorWrapper::after {
-	content: "▼";
-	color: maroon;
-	font-size: 1rem;
-	top: 10px;
-	right: 10px;
-	position: absolute;
-}
-
-/*-----------------------------------------------------------------*/
-
-svg {
-    background-color: white;
-    border: 2px solid maroon;
-    width: 100%;
-	max-width: 1000px;
-}
-
-fieldset, form {
-    border: none;
-	display: inline-block;
+fieldset {
+	border: none;
 }
 
 .formgroup {
 	white-space: nowrap;
-	margin-right: 12px;
 }
 
-select, input, button {
-	margin: 3px 0;
-	padding: 3px 6px;
-	background-color: white;
-	border: solid 1px maroon;
-	border-radius: 5px;
-}
-
-input[type="checkbox"], input[type="radio"] {
-	width: 18px;
-	height: 18px;
-	margin-right: 0;
-	vertical-align: middle;
-}
-
-select:hover:not(:disabled), input:hover:not(:disabled), button:hover:not(:disabled) {
-	cursor: pointer;
-}
-
-input:active:not(:disabled), button:active:not(:disabled), button.selected:not(:disabled) {
-	background-color: maroon;
-	color: white;
-}
-
-*:disabled, *:disabled * {
-	background: transparent;
-	color: maroon;
-}
-
-
-/*-----------------------------------------------------------------*/
-
-:root {
-	--node-font-size: 100%;
+*:disabled,
+*:disabled * {
+	color: var(--dsvis-disabled-fg);
 }
 
 svg {
+	background-color: var(--dsvis-svg-bg);
+	border: 2px solid var(--dsvis-svg-border);
+	width: 100%;
+	max-width: 1000px;
 	font-size: 20px;
+}
+
+svg,
+img,
+picture,
+video,
+canvas {
+	display: block;
+	max-width: 100%;
 }
 
 svg g {
@@ -168,66 +306,66 @@ text {
 }
 
 text.status-report {
-	fill: grey;
+	fill: var(--dsvis-status-fg);
 	font-size: 80%;
 }
 text.status-report.paused {
-	fill: brown;
+	fill: var(--dsvis-status-paused);
 }
 text.status-report.running {
-	fill: green;
+	fill: var(--dsvis-status-running);
 }
 
 text.title, text.message {
-	fill: brown;
+	fill: var(--dsvis-title-fg);
 }
 text.title {
 	font-weight: bold;
 }
 
 text.printer {
-	fill: blue;
+	fill: var(--dsvis-printer-fg);
 }
 
 circle, rect, polygon {
-    stroke: black;
-    fill: lemonchiffon;
+	stroke: var(--dsvis-shape-stroke);
+	fill: var(--dsvis-shape-fill);
 }
 
 
 
 .edge-table rect {
-    fill: #ffff;
-    stroke: #000;
+	fill: var(--dsvis-edge-fill);
+	stroke: var(--dsvis-edge-stroke);
     stroke-width: 1;
 }
 
 path, line, polyline {
-    stroke: black;
+	stroke: var(--dsvis-line-stroke);
     fill: none;
 }
 
 svg .filled {
 	stroke: none;
-	fill: black;
+	fill: var(--dsvis-filled);
 }
 
 svg .marked, svg .marked > * {
-    stroke: green;
+	stroke: var(--dsvis-marked);
 }
 
 svg .marked.filled, svg text.marked, svg .marked > .filled, svg .marked > text {
 	stroke: none;
-	fill: green;
+	fill: var(--dsvis-marked);
 }
 
 svg .highlight, svg .highlight > * {
-    stroke: #C00;
+	stroke: var(--dsvis-highlight);
 }
 
 svg .highlight.filled, svg text.highlight, svg .highlight > .filled, svg .highlight > text {
 	stroke: none;
-	fill: #C00;
+	fill: var(--dsvis-highlight);
 }
 
 svg .nofill {
@@ -235,13 +373,13 @@ svg .nofill {
 }
 
 svg .highlight-circle {
-	stroke: #C00;
+	stroke: var(--dsvis-highlight);
 	fill: none;
 }
 
 g text {
 	stroke: none;
-    fill: black;
+    fill: var(--dsvis-node-text);
     text-anchor: middle;
 }
 
@@ -254,11 +392,11 @@ g.unfilled circle {
 }
 
 g.red circle {
-	fill: pink;
+	fill: var(--dsvis-red-node);
 }
 
 g.red.black circle {
-	fill: lightgrey;
+	fill: var(--dsvis-red-black-node);
 }
 
 text.arrayindex > tspan {
@@ -266,12 +404,12 @@ text.arrayindex > tspan {
 }
 
 rect.background.disabled {
-	fill: lightgray;
+	fill: var(--dsvis-disabled-fill);
 }
 
 svg.shownullnodes .nullnode:not(.invisible) {
-	fill: black;
-	stroke: black;
+	fill: var(--dsvis-nullnode-fill);
+	stroke: var(--dsvis-nullnode-fill);
 }
 
 line.gridline, svg .invisible, svg .nullnode {
@@ -284,7 +422,7 @@ line.gridline {
 }
 
 svg.debug line.gridline, svg.debug .invisible, svg.debug .nullnode {
-    stroke: lightgray;
+	stroke: var(--dsvis-gridline-debug);
 }
 
 /*PseudoCode*/
@@ -300,12 +438,12 @@ svg.debug line.gridline, svg.debug .invisible, svg.debug .nullnode {
 
 /*Highlights*/
 svg .highlightblue, svg .highlightblue > * {
-    stroke: #04D9FF;
+    stroke: var(--dsvis-highlight-blue);
 }
 
 svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled, svg .highlightblue > text {
 	stroke: none;
-	fill: #04D9FF;
+	fill: var(--dsvis-highlight-blue);
 }
 
 
