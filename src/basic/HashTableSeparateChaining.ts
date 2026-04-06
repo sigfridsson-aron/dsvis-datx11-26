@@ -207,41 +207,35 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     }
     
 
-    async findOne(value: string | number): Promise<number | null> {
+    async findOne(value: string | number): Promise<[number,number] | null> {
         await this.pause("find.start", value); //start the search
         value = String(value)
         let curIndex = this.hashString(value) % this.sortArray.getSize();
-        this.sortArray.setIndexHighlight(curIndex, true);
         await this.pause("find.read", curIndex);
-        /* while(this.metadataArray[curIndex] != 0 ){
-            if(this.metadataArray[curIndex] == 2 && value == this.sortArray.getValue(curIndex)){
-                await this.pause("find.found", value);
-                this.sortArray.setIndexHighlight(curIndex, false);
-                return curIndex;
+        ////////////////////////
+        for (let i = 1; this.sortArray.$nodeArrays[curIndex].length;i++){
+            this.sortArray.$nodeArrays[curIndex][i].setHighlight(true);
+            await this.pause("find.lookStart", i);
+            if(String(this.sortArray.$nodeArrays[curIndex][i].value) == value){
+                await this.pause("find.found", i);
+                this.sortArray.$nodeArrays[curIndex][i].setHighlight(false);
+                return [curIndex, i]
             }
-            else{
-                await this.pause("find.notfound", value); //not found
-                this.sortArray.setIndexHighlight(curIndex, false);
-                curIndex = (curIndex + 1) % this.sortArray.getSize();
-                this.sortArray.setIndexHighlight(curIndex, true);
-                await this.pause("find.look", curIndex);
-            }
-        } */
-        this.sortArray.setIndexHighlight(curIndex, false);
+            this.sortArray.$nodeArrays[curIndex][i].setHighlight(false);
+        }
+        ///////////////////////
+        
         await this.pause("find.nonExistent", value);
         return null;
     }
 
     async delete(value: string | number): Promise<void> {
         if(value != undefined){
-            const index = await this.findOne(value);
-            if(index){
-                this.sortArray.setIndexHighlight(index, true);
+            const indexes = await this.findOne(value);
+            if(indexes){
+                this.sortArray.removeLinkedNode(...indexes)
                 await this.pause("delete.delete");
-                this.sortArray.setValue(index, "DEL");
-                /* this.metadataArray[index] = 1; */
-                this.sortArray.setIndexHighlight(index, false);
-                
+                this.elementCounter--
             }
             await this.pause(undefined);
         }

@@ -3,6 +3,7 @@ import { NBSP } from "~/engine";
 import { Polyline } from "@svgdotjs/svg.js";
 import { LinkedNode } from "~/objects/basic-structure-objects/linked-node";
 import { LinkedConnection } from "~/objects/basic-structure-objects/node-connection";
+import { Connection } from '../objects/connection';
 
 export class hashTable extends G {
     $horizontal: boolean; // Make it do stuff
@@ -135,27 +136,6 @@ export class hashTable extends G {
                     cy + cellHeight * 0.8
                 );
             }else{
-                /* if (!this.$backgrounds[i]) {
-                    this.$backgrounds[i] = this.rect(cellWidth, cellHeight)
-                        .stroke({ width: stroke })
-                        .addClass("background");
-                }
-                this.$backgrounds[i].center(this.getCX(i), this.getCY(i)); 
-
-                if (!this.$values[i]) {
-                    this.$values[i] = this.text(NBSP);
-                }
-                this.$values[i].center(this.getCX(i), this.getCY(i));
-
-                if (!this.$indices[i]) {
-                    this.$indices[i] = this.text(i.toString()).addClass(
-                        "arrayindex"
-                    );
-                }
-                this.$indices[i].center(
-                    this.getCX(i) -cellWidth*0.8,
-                    this.getCY(i)
-                ); */
             } 
             
         }
@@ -184,6 +164,56 @@ export class hashTable extends G {
         return newNode;
     }
 
+    async removeLinkedNode(arrayindex: number, linkedindex:number){
+        const nextNode = this.$nodeArrays[arrayindex][linkedindex+1] as LinkedNode;
+        const prevConnection = this.$connections[arrayindex][linkedindex-1] as LinkedConnection; 
+
+        this.$nodeArrays[arrayindex][linkedindex].remove();
+        this.$nodeArrays[arrayindex].splice(linkedindex, 1);
+
+        if (linkedindex === this.$nodeArrays[arrayindex].length) {
+            // If the node is the last one, remove the connection to the previous node
+            this.$connections[arrayindex][linkedindex-1].remove();
+            this.$connections[arrayindex].splice(linkedindex-1, 1); // Set the connection to null
+        } else {
+            // If the node is not the last one
+            // Remove the connection to the next node
+            this.$connections[arrayindex][linkedindex].remove();
+            this.$connections[arrayindex].splice(linkedindex, 1);
+            // Update the connection of the previous node to go to the next node
+            
+            this.adjustNodes(arrayindex, linkedindex); 
+            /* prevConnection.setEnd(nextNode, this.animationValue()); */
+        }
+    }
+
+    adjustNodes(arrayindex: number, linkedindex:number){
+        const right = this.$nodeArrays[arrayindex].slice(linkedindex);
+        const conright = this.$connections[arrayindex].slice(linkedindex);
+
+        for (const node of right) {
+            // Move the node and link to the correct position with animation
+            node.dMoveCenter(
+                -this.engine().getObjectSize()*3,
+                0,
+                this.animationValue()
+            );
+
+            // Update the connection to the new position
+        }
+        for (const connection of conright){
+            connection.dMoveCenter(
+                -this.engine().getObjectSize()*3,
+                0,
+                this.animationValue()
+            );
+        }
+    }
+
+    private animationValue(): number {
+         const animate = !this.engine().state.isResetting()
+        return animate ? this.engine().$Svg.animationSpeed : 0;
+    }
 
     /** What it do?*/
     clear() {
@@ -265,7 +295,7 @@ export class hashTable extends G {
         return this;
     }
 
-    /** What it do?*/
+    /** Highlights the value with inserted index*/
     setIndexHighlight(i: number, high: boolean, color: string = "#C00") {
         if (this.$backgrounds[i]) {
             if (high) {
