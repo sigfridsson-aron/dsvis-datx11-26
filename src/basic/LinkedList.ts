@@ -71,6 +71,7 @@ export default class LinkedList<T> {
                 if(this.size==0){
                     this.head = node; 
                 }
+                this.tail = node; 
                 this.size++;
                 return true;
             }

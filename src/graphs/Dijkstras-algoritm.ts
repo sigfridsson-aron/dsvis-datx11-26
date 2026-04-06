@@ -58,6 +58,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     
 
     while (minStack.size > 0) {
+        console.log(minStack.size)
         const current = minStack.peek
 
         this.updateTable(this.extractUpdateTableInformation(minStack),current)
@@ -88,6 +89,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
         
         await this.pause(`Add ${node.getText()} to visited nodes`)
         visited.add(node);
+        node.setHighlightColor("highlight",true)
 
         
         await this.pause("Search all connected nodes for a better path")
@@ -104,12 +106,14 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 
 
             const oldDist =  this.distanceMap.get(connectedNode);
+            connectedNode.setHighlightColor("highlight-green",true)
             await this.pause(`Current best distance to ${connectedNode.getText()} is ${oldDist} and this path has distance ${newDist}`)
             if (oldDist === undefined || newDist < oldDist) {
                 await this.pause(`Current path is shortest found yet, so we add ${connectedNode.getText()} to stack`)
                 this.distanceMap.set(connectedNode, newDist);
                 minStack.push({node:connectedNode, weight:newDist,parent:node});
                 this.updateTable(this.extractUpdateTableInformation(minStack))
+                connectedNode.setHighlightColor("highlight-green",false)
             }
         }
     }
