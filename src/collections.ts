@@ -66,7 +66,7 @@ if (!isBaseEngine) {
             engine
         );
     } 
-    else if(engine instanceof HashTableLinearProbing){
+    else if(engine instanceof HashTableLinearProbing || HashTableSeparateChaining){
         engine.algorithmControls = new HashTableAlgorithmControl(
             engine.container,
             engine
