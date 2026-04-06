@@ -10,7 +10,7 @@
 
   <main class="main-shell d-flex align-items-center">
     <section id="collectionsContainer" class="page-content mx-auto py-4 px-3 px-md-4 text-center">
-      <label for="algorithmSelector" class="form-label fw-semibold">Choose a collection data structure:</label>
+      <label for="algorithmSelector" class="form-label fw-semibold d-block text-start">Choose a collection data structure:</label>
       <div class="selectorWrapper mx-auto mb-3">
         <select name="algorithmSelector" class="algorithmSelector form-select" id="algorithmSelector">
           <option disabled value="">
@@ -30,7 +30,7 @@
         </select>
       </div>
 
-      <fieldset class="algorithmControls d-flex flex-wrap justify-content-center gap-2 mb-3">
+      <fieldset class="algorithmControls canvas-controls-attached-top d-flex flex-wrap justify-content-start gap-2 text-start">
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <select class="insertSelect disableWhenRunning form-select form-select-sm w-auto">
             <option value="" selected>Insert many values</option>
@@ -44,21 +44,21 @@
             </option>
           </select>
           <input class="insertField disableWhenRunning form-control form-control-sm w-auto" type="text" size="10" maxlength="20" />
-          <input class="insertSubmit disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="Insert" />
+          <input class="insertSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Insert" />
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <input class="findField disableWhenRunning form-control form-control-sm w-auto" type="text" size="4" maxlength="4" />
-          <input class="findSubmit disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="Find" />
+          <input class="findSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Find" />
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <input class="deleteField disableWhenRunning form-control form-control-sm w-auto" type="text" size="4" maxlength="4" />
-          <input class="deleteSubmit disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="Delete" />
+          <input class="deleteSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Delete" />
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="printSubmit disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="Print" />
+          <input class="printSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Print" />
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="clearSubmit disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="Clear" />
+          <input class="clearSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Clear" />
         </span>
       </fieldset>
 
@@ -66,13 +66,13 @@
         <svg></svg>
       </div>
 
-      <fieldset class="generalControls d-flex flex-wrap justify-content-center gap-2 mt-3">
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <button class="fastBackward btn btn-outline-dark btn-sm">&lt;&lt;</button>
-          <button class="stepBackward btn btn-outline-dark btn-sm">&lt;</button>
-          <button class="toggleRunner btn btn-dark btn-sm">Run</button>
-          <button class="stepForward btn btn-outline-dark btn-sm">&gt;</button>
-          <button class="fastForward btn btn-outline-dark btn-sm">&gt;&gt;</button>
+      <fieldset class="generalControls canvas-controls-attached d-flex flex-wrap justify-content-start gap-2 text-start">
+        <span class="formgroup media-controls d-inline-flex flex-wrap align-items-center gap-2">
+          <button class="fastBackward btn btn-outline-light btn-sm media-btn" aria-label="Fast backward">⏮︎</button>
+          <button class="stepBackward btn btn-outline-light btn-sm media-btn" aria-label="Step backward">⏪︎</button>
+          <button class="toggleRunner btn btn-light btn-sm media-btn media-btn-run" aria-label="Run">Run</button>
+          <button class="stepForward btn btn-outline-light btn-sm media-btn" aria-label="Step forward">⏩︎</button>
+          <button class="fastForward btn btn-outline-light btn-sm media-btn" aria-label="Fast forward">⏭︎</button>
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <label>Speed:

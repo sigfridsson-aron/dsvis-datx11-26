@@ -31,7 +31,7 @@ function headerMarkup(activePage: string): string {
     <button class="navbar-toggler position-absolute start-0 ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand mx-auto text-center" href="index.html">Visualizations of data structures and algorithms</a>
+    <a class="navbar-brand mx-auto text-center fw-bold" href="index.html">Visualizations of data structures and algorithms</a>
     <div class="offcanvas offcanvas-start dsvis-offcanvas" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Navigation</h5>

@@ -11,7 +11,7 @@
   <main class="main-shell d-flex align-items-center">
     <section id="graphContainer" class="page-content mx-auto py-4 px-3 px-md-4 text-center">
       <h2 class="h5">Currently unfinished testing environ for graphs</h2>
-      <label for="algorithmSelector" class="form-label fw-semibold">Choose a graph algorith:</label>
+      <label for="algorithmSelector" class="form-label fw-semibold d-block text-start">Choose a graph algorith:</label>
       <div class="selectorWrapper mx-auto mb-3">
         <select name="algorithmSelector" class="algorithmSelector form-select" id="algorithmSelector">
           <option disabled value="">
@@ -22,7 +22,7 @@
         </select>
       </div>
       
-      <fieldset class="algorithmControls d-flex flex-wrap justify-content-center gap-2 mb-3">
+      <fieldset class="algorithmControls canvas-controls-attached-top d-flex flex-wrap justify-content-start gap-2 text-start">
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <select class="chooseGraphI disableWhenRunning form-select form-select-sm w-auto">
             <option value="" selected>Choose a graph</option>
@@ -34,7 +34,7 @@
           </select>
           <input class="chosengraph disableWhenRunning" type="hidden">
           <label class="d-inline-flex align-items-center gap-2">Start:
-            <input class="start disableWhenRunning btn btn-outline-dark btn-sm" type="submit" value="start" />
+            <input class="start disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="start" />
           </label>
         </span>
       </fieldset>
@@ -45,13 +45,13 @@
         </svg>
       </div>
 
-      <fieldset class="generalControls d-flex flex-wrap justify-content-center gap-2 mt-3">
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <button class="fastBackward btn btn-outline-dark btn-sm">&lt;&lt;</button>
-          <button class="stepBackward btn btn-outline-dark btn-sm">&lt;</button>
-          <button class="toggleRunner btn btn-dark btn-sm">Run</button>
-          <button class="stepForward btn btn-outline-dark btn-sm">&gt;</button>
-          <button class="fastForward btn btn-outline-dark btn-sm">&gt;&gt;</button>
+      <fieldset class="generalControls canvas-controls-attached d-flex flex-wrap justify-content-start gap-2 text-start">
+        <span class="formgroup media-controls d-inline-flex flex-wrap align-items-center gap-2">
+          <button class="fastBackward btn btn-outline-light btn-sm media-btn" aria-label="Fast backward">⏮︎</button>
+          <button class="stepBackward btn btn-outline-light btn-sm media-btn" aria-label="Step backward">⏪︎</button>
+          <button class="toggleRunner btn btn-light btn-sm media-btn media-btn-run" aria-label="Run">Run</button>
+          <button class="stepForward btn btn-outline-light btn-sm media-btn" aria-label="Step forward">⏩︎</button>
+          <button class="fastForward btn btn-outline-light btn-sm media-btn" aria-label="Fast forward">⏭︎</button>
         </span>
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <label>Speed:

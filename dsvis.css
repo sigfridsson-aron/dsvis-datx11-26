@@ -18,6 +18,15 @@
 	--dsvis-btn-outline-border: #1f2328;
 	--dsvis-btn-solid-bg: #70171f;
 	--dsvis-btn-solid-fg: #fff8dc;
+	--dsvis-media-outline-fg: #fff8dc;
+	--dsvis-media-outline-border: #fff8dc;
+	--dsvis-media-solid-bg: #fff8dc;
+	--dsvis-media-solid-fg: #70171f;
+	--dsvis-field-bg: #ffffff;
+	--dsvis-field-fg: #1f2328;
+	--dsvis-field-border: #5c6670;
+	--dsvis-field-border-focus: #1f2328;
+	--dsvis-field-focus-ring: #1f232840;
 	--dsvis-svg-bg: #ffffff;
 	--dsvis-svg-border: #70171f;
 	--dsvis-status-fg: #808080;
@@ -69,6 +78,15 @@ body.theme-dark {
 	--dsvis-btn-outline-border: #e8ebef;
 	--dsvis-btn-solid-bg: #2b3440;
 	--dsvis-btn-solid-fg: #e8ebef;
+	--dsvis-media-outline-fg: #e8ebef;
+	--dsvis-media-outline-border: #e8ebef;
+	--dsvis-media-solid-bg: #e8ebef;
+	--dsvis-media-solid-fg: #111418;
+	--dsvis-field-bg: #1a212b;
+	--dsvis-field-fg: #e8ebef;
+	--dsvis-field-border: #9aa4af;
+	--dsvis-field-border-focus: #e8ebef;
+	--dsvis-field-focus-ring: #e8ebef40;
 	--dsvis-svg-bg: #232933;
 	--dsvis-svg-border: #e8ebef;
 	--dsvis-status-fg: #b0bac5;
@@ -110,6 +128,15 @@ body.theme-colorblind {
 	--dsvis-btn-outline-border: #102a43;
 	--dsvis-btn-solid-bg: #0f2d4f;
 	--dsvis-btn-solid-fg: #f4f7fb;
+	--dsvis-media-outline-fg: #f4f7fb;
+	--dsvis-media-outline-border: #f4f7fb;
+	--dsvis-media-solid-bg: #ffd166;
+	--dsvis-media-solid-fg: #102a43;
+	--dsvis-field-bg: #ffffff;
+	--dsvis-field-fg: #102a43;
+	--dsvis-field-border: #334e68;
+	--dsvis-field-border-focus: #102a43;
+	--dsvis-field-focus-ring: #102a4340;
 	--dsvis-svg-bg: #ffffff;
 	--dsvis-svg-border: #0f2d4f;
 	--dsvis-status-fg: #486581;
@@ -151,6 +178,15 @@ body.theme-dark.theme-colorblind {
 	--dsvis-btn-outline-border: #e8ebef;
 	--dsvis-btn-solid-bg: #2b3440;
 	--dsvis-btn-solid-fg: #e8ebef;
+	--dsvis-media-outline-fg: #e8ebef;
+	--dsvis-media-outline-border: #e8ebef;
+	--dsvis-media-solid-bg: #ffd166;
+	--dsvis-media-solid-fg: #111418;
+	--dsvis-field-bg: #1a212b;
+	--dsvis-field-fg: #e8ebef;
+	--dsvis-field-border: #9aa4af;
+	--dsvis-field-border-focus: #ffd166;
+	--dsvis-field-focus-ring: #ffd16640;
 	--dsvis-svg-bg: #232933;
 	--dsvis-svg-border: #e8ebef;
 	--dsvis-status-fg: #b0bac5;
@@ -242,6 +278,21 @@ body.theme-dark.theme-colorblind {
 	--bs-btn-active-color: var(--dsvis-btn-solid-fg);
 	--bs-btn-active-bg: var(--dsvis-btn-solid-bg);
 	--bs-btn-active-border-color: var(--dsvis-btn-solid-bg);
+}
+
+.form-control,
+.form-select {
+	background-color: var(--dsvis-field-bg);
+	border-color: var(--dsvis-field-border);
+	color: var(--dsvis-field-fg);
+}
+
+.form-control:focus,
+.form-select:focus {
+	background-color: var(--dsvis-field-bg);
+	border-color: var(--dsvis-field-border-focus);
+	box-shadow: 0 0 0 0.2rem var(--dsvis-field-focus-ring);
+	color: var(--dsvis-field-fg);
 }
 
 main {
@@ -450,4 +501,77 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 /* Sorting */
 .customInsertContainer.hidden {
 	display: none;
+}
+
+.canvas-controls-attached {
+	width: 100%;
+	max-width: 1000px;
+	margin-top: -2px;
+	padding: 0.5rem 0.75rem;
+	border: 2px solid var(--dsvis-svg-border);
+	border-top: 0;
+	border-radius: 0 0 0.375rem 0.375rem;
+	background-color: var(--dsvis-header-bg);
+	color: var(--dsvis-header-fg);
+}
+
+.canvas-controls-attached label {
+	color: inherit;
+}
+
+.canvas-controls-attached-top {
+	width: 100%;
+	max-width: 1000px;
+	margin-bottom: -2px;
+	padding: 0.5rem 0.75rem;
+	border: 2px solid var(--dsvis-svg-border);
+	border-bottom: 0;
+	border-radius: 0.375rem 0.375rem 0 0;
+	background-color: var(--dsvis-header-bg);
+	color: var(--dsvis-header-fg);
+}
+
+.canvas-controls-attached-top label {
+	color: inherit;
+}
+
+.media-controls {
+	gap: 0.35rem;
+}
+
+.media-controls .media-btn {
+	min-width: 2.25rem;
+	height: 2.1rem;
+	padding: 0;
+	font-size: 1rem;
+	line-height: 1;
+	border-radius: 0.5rem;
+	font-weight: 700;
+}
+
+.media-controls .media-btn-run {
+	min-width: 2.6rem;
+}
+
+.media-controls .btn-outline-light {
+	--bs-btn-color: var(--dsvis-media-outline-fg);
+	--bs-btn-border-color: var(--dsvis-media-outline-border);
+	--bs-btn-hover-color: var(--dsvis-media-solid-fg);
+	--bs-btn-hover-bg: var(--dsvis-media-solid-bg);
+	--bs-btn-hover-border-color: var(--dsvis-media-solid-bg);
+	--bs-btn-active-color: var(--dsvis-media-solid-fg);
+	--bs-btn-active-bg: var(--dsvis-media-solid-bg);
+	--bs-btn-active-border-color: var(--dsvis-media-solid-bg);
+}
+
+.media-controls .btn-light {
+	--bs-btn-color: var(--dsvis-media-solid-fg);
+	--bs-btn-bg: var(--dsvis-media-solid-bg);
+	--bs-btn-border-color: var(--dsvis-media-solid-bg);
+	--bs-btn-hover-color: var(--dsvis-media-solid-fg);
+	--bs-btn-hover-bg: var(--dsvis-media-solid-bg);
+	--bs-btn-hover-border-color: var(--dsvis-media-solid-bg);
+	--bs-btn-active-color: var(--dsvis-media-solid-fg);
+	--bs-btn-active-bg: var(--dsvis-media-solid-bg);
+	--bs-btn-active-border-color: var(--dsvis-media-solid-bg);
 }
