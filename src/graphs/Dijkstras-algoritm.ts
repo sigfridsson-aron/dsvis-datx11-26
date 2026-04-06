@@ -44,6 +44,8 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
 
     await this.pause("Add start node to min stack")
 
+     
+
     this.distanceMap.set(this.start_Node, 0);
 
 
@@ -61,6 +63,9 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
         this.updateTable(this.extractUpdateTableInformation(minStack),current)
 
         await this.pause("Pop first element from stack")
+
+        
+
         minStack.pop()
 
         this.updateTable(this.extractUpdateTableInformation(minStack))

@@ -231,12 +231,21 @@ svg .marked.filled, svg text.marked, svg .marked > .filled, svg .marked > text {
 	fill: green;
 }
 
+
+svg .highlight, svg .highlight > * {
+    stroke: #C00;
+}
+
 svg .highlight, svg .highlight > * {
     stroke: #C00;
 }
 
 svg .highlight-blue, svg .highlight-blue > * {
     stroke: blue;
+}
+
+svg .highlight-green, svg .highlight-green > * {
+    stroke: green;
 }
 
 svg .highlight.filled, svg text.highlight, svg .highlight > .filled, svg .highlight > text {

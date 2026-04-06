@@ -20,16 +20,25 @@ export class TextCircle extends G {
     }
 
     
-   
+   /**
+    * 
+    * @param cssClass name of a defined css class
+    * @param enabled 
+    */
 
-    setHighlightColor(cssClass:string,bool:boolean) {
+    setHighlightColor(cssClass: string, enabled: boolean) {
+    const highlightClasses = [
+        'highlight',
+        'highlight-blue',
+        'highlight-green'
+    ]
 
-        if (!bool) {this.removeClass(cssClass)}
-        else {this.addClass(cssClass)}
+    highlightClasses.forEach(c => this.removeClass(c))
 
-
-
+    if (enabled) {
+        this.addClass(cssClass)
     }
+}
 
 
     getText(): string {
