@@ -62,10 +62,12 @@ Cypress.Commands.add("checkForAllPages", (check: () => void) => {
     cy.get("ul")
         .find("a")
         .each((a) => {
-            cy.log(a..constructor)
-            if (a instanceof HTMLAnchorElement) {
-                cy.visit(`localhost:8080/${a.href}`);
-                cy.url().should("include", a.href);
+            const anchorElement: HTMLElement = a.get(0);
+            expect(anchorElement.ownerDocument.defaultView).to.not.be.undefined;
+            // Test fails if anchorElement.ownerDocument.defaultView is undefined, hence not null assertion
+            if (anchorElement instanceof anchorElement.ownerDocument.defaultView!.HTMLAnchorElement) {
+                cy.visit(anchorElement.href);
+                cy.url().should("include", anchorElement.href);
                 check();
             }
         });
