@@ -17,7 +17,7 @@ describe("Index.html", () => {
 });
 
 describe("General controls", () => {
-    it("Node size and animation speed has values", () => {
+    it("Node size and animation speed does not have empty values", () => {
         cy.checkForAllPages(() => {
             cy.checkForAllAlgorithms(() => {
                 cy.get(".objectSize").should("not.have.value", "");
