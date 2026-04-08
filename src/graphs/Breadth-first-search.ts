@@ -1,5 +1,5 @@
 import { MessagesObject } from "~/engine";
-import { BaseGraph, BaseGraphMessages, tableInformation } from "./base-graph";
+import { BaseGraph, BaseGraphMessages, rowHighlight, tableInformation } from "./base-graph";
 import { Graph } from "~/graph";
 import { updateDefault } from "~/helpers";
 import { WeightedConnection } from "~/objects/weigted-connection";
@@ -99,7 +99,7 @@ export class Breadth extends BaseGraph implements Graph {
 
             this.updateTable([...knownEdges])
             await this.pause("traversal.chooseEdge", startNode.getText())
-            this.updateTable([...knownEdges], edge)
+            this.updateTable([...knownEdges], {node:startNode,weight:edge.$weight,node2:edge.$end})
             await this.pause("traversal.move", startNode.getText())
 
             visitedNodes.add(edge.$end)
@@ -129,7 +129,6 @@ export class Breadth extends BaseGraph implements Graph {
             )
 
             await this.pause("traversal.atNode", endNode.getText())
-
             // remove edge from known edges
             await this.pause("traversal.cleanUp", endNode.getText())
             for (const currEdge of knownEdges) {
@@ -162,7 +161,7 @@ export class Breadth extends BaseGraph implements Graph {
 
     async updateTable(
         tableInformation:tableInformation[]
-    , highlightEdge?:WeightedConnection<WeightedGraphNode>
+    , highlightEdge?:rowHighlight
     ) {
         const columns = ["From", "Weight", "To"];
         const edges = tableInformation
@@ -189,7 +188,7 @@ export class Breadth extends BaseGraph implements Graph {
 
             //Check if this edge is the one that should be highlight
             let bool_highlight: boolean 
-            if (highlightEdge?.$start === currEdge.node && highlightEdge.$end === currEdge.node2) bool_highlight = true
+            if (highlightEdge?.node === currEdge.node && highlightEdge.node2 === currEdge.node2) bool_highlight = true
             else bool_highlight = false
         
             

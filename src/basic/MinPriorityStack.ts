@@ -12,7 +12,7 @@ export class MinPriorityStack<T extends Weighted> {
     //Very bad complexity but is fine for low list size
    push(element: T) {
     for (let i = 0; i < this.list.size; i++) {
-        if (element.weight >= this.list.get(i)!.weight) {
+        if (element.weight >= this.list.get(i).weight) {
             this.list.insertAt(element, i);
             return;
         }
@@ -28,11 +28,23 @@ export class MinPriorityStack<T extends Weighted> {
     }
 
 
-    get peek():(T | null) {
+    get peek():(T) {
         let listSize = this.list.size
         return this.list.get(listSize-1)
     }
 
     get size() : number {return this.list.size}
+
+
+     get(index:number):T {
+        if (index <= this.list.size - 1) return this.list.get(index)
+        
+        
+        else throw new Error("Index out of bounds")
+        
+    }
+
+
+   
 
 }

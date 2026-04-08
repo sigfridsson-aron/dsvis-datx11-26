@@ -59,7 +59,7 @@ export abstract class BaseGraph extends Engine implements Graph {
 //knownEdges:Set<WeightedConnection<WeightedGraphNode>>
 abstract updateTable(
     tableInformation:tableInformation[]
-  , rowHighlight?: rowHighlight
+  , rowHighlight:rowHighlight
 )  : Promise<void>
 
  drawRow(
@@ -116,13 +116,15 @@ abstract updateTable(
             const inc = k.$incoming
             const out = k.$outgoing
             for (const c in inc) {
-                inc[c]?.setHighlight(false)
+                inc[c]?.setHighlightColor(false)
             }
             for (const c in out) {
-                out[c]?.setHighlight(false)
+                out[c]?.setHighlightColor(false)
             }
-            k.setHighlight(false)
+            k.setHighlightColor(false)
         }
+        this.graph?.setHighlightColor(false)
+        this.edgeTable.clear()
     }
 
     async startNode(value: string | number) {
