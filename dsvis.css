@@ -2,9 +2,6 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 :root {
-	--dsvis-maroon: #70171f;
-	--dsvis-cream: #fff8dc;
-	--dsvis-white: #ffffff;
 	--dsvis-page-bg: #70171f;
 	--dsvis-main-bg: #fff8dc;
 	--dsvis-main-fg: #1f2328;
@@ -62,9 +59,6 @@ body {
 }
 
 body.theme-dark {
-	--dsvis-maroon: #70171f;
-	--dsvis-cream: #fff8dc;
-	--dsvis-white: #ffffff;
 	--dsvis-page-bg: #111418;
 	--dsvis-main-bg: #1c2026;
 	--dsvis-main-fg: #e8ebef;
@@ -112,9 +106,6 @@ body.theme-dark {
 }
 
 body.theme-colorblind {
-	--dsvis-maroon: #70171f;
-	--dsvis-cream: #fff8dc;
-	--dsvis-white: #ffffff;
 	--dsvis-page-bg: #0f2d4f;
 	--dsvis-main-bg: #f4f7fb;
 	--dsvis-main-fg: #102a43;
@@ -162,9 +153,6 @@ body.theme-colorblind {
 }
 
 body.theme-dark.theme-colorblind {
-	--dsvis-maroon: #70171f;
-	--dsvis-cream: #fff8dc;
-	--dsvis-white: #ffffff;
 	--dsvis-page-bg: #111418;
 	--dsvis-main-bg: #1c2026;
 	--dsvis-main-fg: #e8ebef;
