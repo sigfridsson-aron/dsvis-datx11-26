@@ -6,11 +6,11 @@ import { LinkedConnection } from "~/objects/basic-structure-objects/node-connect
 import { Connection } from '../objects/connection';
 
 export class hashTable extends G {
-    $horizontal: boolean; // Make it do stuff
+    $horizontal: boolean;
     
-    $nodeArrays: LinkedNode[][] = []; // Used for vertical
+    $nodeArrays: LinkedNode[][] = [];
     $connections: LinkedConnection[][] = [];
-    $bound: Rect | undefined; // Used for coordinates
+    $bound: Rect | undefined;
 
     $backgrounds: Rect[] = [];
     $values: Text[] = [];
@@ -22,11 +22,12 @@ export class hashTable extends G {
         this.$values = new Array(size)
         this.$bound = new Rect();
         if (!horizontal){
-            this.$bound = this.rect(2 * objectSize, objectSize * size)//.addClass("invisible")
+            this.$bound = this.rect(2 * objectSize, objectSize * size)
         }
     }
 
-    /** */
+    /*** Initiates the Hashtable with specified size 
+     ** If vertical center around x & y coordinates */
     init(size: number, x: number, y: number) {
         if (this.$bound){
             this.$bound.center(x, y);
@@ -37,7 +38,7 @@ export class hashTable extends G {
     }
 
 
-    /** Returns number of elements that fit in a row*/ 
+    /*** Returns number of elements that fit in a row*/ 
     getRowWidth() : number {
         if(this.$horizontal){
             return Math.floor((this.engine().$Svg.width - 7 * this.engine().$Svg.margin + 10) / (this.engine().getObjectSize() * 2));
@@ -47,7 +48,7 @@ export class hashTable extends G {
         
     }
 
-    /** Calculates the x-coordinate based on index*/ 
+    /*** Calculates the x-coordinate based on index*/ 
     getCX(i: number): number {
         const maxPerLine = this.getRowWidth();
         const lineSize = Math.min(this.getSize(), maxPerLine);
@@ -59,12 +60,11 @@ export class hashTable extends G {
             return this.cx() + objectSize * (col - lineSize / 2 + 0.5);
         } else {
             // vertical layout
-
-            return this.$bound.cx() /* + objectSize/2 * i*3 */;//Number(this.$bound.x()) + objectSize + objectSize*3*i //Number(this.x()) + objectSize + objectSize*3*i;
+            return this.$bound.cx();
         }
     }
 
-    /** Calculates the y-coordinate based on index*/ 
+    /*** Calculates the y-coordinate based on index*/ 
     getCY(i: number): number {
         const maxPerLine = this.getRowWidth();
         const objectSize = this.engine().getObjectSize();
@@ -75,7 +75,7 @@ export class hashTable extends G {
             return Number(this.y()) +  objectSize * 0.5 + objectSize * 2 * row;
         } else {
             // Vertical
-            return Number(this.$bound.y()) + objectSize/2 + objectSize*i//Number(this.y()) + objectSize/2 + objectSize*i;
+            return Number(this.$bound.y()) + objectSize/2 + objectSize*i;
         }
     }
 
@@ -84,7 +84,7 @@ export class hashTable extends G {
         return this.$values.length;    
     }
 
-    /** What it do?*/
+    /** Initializes the hashtable's SVG elements with the assigned size*/
     setSize(size: number) {
         while (size < this.getSize()) {
             this.$backgrounds.pop()?.remove();
@@ -151,6 +151,7 @@ export class hashTable extends G {
         return this;
     }
 
+    /*** Adds a new linked node at the indexed bin */
     addLinkedNode(index:number, value:string =""):LinkedNode{
         const nodeDimensions: [number, number] = [this.engine().getObjectSize() * 2, this.engine().getObjectSize()];
         const newNode = new LinkedNode(value, nodeDimensions, this.engine().getStrokeWidth())
@@ -173,29 +174,31 @@ export class hashTable extends G {
         return newNode;
     }
 
-    async removeLinkedNode(arrayindex: number, linkedindex:number){
-        const nextNode = this.$nodeArrays[arrayindex][linkedindex+1] as LinkedNode;
-        const prevConnection = this.$connections[arrayindex][linkedindex-1] as LinkedConnection; 
+    /*** Removes indexed linked node from the linked list in the specified bin */
+    async removeLinkedNode(binIndex: number, linkedindex:number){
+        const nextNode = this.$nodeArrays[binIndex][linkedindex+1] as LinkedNode;
+        const prevConnection = this.$connections[binIndex][linkedindex-1] as LinkedConnection; 
 
-        this.$nodeArrays[arrayindex][linkedindex].remove();
-        this.$nodeArrays[arrayindex].splice(linkedindex, 1);
+        this.$nodeArrays[binIndex][linkedindex].remove();
+        this.$nodeArrays[binIndex].splice(linkedindex, 1);
 
-        if (linkedindex === this.$nodeArrays[arrayindex].length) {
+        if (linkedindex === this.$nodeArrays[binIndex].length) {
             // If the node is the last one, remove the connection to the previous node
-            this.$connections[arrayindex][linkedindex-1].remove();
-            this.$connections[arrayindex].splice(linkedindex-1, 1); // Set the connection to null
+            this.$connections[binIndex][linkedindex-1].remove();
+            this.$connections[binIndex].splice(linkedindex-1, 1); // Set the connection to null
         } else {
             // If the node is not the last one
             // Remove the connection to the next node
-            this.$connections[arrayindex][linkedindex].remove();
-            this.$connections[arrayindex].splice(linkedindex, 1);
+            this.$connections[binIndex][linkedindex].remove();
+            this.$connections[binIndex].splice(linkedindex, 1);
             // Update the connection of the previous node to go to the next node
             
-            this.adjustNodes(arrayindex, linkedindex); 
+            this.adjustNodes(binIndex, linkedindex); 
             /* prevConnection.setEnd(nextNode, this.animationValue()); */
         }
     }
 
+    /*** Adjusts the nodes after a node has been removed */
     adjustNodes(arrayindex: number, linkedindex:number){
         const right = this.$nodeArrays[arrayindex].slice(linkedindex);
         const conright = this.$connections[arrayindex].slice(linkedindex);
@@ -219,12 +222,13 @@ export class hashTable extends G {
         }
     }
 
+    /*** Gets animation value from engine */
     private animationValue(): number {
          const animate = !this.engine().state.isResetting()
         return animate ? this.engine().$Svg.animationSpeed : 0;
     }
 
-    /** What it do?*/
+    /*** Clears all values and removes SVG elements*/
     clear() {
         if(this.$horizontal){
             for (let i = 0; i < this.getSize(); i++) {
@@ -250,16 +254,17 @@ export class hashTable extends G {
         return this;
     }
 
+    /*** Returns the indexed values from the hashtable (if horizontal) */
     getValues(i: number): string[]{
         return this.$nodeArrays[i].map(node => String(node.value));
     }
 
-    /** What it do?*/
+    /*** Returns the indexed value from the hashtable (if horizontal) */
     getValue(i: number): string {
         return this.$values[i].text();
     }
 
-    /** What it do?*/
+    /*** Sets the indexed value from the hashtable (if horizontal) */
     setValue(i: number, text: string) {
         if (this.$horizontal){
             if (text == null) {
@@ -272,13 +277,10 @@ export class hashTable extends G {
             }
             this.$values[i].text(text);
             return this;
-        }else{
-            
         }
-        
     }
 
-    /** What it do?*/
+    /*** Swaps two elements in the hashtable (if horizontal)*/
     swap(j: number, k: number, animate: boolean = false) {
         const jText = this.$values[j],
             kText = this.$values[k];
@@ -304,7 +306,7 @@ export class hashTable extends G {
         return this;
     }
 
-    /** Highlights the value with inserted index*/
+    /*** Highlights the value with inserted index*/
     setIndexHighlight(i: number, high: boolean, color: string = "#C00") {
         if (this.$backgrounds[i]) {
             if (high) {
