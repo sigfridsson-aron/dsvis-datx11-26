@@ -39,11 +39,11 @@ export const SortMessages = {
 
 export class HashTableSeparateChaining extends Engine implements Collection {
     initialValues: Array<string> = [];
-    compensate: number = 0;
     sortArray: hashTable;
     baseSize: number = 8;
     messages: MessagesObject = SortMessages;
-    elementCounter: number = 0
+    elementCounter: number = 0;
+    maxLoadFactor: number = 0.75;
 
     constructor(containerSelector: string) {
         super(containerSelector);
@@ -154,7 +154,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     }
 
     async insertOne(value: number | string) {
-        if(this.elementCounter >= this.sortArray.getSize() * 0.75){ // Loadfactor
+        if(this.elementCounter >= this.sortArray.getSize() * this.maxLoadFactor){ // Loadfactor
             await this.pause("Load Factor exceeded!");
             await this.resize(this.sortArray.getSize() * 2);
         }
