@@ -4,13 +4,12 @@ import { EngineGeneralControls } from "~/general-controls/engine-general-control
 import { Graph } from "~/graph";
 import { parseValues } from "~/helpers";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
-import { WeightedConnection } from "~/objects/weigted-connection";
 
 export const BaseGraphMessages = {
-    error: {
+    warning: {
         nullGraph: "Please choose a graph first"
       , incorrectStart: (value: string, graph: string) => 
-            `could not find ${value}; current start node is ${graph}`
+            `Could not find ${value}; current start node is ${graph}`
     }
     , traversal: {
         start: (value: string) => `Starting search at ${value}`
@@ -35,17 +34,13 @@ export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
     graph: WeightedGraphNode | null = null;
     createdNodes: WeightedGraphNode[] = [];
-    initialValues: (String | Number)[] = [];
     generalControls: EngineGeneralControls;
-    
-    
 
     constructor(containorSelector: string) {
         super(containorSelector)
 
         this.generalControls = new EngineGeneralControls(this.container, this)
         this.edgeTable = this.Svg.group()
-       
     }
 
     async start() {
@@ -56,60 +51,60 @@ export abstract class BaseGraph extends Engine implements Graph {
     abstract nodeTraversalVisualisation():void
 
 
-//knownEdges:Set<WeightedConnection<WeightedGraphNode>>
-abstract updateTable(
-    tableInformation:tableInformation[]
-  , rowHighlight:rowHighlight
-)  : Promise<void>
+    //knownEdges:Set<WeightedConnection<WeightedGraphNode>>
+    abstract updateTable(
+        tableInformation:tableInformation[]
+    , rowHighlight:rowHighlight
+    )  : Promise<void>
 
- drawRow(
-    rowData: string[],
-    rowIndex: number,
-    startX: number,
-    startY: number,
-    cellWidth: number,
-    cellHeight: number,
-    highlight?: boolean
-) {
-    const rowY = startY + rowIndex * cellHeight;
-    const rowWidth = rowData.length * cellWidth;
+    drawRow(
+        rowData: string[],
+        rowIndex: number,
+        startX: number,
+        startY: number,
+        cellWidth: number,
+        cellHeight: number,
+        highlight?: boolean
+    ) {
+        const rowY = startY + rowIndex * cellHeight;
+        const rowWidth = rowData.length * cellWidth;
 
-    // Create a group for the row
-    const rowGroup = this.edgeTable.group();
+        // Create a group for the row
+        const rowGroup = this.edgeTable.group();
 
-    // Background highlight (CSS class)
-    const rowRect = rowGroup
-        .rect(rowWidth, cellHeight)
-        .move(startX, rowY)
+        // Background highlight (CSS class)
+        const rowRect = rowGroup
+            .rect(rowWidth, cellHeight)
+            .move(startX, rowY)
 
-    if (highlight) rowRect.addClass('row-highlight');
-    else rowRect.addClass("row-normal")
+        if (highlight) rowRect.addClass('row-highlight');
+        else rowRect.addClass("row-normal")
 
-    // Send highlight to back so cells and text appear on top
-    
+        // Send highlight to back so cells and text appear on top
+        
 
-    // Draw cells and text on top
-    for (let col = 0; col < rowData.length; col++) {
-        const x = startX + col * cellWidth;
-        const y = rowY;
+        // Draw cells and text on top
+        for (let col = 0; col < rowData.length; col++) {
+            const x = startX + col * cellWidth;
+            const y = rowY;
 
-        rowGroup
-            .rect(cellWidth, cellHeight)
-            .move(x, y)
-            .addClass('cell');
+            rowGroup
+                .rect(cellWidth, cellHeight)
+                .move(x, y)
+                .addClass('cell');
 
-        rowGroup
-            .text(rowData[col])
-            .font({
-                anchor: 'middle',
-                leading: '1em',
-                size: 14
-            })
-            .center(x + cellWidth / 2, y + cellHeight / 2);
+            rowGroup
+                .text(rowData[col])
+                .font({
+                    anchor: 'middle',
+                    leading: '1em',
+                    size: 14
+                })
+                .center(x + cellWidth / 2, y + cellHeight / 2);
+        }
+        rowRect.front();
+        return rowGroup;
     }
-    rowRect.front();
-    return rowGroup;
-}
 
     resetHighlights() {
         for (const k of this.createdNodes) {
@@ -137,16 +132,13 @@ abstract updateTable(
                 return
             }
         }
-        await this.pause("error.incorrectStart", value, this.graph?.getText())
+        await this.pause("warning.incorrectStart", value, this.graph?.getText())
         this.graph?.setHighlight(true)
     }
 
     async chosenGraph(graf: string | number) {
         if (graf === "") {
             await this.resetAlgorithm()
-        } else if (graf === "Undirected") {
-            await this.resetAlgorithm()
-            this.undirectedGraph()
         } else if (graf === "Directed") {
             await this.resetAlgorithm()
             this.directedGraph()
@@ -191,17 +183,6 @@ abstract updateTable(
             .font({ size: 10 })
             .stroke({ color: "#f44444", width: 0.5 })
         }
-    }
-
-    initialise(initialValues: string[] | null = null): this {
-        //initialValues will probably only be used if we can make it so
-        //that you can construct your own graph, in other classes it's
-        //used like this.initialise(["k"]) and you start with a k node
-
-        //the current code is just copied and pretty much does nothing
-        this.initialValues = parseValues(initialValues);
-        super.initialise()
-        return this;
     }
 
     //defines a new Node object and puts it under where messages
@@ -270,73 +251,6 @@ abstract updateTable(
     }
 
     //Implement default graphs below
-
-    //New bug putAtDeg seems to cause issues if you redraw a graph (only in animation)
-    private async bugExample() {
-        const midW = this.$Svg.width/2
-        const midH = this.$Svg.height/2
-        const A = this.newNode("A")
-        A.setCenter(midW, midH, this.getAnimationSpeed())
-        await this.pause("example.here")
-        const B = this.newNode("B")
-        await this.pause("example.here")
-        this.graph = A
-        this.link(A, B, 2, "both")
-        await this.pause("example.here")
-        this.putAtDeg(B, A, 135, 125, true)
-        await this.pause("example.here")
-    }
-
-    private undirectedGraph(): void {
-        // i am happy with this but feel free to add to it
-        const midW = this.$Svg.width/2 - 250
-        const midH = this.$Svg.height/2 + 150
-
-        const A = this.newNode("A")
-        const B = this.newNode("B")
-        const C = this.newNode("C")
-        const D = this.newNode("D")
-        const E = this.newNode("E")
-        const F = this.newNode("F")
-        const G = this.newNode("G")
-        const H = this.newNode("H")
-        const I = this.newNode("I")
-        const J = this.newNode("J")
-
-        A.setCenter(midW, midH)
-        this.graph = A
-
-        this.putAtDeg(B, A, 135)
-        this.link(A, B, 1, "both")
-
-        this.putAtDeg(C, A, 0, 150)
-        this.link(A, C, 6, "both")
-        
-        this.putAtDeg(D, B, 45)
-        this.link(C, D, 30, "both")
-        this.link(B, D, 4, "both")
-        this.link(A, D, 3, "both")
-
-        this.putAtDeg(E, A, 225)
-        this.link(E, A, 5, "both")
-
-        this.putAtDeg(F, C, 45)
-        this.link(F, C, 2, "both")
-
-        this.putAtDeg(G, C, -45)
-        this.link(G, C, 1, "both")
-        this.link(G, F, 5, "both")
-
-        this.putAtDeg(H, D, 0, 150)
-        this.link(D, H, 7, "both")
-        this.link(H, C, 0, "both")
-
-        this.putAtDeg(I, D, 135, 80)
-        this.link(I, D, 3, "both")
-
-        this.putAtDeg(J, G, 45)
-        this.link(G, J, 8, "both")
-    }
 
     private directedGraph(): void {
         //copied the undirected graph and made it directed

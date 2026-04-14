@@ -1,4 +1,4 @@
-import { MessagesObject } from "~/engine";
+import { MessagesObject, NBSP } from "~/engine";
 import { BaseGraph, BaseGraphMessages, rowHighlight, tableInformation } from "./base-graph";
 import { Graph } from "~/graph";
 import { updateDefault } from "~/helpers";
@@ -155,6 +155,14 @@ export class FloydWarshall extends BaseGraph implements Graph {
     private paths: Record<string, 
                           Record<string, 
                                  WeightedConnection<WeightedGraphNode>[]>> = {};
+    private body: string = "Warning! this algorithm takes a lot of time to complete".concat(
+                           "\nIts time complexity is cubic O(N^3)").concat(
+                           "\nChoose a small graph or be prepared for a long wait")
+
+    override setIdleTitle(): void {
+        this.info.setTitle("Select an action from the menu above");
+        this.info.setBody(this.body);
+    }
 
     override async startNode(value: string | number): Promise<void> {
         try {
@@ -162,6 +170,13 @@ export class FloydWarshall extends BaseGraph implements Graph {
             for (const path of Object.values(this.paths[value])) {
                 for (const edge of path) {
                     edge.setHighlight(true)
+                }
+            }
+            for (let i = 0;  i < this.createdNodes.length; i++) {
+                if (this.createdNodes[i].getText() === value) {
+                    for (let j = 1; j < this.matrix[i].length; j++) {
+                        this.matrix[i+1][j].setHighlight(true)
+                    }
                 }
             }
         } catch {
@@ -179,17 +194,12 @@ export class FloydWarshall extends BaseGraph implements Graph {
     }
 
     async floydWarshallSearch(): Promise<void> {
-        // Creates a preliminary matrix for vertixes, structured
-        // as matrix[startVertix][endVertix] = weight of path
-        // from startVertix to endVertix
-        // since it is preliminary it only has the weight of
-        // paths that are immediatly connected
-
         var tableInf: tableInformation[] = [];
         var high: rowHighlight
 
         await this.pause("floydWarshall.start1")
-        await this.createTable()   
+
+        await this.createTable()
 
         await this.pause("floydWarshall.start2")
 
@@ -213,6 +223,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
             for (const edge of Object.values(nodeFrom.$outgoing)) {
                 out[out.length] = edge!.$end
             }
+            
             const nodeFromT = nodeFrom.getText()
             await this.pause("floydWarshall.prelim.base", nodeFromT)
             for (const nodeTo of this.createdNodes) {
@@ -224,7 +235,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     nodeTo.cy(),
                     this.getObjectSize(),
                     this.getStrokeWidth()
-                )
+                ).removeClass('highlight-circle').addClass(`highlight-circle-green`)
                 await this.pause("floydWarshall.prelim.lookup", nodeFromT, nodeToT)
                 if (nodeFrom === nodeTo) {
                     await this.pause("floydWarshall.prelim.same", nodeFromT, nodeToT)
@@ -260,7 +271,6 @@ export class FloydWarshall extends BaseGraph implements Graph {
                 
                 await this.updateTable(tableInf)
                 await this.pause("floydWarshall.prelim.updateEdgetable", nodeFromT, nodeToT)
-                await this.updateTable([])
 
                 toPointer.remove()
                 this.resetHighlights()
@@ -279,7 +289,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                 kNode.cy(),
                 this.getObjectSize(),
                 this.getStrokeWidth()
-            )
+            ).removeClass('highlight-circle').addClass(`highlight-circle-blue`)
             await this.pause("floydWarshall.final.base1", k)
             for (const iNode of this.createdNodes) {
                 if (kNode === iNode) continue
@@ -313,7 +323,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         jNode.cy(),
                         this.getObjectSize(),
                         this.getStrokeWidth()
-                    )
+                    ).removeClass('highlight-circle').addClass(`highlight-circle-green`)
 
                     this.traversalMsg.k = k
                     this.traversalMsg.i = i
@@ -398,7 +408,6 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         this.graphTraversal = this.paths[i][j]
                         await this.nodeTraversalVisualisation()
                         
-                        await this.updateTable([])
                         this.resetHighlights()
                     } else {
                         await this.pause("floydWarshall.final.compareOutcome1", k, i)
@@ -410,12 +419,26 @@ export class FloydWarshall extends BaseGraph implements Graph {
             }
             kPointer.remove()
         }
+        this.body = NBSP
     }
 
     async nodeTraversalVisualisation(): Promise<void> {
         if(this.graphTraversal.length === 0) {
             throw new Error ("graphTraversal is empty, shouldn't happen")
         }
+
+        let highColor = `highlight`
+        let circColor = `highlight-circle`
+
+        if (this.traversalMsg.msg != "floydWarshall.prelim.found")
+            for (const edge of this.graphTraversal) {
+                if (edge.$start.getText() === this.traversalMsg.k ||
+                    edge.$end.getText() === this.traversalMsg.k) {
+                    highColor = `highlight-blue`
+                    circColor = `highlight-circle-blue`
+                    break
+                }
+            }
     
         let lastNode: WeightedGraphNode | null = null
     
@@ -428,7 +451,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         firstNode.cy(),
                         this.getObjectSize(),
                         this.getStrokeWidth()
-        )
+        ).removeClass(`highlight-circle`).addClass(circColor)
     
         for (let i = 0; i < this.graphTraversal.length;i++) {
             const edge = this.graphTraversal[i]
@@ -445,7 +468,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
             }
     
             // highlight the traversed edge
-            edge.setHighlight(true)
+            edge.setHighlightColor(true, highColor)
             
             // animate pointer to next node
             pointer?.setCenter(
@@ -544,6 +567,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
     }
 
     override resetHighlights(): void {
+        this.updateTable([])
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing

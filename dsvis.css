@@ -262,6 +262,16 @@ svg .highlight-circle {
 	fill: none;
 }
 
+svg .highlight-circle-green {
+	stroke: rgb(0, 204, 0);
+	fill: none;
+}
+
+svg .highlight-circle-blue {
+	stroke: rgb(0, 0, 204);
+	fill: none;
+}
+
 g text {
 	stroke: none;
     fill: black;
