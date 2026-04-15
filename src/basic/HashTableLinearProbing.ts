@@ -37,7 +37,6 @@ export const HashTableMessages = {
 
 export class HashTableLinearProbing extends Engine implements Collection {
     initialValues: Array<string> = [];
-    compensate: number = 0;
     hashTable: hashTable;
     metadataArray: number[] = []; // metadata array of the same length as the hash table. 0 = empty, 1 = removed, 2 = filled
     loadFactor: number = 0;
