@@ -2,7 +2,6 @@ import { G } from "@svgdotjs/svg.js";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
-import { parseValues } from "~/helpers";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 
 export const BaseGraphMessages = {
@@ -43,10 +42,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.edgeTable = this.Svg.group()
     }
 
-    async start() {
-        //Only here because it's apart of the Graph interface
-    }
-
+    abstract start(): Promise<void>
 
     abstract nodeTraversalVisualisation():void
 
@@ -220,12 +216,41 @@ export abstract class BaseGraph extends Engine implements Graph {
         weight: number,
         dir: string
     ): WeightedGraphNode {
-        return ourNode.connect(theirNode.getText(), 
-                               ourNode.getText(), 
-                               theirNode, 
-                               this.getStrokeWidth(), 
-                               weight, 
-                               dir)
+        if (dir === "to") {
+            ourNode.setSuccessor(
+                theirNode.getText(), 
+                ourNode.getText(), 
+                theirNode, 
+                this.getStrokeWidth(), 
+                weight
+            )
+        } else if (dir === "from") {
+            ourNode.setPredecessor(
+                theirNode.getText(), 
+                ourNode.getText(), 
+                theirNode, 
+                this.getStrokeWidth(), 
+                weight
+            )
+        } else if (dir === "both") {
+            ourNode.setPredecessor(
+                theirNode.getText(),
+                ourNode.getText(),
+                theirNode,
+                this.getStrokeWidth(),
+                weight
+            )
+            ourNode.setSuccessor(
+                theirNode.getText(), 
+                ourNode.getText(), 
+                theirNode, 
+                this.getStrokeWidth(), 
+                weight
+            )
+        } else {
+            throw new Error ("Internal error, you've spelt the direction wrong")
+        }
+        return ourNode
     }
 
     //Puts a Node a 100(px not sure what unit we have) away from

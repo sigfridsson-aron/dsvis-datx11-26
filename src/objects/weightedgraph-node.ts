@@ -5,46 +5,28 @@ export class WeightedGraphNode extends GraphNode {
     $outgoing: Record<string, WeightedConnection<this> | null> = {};
     $incoming: Record<string, WeightedConnection<this> | null> = {};
     $weights: Record<string, number | null> = {};
-    
+    $dir: boolean = true;
 
-    constructor(text: string, size: number, strokeWidth: number) {
-        super(text, size, strokeWidth);
+    override getDirected(): boolean {
+        return this.$dir
     }
 
+    override setPredecessor(inKey: string
+                          , outKey: string
+                          , predecessor: this
+                          , strokeWidth: number
+                          , weight: number = 0): this {
+        predecessor.setSuccessor(outKey, inKey, this, strokeWidth, weight);
+        return this;
+    }
 
-    // These are inhereted functions, nothing wrong with them
-    // but adding more variables to them seems to be a no-no
-    // so use connect instead
-    override setPredecessor(): never 
-     { throw new Error ("setPredecessor and setSuccessor are obsolete use connect for this class");}
+    override setSuccessor(outKey: string
+                        , inKey: string
+                        , successor: this | null
+                        , strokeWidth: number
+                        , weight: number = 0): this {
+        const outEdge = this.$outgoing[outKey];
 
-    override setSuccessor(): never 
-     { throw new Error ("setPredecessor and setSuccessor are obsolete use connect for this class")}
-
-    // connect has pretty much the exact structure of setSuccessor
-    // but i added so it checks dir in the beginning and puts
-    // weight in at the end
-    // dir = from creates theirKey ----> ourKey
-    // dir = to creates   theirKey <---- ourKey
-    // dir = both creates theirKey <---> ourKey
-    connect(
-        theirKey: string,
-        ourKey: string,
-        theirNode: this | null,
-        strokeWidth: number,
-        weight: number,
-        dir: string
-    ): this {
-        if (dir === "from" && theirNode) {
-            theirNode.connect(ourKey, theirKey, this, strokeWidth, weight, "to")
-            return this
-        } else if (dir === "both" && theirNode) {
-            theirNode.connect(ourKey, theirKey, this, strokeWidth, weight, "to")
-        } else if (dir !== "to") {
-            throw new Error ("connect only has the directions to, from and both defined")
-        }
-        const outEdge = this.$outgoing[theirKey];
-        
         if (outEdge) {
             const oldSuccessor = outEdge.getEnd();
             const oldIncoming = oldSuccessor.$incoming;
@@ -55,8 +37,8 @@ export class WeightedGraphNode extends GraphNode {
             }
             outEdge.remove();
         }
-        if (theirNode) {
-            const inEdge = theirNode.$incoming[ourKey];
+        if (successor) {
+            const inEdge = successor.$incoming[inKey];
             if (inEdge) {
                 const oldPredecessor = inEdge.getStart();
                 const oldOutgoing = oldPredecessor.$outgoing;
@@ -68,24 +50,24 @@ export class WeightedGraphNode extends GraphNode {
                 inEdge.remove();
             }
             var bend = 0
-            if(theirNode.$outgoing[ourKey]) {
+            if(successor.$outgoing[inKey]) {
                 bend = 0.2
-                theirNode.$outgoing[ourKey].$bend = bend
-                theirNode.$outgoing[ourKey].update(theirNode.$outgoing[ourKey].$coords)
+                successor.$outgoing[inKey].$bend = bend
+                successor.$outgoing[inKey].update(successor.$outgoing[inKey].$coords)
             }
             const edge = this.root()
-                .put(new WeightedConnection(this, theirNode, weight))
+                .put(new WeightedConnection(this, successor, weight))
                 .init(
                     strokeWidth,
-                    this.getBend(theirKey) + bend,
-                    this.getDirected(theirKey)
+                    this.getBend(outKey) + bend,
+                    this.getDirected()
                 );
 
-            this.$outgoing[theirKey] = edge;
-            this.$weights[theirKey] = weight
-            theirNode.$incoming[ourKey] = edge;
+            this.$outgoing[outKey] = edge;
+            this.$weights[outKey] = weight
+            successor.$incoming[inKey] = edge;
         } else {
-            delete this.$outgoing[theirKey];
+            delete this.$outgoing[outKey];
         }
         this._updateNullary();
         return this;
