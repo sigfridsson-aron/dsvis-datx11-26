@@ -26,9 +26,13 @@ export const BaseGraphMessages = {
     }
 } as const satisfies MessagesObject
 
-export type rowHighlight = {node:GraphNode, weight:number, node2?:GraphNode}
+export type tableInformation = { node:   WeightedGraphNode
+                               , weight: number
+                               , node2?: WeightedGraphNode}
 
-export type tableInformation = {node:GraphNode,weight:number,node2?:GraphNode}
+export type rowHighlight = { node:   WeightedGraphNode
+                           , weight: number
+                           , node2?: WeightedGraphNode}
 
 export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
@@ -110,8 +114,7 @@ abstract updateTable(
     return rowGroup;
 }
 
-    async resetHighlights() {
-        
+    resetHighlights() {
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing
@@ -128,6 +131,7 @@ abstract updateTable(
     }
 
     async startNode(value: string | number) {
+        this.resetHighlights()
         this.graph?.setHighlight(false)
         for (const k of this.createdNodes) {
             if (k.getText() === value) {
@@ -288,8 +292,8 @@ abstract updateTable(
 
     private undirectedGraph(): void {
         // i am happy with this but feel free to add to it
-        const midW = this.$Svg.width/2 - 200
-        const midH = this.$Svg.height/2 + 100
+        const midW = this.$Svg.width/2 - 250
+        const midH = this.$Svg.height/2 + 150
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -308,7 +312,7 @@ abstract updateTable(
         this.putAtDeg(B, A, 135)
         this.link(A, B, 1, "both")
 
-        this.putAtDeg(C, A, 0)
+        this.putAtDeg(C, A, 0, 150)
         this.link(A, C, 6, "both")
         
         this.putAtDeg(D, B, 45)
@@ -326,11 +330,11 @@ abstract updateTable(
         this.link(G, C, 1, "both")
         this.link(G, F, 5, "both")
 
-        this.putAtDeg(H, D, 0)
+        this.putAtDeg(H, D, 0, 150)
         this.link(D, H, 7, "both")
         this.link(H, C, 0, "both")
 
-        this.putAtDeg(I, D, 135)
+        this.putAtDeg(I, D, 135, 80)
         this.link(I, D, 3, "both")
 
         this.putAtDeg(J, G, 45)
@@ -339,8 +343,8 @@ abstract updateTable(
 
     private directedGraph(): void {
         //copied the undirected graph and made it directed
-        const midW = this.$Svg.width/2 - 200
-        const midH = this.$Svg.height/2 + 100
+        const midW = this.$Svg.width/2 - 250
+        const midH = this.$Svg.height/2 + 150
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -359,7 +363,7 @@ abstract updateTable(
         this.putAtDeg(B, A, 135)
         this.link(A, B, 1, "from")
 
-        this.putAtDeg(C, A, 0)
+        this.putAtDeg(C, A, 0, 150)
         this.link(A, C, 6, "from")
         
         this.putAtDeg(D, B, 45)
@@ -377,11 +381,11 @@ abstract updateTable(
         this.link(G, C, 1, "from")
         this.link(G, F, 5, "from")
 
-        this.putAtDeg(H, D, 0)
+        this.putAtDeg(H, D, 0, 150)
         this.link(D, H, 7, "to")
         this.link(H, C, 0, "from")
 
-        this.putAtDeg(I, D, 135)
+        this.putAtDeg(I, D, 135, 80)
         this.link(I, D, 3, "from")
 
         this.putAtDeg(J, G, 45)
@@ -418,7 +422,7 @@ abstract updateTable(
         this.putAtDeg(D, A, -150, 100)
         this.link(D, A, 9, "to")
 
-        this.putAtDeg(E, A, 90, 200)
+        this.putAtDeg(E, A, 90)
         this.link(E, A, 0, "to")
         this.link(E, A, 1, "from")
 
@@ -446,8 +450,8 @@ abstract updateTable(
     }
 
     private treeGraph(): void {
-        const midW = this.$Svg.width/2 - 100
-        const midH = this.$Svg.height/2 - 200
+        const midW = this.$Svg.width/2 - 150
+        const midH = this.$Svg.height/2 - 120
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -467,45 +471,45 @@ abstract updateTable(
         A.setCenter(midW, midH)
         this.graph = A
 
-        this.putAtDeg(B, A, -20, 150)
-        this.putAtDeg(C, A, -160, 150)
+        this.putAtDeg(B, A, -40, 100)
+        this.putAtDeg(C, A, 180, 100)
         this.link(A, B, 10, "to")
         this.link(A, C, 10, "to")
 
-        this.putAtDeg(D, B, -135, 100)
-        this.putAtDeg(E, B, -45, 100)
+        this.putAtDeg(D, B, -120, 90)
+        this.putAtDeg(E, B, -60, 90)
         this.link(B, D, 10, "to")
         this.link(B, E, 10, "to")
 
-        this.putAtDeg(F, C, -135, 125)
-        this.putAtDeg(G, C, -45, 100)
+        this.putAtDeg(F, C, -150, 90)
+        this.putAtDeg(G, C, -90, 90)
         this.link(C, F, 10, "to")
         this.link(C, G, 10, "to")
 
-        this.putAtDeg(H, F, -135, 100)
-        this.putAtDeg(I, F, -45, 100)
+        this.putAtDeg(H, F, -120, 90)
+        this.putAtDeg(I, F, -60, 90)
         this.link(F, H, 10, "to")
         this.link(F, I, 10, "to")
 
-        this.putAtDeg(J, G, -45, 100)
+        this.putAtDeg(J, G, -60, 90)
         this.link(G, J, 10, "to")
 
-        this.putAtDeg(K, I, -100, 100)
+        this.putAtDeg(K, I, -120, 90)
         this.link(I, K, 10, "to")
 
-        this.putAtDeg(L, K, -135, 100)
-        this.putAtDeg(M, K, -45, 100)
+        this.putAtDeg(L, K, -135, 90)
+        this.putAtDeg(M, K, -45, 90)
         this.link(K, L, 10, "to")
         this.link(K, M, 10, "to")
 
-        this.putAtDeg(N, D, -90, 100)
+        this.putAtDeg(N, D, -90, 90)
         this.link(D, N, 10, "to")
     }
 
     private cyclicGraph(): void {
         //Neutered sign
-        const midW = this.$Svg.width/2 + 100
-        const midH = this.$Svg.height/2 - 25
+        const midW = this.$Svg.width/2 - 80
+        const midH = this.$Svg.height/2 - 50
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -523,40 +527,38 @@ abstract updateTable(
         A.setCenter(midW, midH)
 
         this.link(A, B, 1, "to")
-        this.putAtDeg(B, A, 135)
+        this.putAtDeg(B, A, 145)
 
         this.link(B, C, 2, "to")
-        this.putAtDeg(C, B, 180)
+        this.putAtDeg(C, B, 190)
 
         this.link(C, D, 3, "to")
-        this.putAtDeg(D, C, 225)
+        this.putAtDeg(D, C, 235)
 
         this.link(D, E, 4, "to")
-        this.putAtDeg(E, D, 270)
+        this.putAtDeg(E, D, 280)
         
         this.link(E, F, 5, "to")
-        this.putAtDeg(F, E, 315)
+        this.putAtDeg(F, E, 325)
 
         this.link(F, G, 6, "to")
         this.link(F, B, 14, "both")
-        this.putAtDeg(G, F, 0)
+        this.putAtDeg(G, F, 10)
 
         this.link(G, H, 7, "to")
-        this.putAtDeg(H, G, 45)
+        this.putAtDeg(H, G, 55)
 
         this.link(H, A, 8, "to")
-
-        this.link(D, I, 9, "both")
-        this.putAtDeg(I, D, 100)
+        this.link(H, I, 9, "both")
+        this.putAtDeg(I, H, 60)
 
         this.link(I, J, 10, "both")
-        this.putAtDeg(J, I, 202)
-
         this.link(J, K, 11, "both")
-        this.link(J, D, 12, "to")
-        this.putAtDeg(K, D, 220)
+        this.link(J, H, 12, "to")
+        this.putAtDeg(J, I, -45)
 
-        this.link(K, D, 13, "both")
+        this.link(K, H, 13, "both")
+        this.putAtDeg(K, H, -60)
     }
 
     private acyclicGraph(): void {
@@ -577,10 +579,10 @@ abstract updateTable(
         A.setCenter(midW, midH)
         
         this.link(A, B, 4, "from")
-        this.putAtDeg(B, A, 135)
+        this.putAtDeg(B, A, 180)
 
         this.link(A, C, 7, "from")
-        this.putAtDeg(C, A, 45)
+        this.putAtDeg(C, A, 0)
 
         this.link(D, B, 6, "to")
         this.link(D, B, 3, "from")
@@ -603,7 +605,7 @@ abstract updateTable(
 
     private DAGraph(): void {
         const midW = this.$Svg.width/2 - 300
-        const midH = this.$Svg.height/2 - 150
+        const midH = this.$Svg.height/2 - 50
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -621,33 +623,33 @@ abstract updateTable(
         this.putAtDeg(B, A, -90)
 
         this.link(C, A, 2, "from")
-        this.putAtDeg(C, A, -45)
+        this.putAtDeg(C, A, 0)
 
         this.link(D, B, 8, "from")
         this.link(D, C, 4, "from")
-        this.putAtDeg(D, C, -20)
+        this.putAtDeg(D, C, 10)
 
         this.link(E, B, 5, "from")
-        this.putAtDeg(E, B, -20)
+        this.putAtDeg(E, B, 10)
 
         this.link(F, E, 2, "from")
         this.link(F, D, 4, "from")
-        this.putAtDeg(F, D, -80)
+        this.putAtDeg(F, D, -50)
 
         this.link(G, B, 3, "from")
         this.link(G, F, 6, "from")
-        this.putAtDeg(G, B, -90, 140)
+        this.putAtDeg(G, B, -60, 140)
 
         this.link(H, F, 2, "from")
         this.link(H, G, 1, "to")
-        this.putAtDeg(H, F, -150)
+        this.putAtDeg(H, F, -120)
     }
 
     private weaklyConnectedGraph(): void {
         //Somewhat small but I thought it might be better to
         //focus on it being weakly connected
-        const midW = this.$Svg.width/2 - 100
-        const midH = this.$Svg.height/2 + 150
+        const midW = this.$Svg.width/2 - 200
+        const midH = this.$Svg.height/2 + 200
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -676,8 +678,8 @@ abstract updateTable(
     private stronglyConnectedGraph(): void {
         //Somewhat small but I thought it might be better to
         //focus on it being strongly connected
-        const midW = this.$Svg.width/2 - 100
-        const midH = this.$Svg.height/2 + 150
+        const midW = this.$Svg.width/2 - 200
+        const midH = this.$Svg.height/2 + 200
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -704,8 +706,8 @@ abstract updateTable(
     }
 
     private eulerianGraph(): void {
-        const midW = this.$Svg.width/2 - 100
-        const midH = this.$Svg.height/2
+        const midW = this.$Svg.width/2 - 200
+        const midH = this.$Svg.height/2 + 50
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -773,7 +775,7 @@ abstract updateTable(
 
     private chordalGraph(): void {
         const midW = this.$Svg.width/2 - 200
-        const midH = this.$Svg.height/2 + 50
+        const midH = this.$Svg.height/2 + 100
 
         const A = this.newNode("A")
         const B = this.newNode("B")
@@ -792,45 +794,49 @@ abstract updateTable(
         this.graph = A
 
         this.link(B, A, 1, "both")
-        this.putAtDeg(B, A, -10)
+        this.putAtDeg(B, A, -10, 90)
 
         this.link(C, A, 1, "both")
         this.link(C, B, 1, "both")
-        this.putAtDeg(C, A, 50)
+        this.putAtDeg(C, A, 50, 90)
 
         this.link(D, A, 2, "from")
         this.putAtDeg(D, A, -90)
 
         this.link(E, D, 4, "from")
         this.link(E, A, 1, "from")
-        this.putAtDeg(E, D, 170)
+        this.putAtDeg(E, D, 150, 100)
 
         this.link(F, E, 7, "from")
         this.link(F, A, 2, "from")
-        this.putAtDeg(F, E, 120)
+        this.putAtDeg(F, E, 120, 100)
 
         this.link(G, F, 5, "from")
         this.link(G, A, 3, "to")
-        this.putAtDeg(G, F, 60)
+        this.putAtDeg(G, F, 60, 100)
 
         this.link(H, B, 4, "from")
         this.putAtDeg(H, B, -80)
 
         this.link(I, H, 1, "from")
         this.link(I, B, 7, "from")
-        this.putAtDeg(I, H, 45)
+        this.putAtDeg(I, H, 45, 100)
 
         this.link(J, I, 6, "from")
         this.link(J, B, 4, "to")
-        this.putAtDeg(J, I, 110)
+        this.putAtDeg(J, I, 95, 100)
 
         this.link(K, C, 2, "from")
-        this.putAtDeg(K, C, 70)
+        this.putAtDeg(K, C, 20)
 
         this.link(L, K, 1, "from")
         this.link(L, C, 3, "to")
-        this.putAtDeg(L, K, 190)
+        this.putAtDeg(L, K, 150)
     }
+
+
+
+
 
 
 

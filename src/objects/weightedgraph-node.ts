@@ -68,7 +68,7 @@ export class WeightedGraphNode extends GraphNode {
                 inEdge.remove();
             }
             var bend = 0
-            if(theirNode.$outgoing[ourKey] && theirNode.$outgoing[ourKey].$weight != weight) {
+            if(theirNode.$outgoing[ourKey]) {
                 bend = 0.2
                 theirNode.$outgoing[ourKey].$bend = bend
                 theirNode.$outgoing[ourKey].update(theirNode.$outgoing[ourKey].$coords)
