@@ -26,18 +26,7 @@ export class InsertionSort extends BaseSorter implements Sorter {
             await this.pause("general.empty");
             return;
         }
-
-        // TODO: remove?
-        // if (this.sortArray.getValue(this.sortArray.length() - 1) === NBSP) {
-        //     this.sortArray.setSize(this.sortArray.length() - 1);
-        //     sortSize--;
-        // }
-
-        //Center the array depending on its size
-        this.sortArray.center(
-            this.getTreeRoot()[0], // + this.compensate, // TODO: remove compensate?
-            this.getTreeRoot()[1] + this.$Svg.margin * 4
-        );
+        
         for (let i = 1; i < sortSize; i++) {
             let j = i;
 
