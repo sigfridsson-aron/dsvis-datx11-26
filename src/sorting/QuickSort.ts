@@ -50,8 +50,6 @@ export class QuickSort extends BaseSorter implements Sorter {
 
     async quickSort(array: StapleArray, start: number, end: number) {
         if (end <= start) {
-            // await this.pause("general.empty")
-            // this.sortArray.clearStaplesDisabled(0);
             return;
         }
         
@@ -131,9 +129,8 @@ export class QuickSort extends BaseSorter implements Sorter {
 
         while (true) {
 
-            //Moves low as far right in the array as possible
-            //Stops moving if equal to pivot or if it gets farther right then high
-            //Also moves the highlights and arrow along with it
+            // Moves low as far right in the array as possible
+            // Stops moving if bigger or equal to pivot or if it exceeds high
             while (
                 low <= high                
             ) {
@@ -157,9 +154,8 @@ export class QuickSort extends BaseSorter implements Sorter {
                 await this.pause("Low is smaller than the pivot, advance pointer.");
             }
 
-            //Moves high as far left in the array as possible
-            //Stops moving if equal to pivot or if it gets farther left then low
-            //Also moves the highlights and arrow along with it
+            // Moves high as far left in the array as possible
+            // Stops moving if smaller or equal to pivot or if it precedes low
             while (
                 low <= high                
             ) {
@@ -190,8 +186,8 @@ export class QuickSort extends BaseSorter implements Sorter {
                 break;
             }
 
-            //Swap low and high since low is now higher than or equal to the pivot
-            //And higher is lower than or equal to the pivot
+            // Swap low and high since low is now higher than or equal to the pivot
+            // and high is lower than or equal to the pivot
             this.sortArray.swap(low, high);
 
             low += 1;
@@ -209,8 +205,8 @@ export class QuickSort extends BaseSorter implements Sorter {
             await this.pause("Swap low and high, advance both pointers.")
         }
 
-        //Swap the pivot back into its original position and now correct sorted position in the array
-        // Highlight with green
+        // Swap the pivot back into its correct position in the array
+        // Highlight pivot as sorted
         this.sortArray.swap(pivotIndex, high);
         this.sortArray.clearStapleHighlight(high, 'info');
         this.sortArray.setStapleHighlight(high, 'success');
