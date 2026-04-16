@@ -72,12 +72,6 @@ export class StapleArray extends G {
         this.positionStaples();
         this.center(centerX, centerY);
 
-        // setTimeout(() => {
-        //     this.swap(10, 20);
-        // }, 1000);
-        // setTimeout(() => {
-        //     this.shuffle();
-        // }, 5000);
         return this;
     }
 
@@ -197,10 +191,8 @@ export class StapleArray extends G {
 
     private positionStaples() {
         this.$staples.forEach((staple, i) => {
-            // staple.center(0, 0);
             staple.x(this.getStapleX(i));
         });
-        // this.center
     }
 
     private createStaples(values: number[]): ValueStaple[] {
