@@ -64,7 +64,7 @@ export class StapleArray extends G {
         )
             .center(0, 0)
             .dy(-this.$stapleMaxHeight / 2) // Move bounding box to cover staples
-            .height(this.$stapleMaxHeight + (this.$staples[0].$hideText ? 0 : 20)) // Add size of 30 to cover the text
+            .height(this.$stapleMaxHeight + (this.$stapleWidth < 25 ? 0 : 20)) // Add size of 30 to cover the text
             .addClass("invisible");
         this.$staples.forEach((staple, i) => {
             staple.init();
