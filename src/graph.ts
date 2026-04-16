@@ -5,6 +5,7 @@ import { GraphAlgorithmControl } from "./algorithm-controls/graph-algorithmcontr
 import { Breadth } from "./graphs/Breadth-first-search";
 import { FloydWarshall } from "./graphs/Floyd-Warshall";
 import { Dijkstras_algorithm } from "./graphs/Dijkstras-algoritm";
+import { Prim } from "./graphs/Prim";
 
 export interface Graph extends Engine {
     start: SubmitFunction;
@@ -16,7 +17,8 @@ const GRAPH_CLASSES = {
     FloydWarshall: FloydWarshall,
     Breadth: Breadth,
     Depth: Depth,
-    Dijkstras_algorithm: Dijkstras_algorithm
+    Dijkstras_algorithm: Dijkstras_algorithm,
+    Prim: Prim
 } as const satisfies RecordOfEngines<Graph>;
 
 const { engine, isBaseEngine } = initialiseEngine<Graph>(
