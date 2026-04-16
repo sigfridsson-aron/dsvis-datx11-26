@@ -12,7 +12,7 @@ import { BaseSorter, SortMessages } from "~/sorting/BaseSorter";
 
 export const QuickSortMessages = {
     sort: {
-        findPivot: "Pivot is selected",
+        selectPivot: "Select pivot",
         pivotFirst: "Place pivot at the start of the range",
         initPointers: "Initialize low and high pointers",
         compareWithPivot: (pointer: "low" | "high") =>
@@ -27,14 +27,13 @@ export const QuickSortMessages = {
     },
 } as const satisfies MessagesObject;
 
+export const PivotSelectionMethods = ['first' , 'middle' , 'last' , 'medianOfThree', 'random'] as const;
+export type PivotSelectionMethods = typeof PivotSelectionMethods[number]
+
 export class QuickSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(QuickSortMessages, SortMessages);
 
-    private getPivotIndex: (
-        arr: number[],
-        start: number,
-        end: number
-    ) => number = (arr, low, high) => Math.floor((low + high) / 2);
+    pivotSelectionMethod: PivotSelectionMethods = "middle";
 
     async sort() {
         if (this.sortArray.length() <= 1) {
@@ -81,12 +80,13 @@ export class QuickSort extends BaseSorter implements Sorter {
 
     async partition(start: number, end: number) {
         // Select pivot
-        let pivotIndex: number = this.getPivotIndex(
-            this.sortArray.getValues(),
+        await this.pause("sort.selectPivot");
+
+        let pivotIndex: number = await this.getPivotIndex(
+            this.sortArray,
             start,
             end
         );
-        this.sortArray.setStapleHighlight(pivotIndex, "info");
         const pivotValue: number = this.sortArray.getValue(pivotIndex);
 
         const pivotStaple: ValueStaple = this.sortArray.getStaple(pivotIndex);
@@ -101,7 +101,6 @@ export class QuickSort extends BaseSorter implements Sorter {
             // @ts-ignore: Wrong typing from library, incorrectly requires camelCase attribute names
             .css({ stroke: "orange", "stroke-width": 2 });
 
-        await this.pause("sort.findPivot");
 
         // Swap pivot with the first value of the range and update index
         this.sortArray.swap(start, pivotIndex);
@@ -237,9 +236,91 @@ export class QuickSort extends BaseSorter implements Sorter {
         return high;
     }
 
-    setPivotSelectionMethod(
-        method: (arr: number[], low: number, high: number) => number
-    ) {
-        this.getPivotIndex = method;
+    setPivotSelectionMethod(method: PivotSelectionMethods) {
+        this.pivotSelectionMethod = method;
+    }
+
+    private async getPivotIndex(
+        arr: StapleArray,
+        start: number,
+        end: number
+    ): Promise<number> {
+        switch (this.pivotSelectionMethod) {
+            case "first":
+                return this.getPivotFirst(arr, start);
+            case "middle":
+                return this.getPivotMiddle(arr, start, end);
+            case "last":
+                return this.getPivotLast(arr, end);
+            case "medianOfThree":
+                return this.getPivotMedianOfThree(arr, start, end);
+            case "random":
+                return this.getPivotRandom(arr, start, end);
+            default:
+                throw new Error("Invalid pivot selection method");
+        }
+    }
+
+    private async getPivotFirst(
+        arr: StapleArray,
+        start: number
+    ): Promise<number> {
+        const pivotIndex = start;
+        arr.setStapleHighlight(pivotIndex, "info");
+        await this.pause("Use first element as pivot");
+        return pivotIndex;
+    }
+
+    private async getPivotMiddle(
+        arr: StapleArray,
+        start: number,
+        end: number
+    ): Promise<number> {
+        const pivotIndex = Math.floor((start + end) / 2);
+        arr.setStapleHighlight(pivotIndex, "info");
+        await this.pause("Use middle element as pivot");
+        return pivotIndex;
+    }
+
+    private async getPivotLast(arr: StapleArray, end: number): Promise<number> {
+        const pivotIndex = end - 1;
+        arr.setStapleHighlight(pivotIndex, "info");
+        await this.pause("Use last element as pivot");
+        return pivotIndex;
+    }
+
+    private async getPivotRandom(arr: StapleArray, start: number, end: number): Promise<number> {
+        const pivotIndex = start + Math.floor(Math.random() * (end - start));
+        arr.setStapleHighlight(pivotIndex, "info");
+        await this.pause("Use random element as pivot");
+        return pivotIndex;
+    }
+
+    private async getPivotMedianOfThree(
+        arr: StapleArray,
+        start: number,
+        end: number
+    ): Promise<number> {
+        const firstIndex = start;
+        const lastIndex = end - 1;
+        const middleIndex = Math.floor((start + end) / 2);
+        const candidates: { i: number; value: number }[] = [
+            { i: firstIndex, value: arr.getValue(firstIndex) },
+            { i: lastIndex, value: arr.getValue(lastIndex) },
+            { i: middleIndex, value: arr.getValue(middleIndex) },
+        ];
+        candidates.sort(
+            (candidateA, candidateB) => candidateA.value - candidateB.value
+        );
+        const pivotIndex = candidates[1].i;
+        for (let candidate of candidates) {
+            arr.setStapleHighlight(candidate.i, "info");
+        }
+        await this.pause("Use median-of-three as pivot");
+        for (let candidate of candidates) {
+            if (candidate.i !== pivotIndex)
+                arr.clearStapleHighlight(candidate.i, "info");
+        }
+        return pivotIndex;
     }
 }
