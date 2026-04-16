@@ -1,5 +1,5 @@
 import { Line } from "@svgdotjs/svg.js";
-import { MessagesObject, NBSP } from "~/engine";
+import { MessagesObject } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
 import { Arrow } from "~/objects/arrow";
 import { StapleArray } from "~/objects/staple-array";
@@ -12,8 +12,10 @@ export const QuickSortMessages = {
         findPivot: "Pivot is selected",
         pivotFirst: "Place pivot at the start of the range",
         initPointers: "Initialize low and high pointers",
-        compareWithPivot: (pointer: 'low' | 'high') => `Compare ${pointer} with pivot`,
-        biggerThanPivot: (pointer: 'low' | 'high') => `${pointer} bigger than pivot`,
+        compareWithPivot: (pointer: "low" | "high") =>
+            `Compare ${pointer} with pivot`,
+        biggerThanPivot: (pointer: "low" | "high") =>
+            `${pointer} bigger than pivot`,
         smaller: "Element smaller than pivot",
         pivotSwap: "Swap pivot with high to put it into the correct place",
         sorting: (low: number, high: number) =>
@@ -37,11 +39,10 @@ export class QuickSort extends BaseSorter implements Sorter {
             return;
         }
 
-        //Start recursive calls to quickSort
-        
+        // Start recursive calls to quickSort
         await this.quickSort(this.sortArray, 0, this.sortArray.length());
 
-        //Message done
+        // Message done
         await this.pause("general.finished");
         for (let i = 0; i < this.sortArray.length(); i++) {
             this.sortArray.clearStapleHighlight(i, "all");
@@ -52,37 +53,40 @@ export class QuickSort extends BaseSorter implements Sorter {
         if (end <= start) {
             return;
         }
-        
-        //Makes only the current section being partitioned enabled
+
+        // Makes only the current section being partitioned enabled
         this.sortArray.setStaplesDisabled(0, start);
         this.sortArray.setStaplesDisabled(end);
         await this.pause(`sort.sorting`, start, end);
 
         if (start === end - 1) {
-            this.sortArray.setStapleHighlight(start, 'success')
+            this.sortArray.setStapleHighlight(start, "success");
             await this.pause(`sort.singleElement`);
             this.sortArray.clearStaplesDisabled(0);
             return;
         }
-        
-        //Partition
+
+        // Partition
         const pivotIndex = await this.partition(start, end);
-        
+
         this.sortArray.clearStaplesDisabled(0);
 
-        //Recursively call quicksort on the subarrays created by partition
+        // Recursively call quicksort on the subarrays created by partition
         await this.quickSort(array, start, pivotIndex);
         await this.quickSort(array, pivotIndex + 1, end);
     }
-    
+
     async partition(start: number, end: number) {
-        
         // Select pivot
-        let pivotIndex: number = this.getPivotIndex(this.sortArray.getValues(), start, end);
-        this.sortArray.setStapleHighlight(pivotIndex, 'info');
+        let pivotIndex: number = this.getPivotIndex(
+            this.sortArray.getValues(),
+            start,
+            end
+        );
+        this.sortArray.setStapleHighlight(pivotIndex, "info");
         const pivotValue: number = this.sortArray.getValue(pivotIndex);
-        
-        const pivotStaple: ValueStaple = this.sortArray.getStaple(pivotIndex)
+
+        const pivotStaple: ValueStaple = this.sortArray.getStaple(pivotIndex);
         // @ts-ignore: Due to incorrect typing below, TS do not understand the returned type will be Line
         const pivotLine: Line = this.Svg.line(
             Number(this.sortArray.x()),
@@ -90,23 +94,23 @@ export class QuickSort extends BaseSorter implements Sorter {
             Number(this.sortArray.x()) + Number(this.sortArray.width()),
             Number(pivotStaple.y())
         )
-        .dy(-1)
-        // @ts-ignore: Wrong typing from library, incorrectly requires camelCase attribute names
-        .css({ 'stroke': 'orange', 'stroke-width': 2})
-        
+            .dy(-1)
+            // @ts-ignore: Wrong typing from library, incorrectly requires camelCase attribute names
+            .css({ stroke: "orange", "stroke-width": 2 });
+
         await this.pause("sort.findPivot");
-        
+
         // Swap pivot with the first value of the range and update index
         this.sortArray.swap(start, pivotIndex);
         pivotIndex = start;
 
-        await this.pause("sort.pivotFirst")
+        await this.pause("sort.pivotFirst");
 
         // Initialize low and high to define range
         let low = start + 1;
         let high = end - 1;
-        
-        //Adds arrows to indicate low and high
+
+        // Adds arrows to indicate low and high
         const lowArrow = new Arrow(20, 90);
         this.Svg.put(lowArrow)
             .css("fill", "blue")
@@ -125,24 +129,20 @@ export class QuickSort extends BaseSorter implements Sorter {
             )
             .y(Number(this.sortArray.y()) + Number(this.sortArray.height()));
 
-        await this.pause("sort.initPointers")
+        await this.pause("sort.initPointers");
 
         while (true) {
-
             // Moves low as far right in the array as possible
             // Stops moving if bigger or equal to pivot or if it exceeds high
-            while (
-                low <= high                
-            ) {
+            while (low <= high) {
                 this.sortArray.setStapleHighlight(low, "primary");
-                await this.pause(
-                    "sort.compareWithPivot",
-                    "low",
-                );
+                await this.pause("sort.compareWithPivot", "low");
                 this.sortArray.clearStapleHighlight(low, "primary");
 
                 if (compare(this.sortArray.getValue(low), pivotValue) >= 0) {
-                    await this.pause("Low is bigger or equal to the pivot, stop the pointer.");
+                    await this.pause(
+                        "Low is bigger or equal to the pivot, stop the pointer."
+                    );
                     break;
                 }
 
@@ -151,14 +151,14 @@ export class QuickSort extends BaseSorter implements Sorter {
                     this.sortArray.getStapleX(low) +
                         this.sortArray.getStapleWidth() / 2
                 );
-                await this.pause("Low is smaller than the pivot, advance pointer.");
+                await this.pause(
+                    "Low is smaller than the pivot, advance pointer."
+                );
             }
 
             // Moves high as far left in the array as possible
             // Stops moving if smaller or equal to pivot or if it precedes low
-            while (
-                low <= high                
-            ) {
+            while (low <= high) {
                 this.sortArray.setStapleHighlight(high, "primary");
                 await this.pause(
                     "sort.compareWithPivot",
@@ -169,7 +169,9 @@ export class QuickSort extends BaseSorter implements Sorter {
                 this.sortArray.clearStapleHighlight(high, "primary");
 
                 if (compare(this.sortArray.getValue(high), pivotValue) <= 0) {
-                    await this.pause("High is smaller or equal to the pivot, stop the pointer.");
+                    await this.pause(
+                        "High is smaller or equal to the pivot, stop the pointer."
+                    );
                     break;
                 }
 
@@ -178,11 +180,13 @@ export class QuickSort extends BaseSorter implements Sorter {
                     this.sortArray.getStapleX(high) +
                         this.sortArray.getStapleWidth() / 2
                 );
-                await this.pause("High is bigger than the pivot, advance pointer.");
+                await this.pause(
+                    "High is bigger than the pivot, advance pointer."
+                );
             }
 
             if (low > high) {
-                await this.pause('Low exceeded high, done.')
+                await this.pause("Low exceeded high, done.");
                 break;
             }
 
@@ -202,25 +206,27 @@ export class QuickSort extends BaseSorter implements Sorter {
                     this.sortArray.getStapleWidth() / 2
             );
 
-            await this.pause("Swap low and high, advance both pointers.")
+            await this.pause("Swap low and high, advance both pointers.");
         }
 
         // Swap the pivot back into its correct position in the array
         // Highlight pivot as sorted
         this.sortArray.swap(pivotIndex, high);
-        this.sortArray.clearStapleHighlight(high, 'info');
-        this.sortArray.setStapleHighlight(high, 'success');
+        this.sortArray.clearStapleHighlight(high, "info");
+        this.sortArray.setStapleHighlight(high, "success");
         await this.pause("sort.pivotSwap");
 
-        pivotLine.remove()
-        lowArrow.remove()
-        highArrow.remove()
+        pivotLine.remove();
+        lowArrow.remove();
+        highArrow.remove();
 
-        await this.pause("Partition done, return pivot index.")
+        await this.pause("Partition done, return pivot index.");
         return high;
     }
 
-    setPivotSelectionMethod(method: (arr: number[], low: number, high: number) => number) {
+    setPivotSelectionMethod(
+        method: (arr: number[], low: number, high: number) => number
+    ) {
         this.getPivotIndex = method;
     }
 }
