@@ -253,12 +253,12 @@ export class MergeSort extends BaseSorter implements Sorter {
     }
 
     followRecursion() {
-        this.disablePanning();
+        this.disableViewBoxPanning();
         this.isFollowingRecursion = true;
     }
 
     doNotFollowRecursion() {
-        this.enablePanning();
+        this.enableViewBoxPanning();
         this.isFollowingRecursion = false;
     }
 }
