@@ -1,15 +1,21 @@
-import { DSArray } from "src/objects/dsarray";
+import { Line } from "@svgdotjs/svg.js";
 import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
+import { Arrow } from "~/objects/arrow";
+import { StapleArray } from "~/objects/staple-array";
+import { ValueStaple } from "~/objects/value-staple";
 import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "~/sorting/BaseSorter";
 
 export const QuickSortMessages = {
     sort: {
         findPivot: "Pivot is selected",
-        lowBig: "Element bigger than pivot",
-        highSmall: "Element smaller than pivot",
-        pivotSwap: "Swap pivot into correct place",
+        pivotFirst: "Place pivot at the start of the range",
+        initPointers: "Initialize low and high pointers",
+        compareWithPivot: (pointer: 'low' | 'high') => `Compare ${pointer} with pivot`,
+        biggerThanPivot: (pointer: 'low' | 'high') => `${pointer} bigger than pivot`,
+        smaller: "Element smaller than pivot",
+        pivotSwap: "Swap pivot with high to put it into the correct place",
         sorting: (low: number, high: number) =>
             `Sorting array from index ${low} to index ${high}`,
         singleElement: "Single element arrays are automatically sorted",
@@ -19,188 +25,206 @@ export const QuickSortMessages = {
 export class QuickSort extends BaseSorter implements Sorter {
     messages: MessagesObject = updateDefault(QuickSortMessages, SortMessages);
 
+    private getPivotIndex: (
+        arr: number[],
+        start: number,
+        end: number
+    ) => number = (arr, low, high) => Math.floor((low + high) / 2);
+
     async sort() {
-        if (this.sortArray.getSize() <= 1) {
+        if (this.sortArray.length() <= 1) {
             await this.pause("general.empty");
             return;
         }
 
-        if (this.sortArray.getValue(this.sortArray.getSize() - 1) === NBSP) {
-            this.sortArray.setSize(this.sortArray.getSize() - 1);
-        }
-
-        //Center the array depending on its size
-        this.sortArray.center(
-            this.getTreeRoot()[0] + this.compensate,
-            this.getTreeRoot()[1] + this.$Svg.margin * 4
-        );
-
-        //Ensures there are no highlights when starting the algorithm
-        for (let i = 0; i < this.sortArray.getSize(); i++) {
-            this.sortArray.setIndexHighlight(i, false);
-        }
-
-        //Start recursive calls to quicksort
-        await this.quickSort(this.sortArray, 0, this.sortArray.getSize() - 1);
-
-        //Enable array again after completion
-        for (let i = 0; i < this.sortArray.getSize(); i++) {
-            this.sortArray.setDisabled(i, false);
-        }
+        //Start recursive calls to quickSort
+        
+        await this.quickSort(this.sortArray, 0, this.sortArray.length());
 
         //Message done
         await this.pause("general.finished");
+        for (let i = 0; i < this.sortArray.length(); i++) {
+            this.sortArray.clearStapleHighlight(i, "all");
+        }
     }
 
-    async quickSort(array: DSArray, low: number, high: number) {
-        //Colors single element arrays green and return since they are sorted
-        if (low >= high || low < 0) {
-            await this.pause(`sort.singleElement`);
-            this.sortArray.setIndexHighlight(low, true, "Green");
+    async quickSort(array: StapleArray, start: number, end: number) {
+        if (end <= start) {
+            // await this.pause("general.empty")
+            // this.sortArray.clearStaplesDisabled(0);
             return;
         }
+        
+        //Makes only the current section being partitioned enabled
+        this.sortArray.setStaplesDisabled(0, start);
+        this.sortArray.setStaplesDisabled(end);
+        await this.pause(`sort.sorting`, start, end);
 
+        if (start === end - 1) {
+            this.sortArray.setStapleHighlight(start, 'success')
+            await this.pause(`sort.singleElement`);
+            this.sortArray.clearStaplesDisabled(0);
+            return;
+        }
+        
         //Partition
-        const p = await this.partition(low, high);
+        const pivotIndex = await this.partition(start, end);
+        
+        this.sortArray.clearStaplesDisabled(0);
 
         //Recursively call quicksort on the subarrays created by partition
-        await this.pause(`sort.sorting`, low, p - 1);
-        await this.quickSort(array, low, p - 1);
-
-        await this.pause(`sort.sorting`, p + 1, high);
-        await this.quickSort(array, p + 1, high);
+        await this.quickSort(array, start, pivotIndex);
+        await this.quickSort(array, pivotIndex + 1, end);
     }
+    
+    async partition(start: number, end: number) {
+        
+        // Select pivot
+        let pivotIndex: number = this.getPivotIndex(this.sortArray.getValues(), start, end);
+        this.sortArray.setStapleHighlight(pivotIndex, 'info');
+        const pivotValue: number = this.sortArray.getValue(pivotIndex);
+        
+        const pivotStaple: ValueStaple = this.sortArray.getStaple(pivotIndex)
+        // @ts-ignore: Due to incorrect typing below, TS do not understand the returned type will be Line
+        const pivotLine: Line = this.Svg.line(
+            Number(this.sortArray.x()),
+            Number(pivotStaple.y()),
+            Number(this.sortArray.x()) + Number(this.sortArray.width()),
+            Number(pivotStaple.y())
+        )
+        .dy(-1)
+        // @ts-ignore: Wrong typing from library, incorrectly requires camelCase attribute names
+        .css({ 'stroke': 'orange', 'stroke-width': 2})
+        
+        await this.pause("sort.findPivot");
+        
+        // Swap pivot with the first value of the range and update index
+        this.sortArray.swap(start, pivotIndex);
+        pivotIndex = start;
 
-    async partition(left: number, right: number) {
-        const leftArrowId: string = "ArrowLow";
-        const rightArrowId: string = "ArrowHigh";
-        const blue = "#00C";
-        const green = "green";
-        const red = "#C00";
-        let low = left;
-        let high = right;
+        await this.pause("sort.pivotFirst")
 
-        //Makes only the current section being partitioned enabled
-        for (let i = 0; i < this.sortArray.getSize(); i++) {
-            if (i < low || i > high) {
-                this.sortArray.setDisabled(i, true);
-            } else {
-                this.sortArray.setDisabled(i, false);
-            }
-        }
-
-        //Makes pivot the middle element in the list
-        let pivot = Math.floor((low + high) / 2);
-        const pivotValue = this.sortArray.getValue(pivot);
-
-        await this.pause(`sort.findPivot`);
-
-        //Marks pivot and swaps pivot with the first value of the range
-        this.sortArray.setIndexHighlight(pivot, true);
-        await this.swap(this.sortArray, low, pivot);
-        this.sortArray.setIndexHighlight(pivot, false);
-
-        //Set pivots new index, disable pivot and increment low
-        pivot = low;
-        this.sortArray.setIndexHighlight(low, false);
-        this.sortArray.setDisabled(pivot, true);
-        low += 1;
-
+        // Initialize low and high to define range
+        let low = start + 1;
+        let high = end - 1;
+        
         //Adds arrows to indicate low and high
-        this.sortArray.addArrow(low, leftArrowId, red);
-        this.sortArray.addArrow(high, rightArrowId, blue);
+        const lowArrow = new Arrow(20, 90);
+        this.Svg.put(lowArrow)
+            .css("fill", "blue")
+            .cx(
+                this.sortArray.getStapleX(low) +
+                    this.sortArray.getStapleWidth() / 2
+            )
+            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()));
+
+        const highArrow = new Arrow(20, 90);
+        this.Svg.put(highArrow)
+            .css("fill", "red")
+            .cx(
+                this.sortArray.getStapleX(high) +
+                    this.sortArray.getStapleWidth() / 2
+            )
+            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()));
+
+        await this.pause("sort.initPointers")
 
         while (true) {
-            this.sortArray.setIndexHighlight(low, true, red);
-            this.sortArray.setIndexHighlight(high, true, blue);
 
             //Moves low as far right in the array as possible
             //Stops moving if equal to pivot or if it gets farther right then high
             //Also moves the highlights and arrow along with it
             while (
-                low <= high &&
-                compare(this.sortArray.getValue(low), pivotValue) < 0
+                low <= high                
             ) {
-                this.sortArray.setIndexHighlight(low, true);
+                this.sortArray.setStapleHighlight(low, "primary");
                 await this.pause(
-                    "sort.compare",
-                    this.sortArray.getValue(low),
-                    pivotValue
+                    "sort.compareWithPivot",
+                    "low",
                 );
-                this.sortArray.setIndexHighlight(low, false);
+                this.sortArray.clearStapleHighlight(low, "primary");
+
+                if (compare(this.sortArray.getValue(low), pivotValue) >= 0) {
+                    await this.pause("Low is bigger or equal to the pivot, stop the pointer.");
+                    break;
+                }
+
                 low += 1;
-                this.sortArray.moveArrow(leftArrowId, low);
+                this.animate(lowArrow).cx(
+                    this.sortArray.getStapleX(low) +
+                        this.sortArray.getStapleWidth() / 2
+                );
+                await this.pause("Low is smaller than the pivot, advance pointer.");
             }
-
-            //Checks so low isn't out of the sorting range before highlighting it
-            if (low < right) {
-                this.sortArray.setIndexHighlight(low, true);
-            }
-
-            await this.pause("sort.lowBig");
 
             //Moves high as far left in the array as possible
             //Stops moving if equal to pivot or if it gets farther left then low
             //Also moves the highlights and arrow along with it
             while (
-                low <= high &&
-                compare(this.sortArray.getValue(high), pivotValue) > 0
+                low <= high                
             ) {
-                this.sortArray.setIndexHighlight(high, true, blue);
+                this.sortArray.setStapleHighlight(high, "primary");
                 await this.pause(
-                    "sort.compare",
+                    "sort.compareWithPivot",
                     this.sortArray.getValue(high),
+                    "high",
                     pivotValue
                 );
-                this.sortArray.setIndexHighlight(high, false, blue);
+                this.sortArray.clearStapleHighlight(high, "primary");
+
+                if (compare(this.sortArray.getValue(high), pivotValue) <= 0) {
+                    await this.pause("High is smaller or equal to the pivot, stop the pointer.");
+                    break;
+                }
+
                 high -= 1;
-                this.sortArray.moveArrow(rightArrowId, high);
+                this.animate(highArrow).cx(
+                    this.sortArray.getStapleX(high) +
+                        this.sortArray.getStapleWidth() / 2
+                );
+                await this.pause("High is bigger than the pivot, advance pointer.");
             }
 
-            await this.pause("sort.highSmall");
-
-            this.sortArray.setIndexHighlight(high, true, blue);
-
             if (low > high) {
+                await this.pause('Low exceeded high, done.')
                 break;
             }
 
             //Swap low and high since low is now higher than or equal to the pivot
             //And higher is lower than or equal to the pivot
-            await this.swap(this.sortArray, low, high);
-
-            //Remove highlights
-            this.sortArray.setIndexHighlight(low, false);
-            this.sortArray.setIndexHighlight(high, false);
+            this.sortArray.swap(low, high);
 
             low += 1;
             high -= 1;
 
-            //Only put them back if low and high are not out of bounds
-            if (low < right && high > left) {
-                this.sortArray.setIndexHighlight(low, true);
-                this.sortArray.setIndexHighlight(high, true, blue);
-            }
+            this.animate(lowArrow).cx(
+                this.sortArray.getStapleX(low) +
+                    this.sortArray.getStapleWidth() / 2
+            );
+            this.animate(highArrow).cx(
+                this.sortArray.getStapleX(high) +
+                    this.sortArray.getStapleWidth() / 2
+            );
 
-            this.sortArray.moveArrow(leftArrowId, low);
-            this.sortArray.moveArrow(rightArrowId, high);
-        }
-
-        //Only remove lows highlight if its not out of bounds so we don't remove green highlight
-        //indicating the correct position has been reached
-        if (low < right) {
-            this.sortArray.setIndexHighlight(low, false);
+            await this.pause("Swap low and high, advance both pointers.")
         }
 
         //Swap the pivot back into its original position and now correct sorted position in the array
+        // Highlight with green
+        this.sortArray.swap(pivotIndex, high);
+        this.sortArray.clearStapleHighlight(high, 'info');
+        this.sortArray.setStapleHighlight(high, 'success');
         await this.pause("sort.pivotSwap");
-        await this.swap(this.sortArray, pivot, high);
-        //Color pivot green since it is sorted into its right place
-        this.sortArray.setIndexHighlight(high, true, green);
 
-        this.sortArray.removeArrow(leftArrowId);
-        this.sortArray.removeArrow(rightArrowId);
+        pivotLine.remove()
+        lowArrow.remove()
+        highArrow.remove()
 
+        await this.pause("Partition done, return pivot index.")
         return high;
+    }
+
+    setPivotSelectionMethod(method: (arr: number[], low: number, high: number) => number) {
+        this.getPivotIndex = method;
     }
 }
