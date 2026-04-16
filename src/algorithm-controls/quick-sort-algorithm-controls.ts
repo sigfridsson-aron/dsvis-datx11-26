@@ -15,7 +15,9 @@ export class QuickSortAlgorithmControls extends SortingAlgorithmControls {
                 <select name="pivotMethodSelect" id="pivotMethodSelect">
                     <option value="middle">Middle</option>
                     <option value="first">First</option>
+                    <option value="last">Last</option>
                     <option value="medianOfThree">Median-of-three</option>
+                    <option value="random">Random</option>
                 </select>
             </span>`
         );
