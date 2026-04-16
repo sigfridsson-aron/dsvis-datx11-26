@@ -191,6 +191,10 @@ export class StapleArray extends G {
         return this.$staples[i];
     }
 
+    getStapleWidth(): number {
+        return this.$stapleWidth;
+    }
+
     private positionStaples() {
         this.$staples.forEach((staple, i) => {
             // staple.center(0, 0);
