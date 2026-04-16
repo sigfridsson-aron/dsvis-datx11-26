@@ -1,5 +1,6 @@
 import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
+import { Arrow } from "~/objects/arrow";
 import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "~/sorting/BaseSorter";
 
@@ -26,7 +27,13 @@ export class InsertionSort extends BaseSorter implements Sorter {
             await this.pause("general.empty");
             return;
         }
-        
+
+        const progressionArrow = new Arrow(this.getObjectSize() * 2 / 3, 90);
+        this.Svg.put(progressionArrow)
+            .cx(this.sortArray.getStapleX(1) + this.sortArray.getStapleWidth() / 2)
+            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()) + 5);
+        await this.pause("Initialize progress pointer.")
+
         for (let i = 1; i < sortSize; i++) {
             let j = i;
 
@@ -60,7 +67,12 @@ export class InsertionSort extends BaseSorter implements Sorter {
                 this.sortArray.clearStapleHighlight(j);
                 this.sortArray.clearStapleHighlight(j - 1);
                 j -= 1;
+
             }
+            this.animate(progressionArrow).cx(
+                this.sortArray.getStapleX(i + 1) + this.sortArray.getStapleWidth() / 2
+            );
+            await this.pause("Advance pointer.");
         }
     }
 }
