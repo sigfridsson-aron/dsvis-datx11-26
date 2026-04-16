@@ -2,6 +2,8 @@ import { G } from "@svgdotjs/svg.js";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
+import { Connection } from "~/objects/connection";
+import { GraphNode } from "~/objects/graph-node";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 
 export const BaseGraphMessages = {
@@ -768,5 +770,15 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.link(L, K, 1, "from")
         this.link(L, C, 3, "to")
         this.putAtDeg(L, K, 150)
+    }
+
+    getEdge(startNode:GraphNode,endNode:GraphNode): Connection<GraphNode> {
+        for (const key in startNode.$outgoing) {
+            if (!startNode.$outgoing[key]) continue
+
+            if (endNode === startNode.$outgoing[key].$end) return startNode.$outgoing[key]
+
+        }
+        throw new Error("There exists no edge between startNode and endNode")
     }
 }

@@ -92,6 +92,10 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
         
         await this.pause(`Add ${node.getText()} to visited nodes`)
         visited.add(node);
+        
+        if(parent) {this.getEdge(parent,node).setHighlightColor(true,"highlight-green")}
+       
+
         node.setHighlightColor(true,"highlight")
 
         
@@ -116,8 +120,8 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
                 this.distanceMap.set(connectedNode, newDist);
                 minStack.push({node:connectedNode, weight:newDist,parent:node});
                 this.updateTable(this.extractUpdateTableInformation(minStack))
-                connectedNode.setHighlightColor(false)
             }
+            connectedNode.setHighlightColor(false)
         }
     }
     const displayDistanceMap:path[] = []
