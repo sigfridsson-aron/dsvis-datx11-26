@@ -4,10 +4,8 @@ import { addReturnSubmit, querySelector } from "~/helpers";
 
 
 export class GraphAlgorithmControl extends EngineAlgorithmControl {
-    start: HTMLInputElement;
-    chosenGraph: HTMLInputElement; //name of element will be displayed as a message
-                                   //uppercase letters will hava a space like
-                                   //Chosen Graph will be displayed
+    runningAlgorithm: HTMLInputElement;
+    chosenGraph: HTMLInputElement;
     insertNode: HTMLInputElement;
     startNode: HTMLInputElement;
     chooseGraphI: HTMLSelectElement;
@@ -28,8 +26,8 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
             container
         );
 
-        this.start = querySelector<HTMLInputElement> (
-            "input.start", //this needs to be the input.(name of class in HTML doc)
+        this.runningAlgorithm = querySelector<HTMLInputElement> (
+            "input.runningAlgorithm",
             container
         );
 
@@ -55,8 +53,8 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
             this.engine.submit(this.engine.chosenGraph, this.chosenGraph)
         })
 
-        this.start.addEventListener("click", () => {
-            this.engine.submit(this.engine.start, null)
+        this.runningAlgorithm.addEventListener("click", () => {
+            this.engine.submit(this.engine.runningAlgorithm, null)
         });
 
         addReturnSubmit(this.insertNode, "ALPHANUM+", () =>

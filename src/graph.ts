@@ -8,7 +8,7 @@ import { Dijkstras_algorithm } from "./graphs/Dijkstras-algoritm";
 import { Prim } from "./graphs/Prim";
 
 export interface Graph extends Engine {
-    start: SubmitFunction;
+    runningAlgorithm: SubmitFunction;
     chosenGraph: SubmitFunction;
     startNode: SubmitFunction;
 }

@@ -1,28 +1,31 @@
 import { Graph } from "~/graph";
-import { BaseGraph, rowHighlight, tableInformation } from "./base-graph";
-import { GraphNode } from "~/objects/graph-node";
-import { WeightedConnection } from "~/objects/weigted-connection";
+import { BaseGraph, BaseGraphMessages, rowHighlight, tableInformation } from "./base-graph";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { MinPriorityStack } from "~/basic/MinPriorityStack";
+import { MessagesObject } from "~/engine";
+import { updateDefault } from "~/helpers";
 
+export const DijkstraMessages = {
+    
+} as const satisfies MessagesObject
 
 export type path = {node:WeightedGraphNode,weight:number,parent:WeightedGraphNode | null}
 
 
 export class Dijkstras_algorithm extends BaseGraph implements Graph {
-    
+    messages: MessagesObject = updateDefault(DijkstraMessages, BaseGraphMessages)
 
   
     private distanceMap:Map<WeightedGraphNode, number> = new Map
     private start_Node:WeightedGraphNode | undefined
 
 
-    override async start() {
+    override async runningAlgorithm() {
         this.resetHighlights()
         this.distanceMap = new Map
         
         if (!this.graph) {
-            await this.pause("error.nullGraph")
+            await this.pause("warning.nullGraph")
             return
         }
         this.graph.setHighlight(false)

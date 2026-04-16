@@ -8,24 +8,18 @@ import { updateDefault } from "~/helpers";
 import { HighlightCircle } from "~/objects/highlight-circle";
 
 export const DepthMessages = {
-    //if you want to change messages that already exist in
-    //BaseGraph you can define something like
-    // error: {
-    //    nullGraph: "you are man"
-    // }
-    //and it will overwrite the BaseGraph's error.nullGraph
-    //message
+    
 } as const satisfies MessagesObject
 
 export class Depth extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(DepthMessages, BaseGraphMessages);
     private graphTraversal: WeightedConnection<WeightedGraphNode>[] = [];
 
-    override async start() {
+    override async runningAlgorithm() {
         this.graphTraversal = []
         this.resetHighlights()
         if (!this.graph) {
-            await this.pause("error.nullGraph")
+            await this.pause("warning.nullGraph")
             return
         }
         this.graph.setHighlight(false)

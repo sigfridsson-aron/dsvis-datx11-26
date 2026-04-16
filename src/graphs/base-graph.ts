@@ -44,7 +44,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.edgeTable = this.Svg.group()
     }
 
-    abstract start(): Promise<void>
+    abstract runningAlgorithm(): Promise<void>
 
     abstract nodeTraversalVisualisation():void
 

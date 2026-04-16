@@ -180,13 +180,13 @@ export class FloydWarshall extends BaseGraph implements Graph {
                 }
             }
         } catch {
-            await this.pause("error.incorrectStart")
+            await this.pause("warning.incorrectStart")
         }
     }
 
-    override async start() {
+    override async runningAlgorithm() {
         if (!this.graph) {
-            await this.pause("error.nullGraph")
+            await this.pause("warning.nullGraph")
             return
         }
         this.graph.setHighlight(false)

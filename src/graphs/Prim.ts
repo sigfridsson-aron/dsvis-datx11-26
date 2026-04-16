@@ -33,7 +33,12 @@ type tableInformation = { node: WeightedGraphNode
 export class Prim extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(PrimMessages, BaseGraphMessages);
 
-    async start(): Promise<void> {
+    async runningAlgorithm(): Promise<void> {
+        if (!this.graph) {
+            await this.pause("warning.nullGraph")
+            return
+        }
+
         this.graph?.setHighlight(false)
         await this.primsAlg()
         this.edgeTable.clear()
