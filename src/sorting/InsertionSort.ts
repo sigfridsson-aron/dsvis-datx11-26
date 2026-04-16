@@ -31,7 +31,8 @@ export class InsertionSort extends BaseSorter implements Sorter {
         const progressionArrow = new Arrow(this.getObjectSize() * 2 / 3, 90);
         this.Svg.put(progressionArrow)
             .cx(this.sortArray.getStapleX(1) + this.sortArray.getStapleWidth() / 2)
-            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()) + 5);
+            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()) + 5)
+            .css({"stroke": "none", "fill": "blue"});
         await this.pause("Initialize progress pointer.")
 
         for (let i = 1; i < sortSize; i++) {
