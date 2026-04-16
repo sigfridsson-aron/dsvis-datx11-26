@@ -1,3 +1,4 @@
+import { QuickSortAlgorithmControls } from "~/algorithm-controls/quick-sort-algorithm-controls";
 import { SortingAlgorithmControls } from "./algorithm-controls/sorting-algorithm-controls";
 import { Engine, SubmitFunction } from "./engine";
 import { initialiseEngine, querySelector, RecordOfEngines } from "./helpers";
@@ -5,6 +6,7 @@ import { InsertionSort } from "./sorting/InsertionSort";
 import { MergeSort } from "./sorting/MergeSort";
 import { QuickSort } from "./sorting/QuickSort";
 import { SelectionSort } from "./sorting/SelectionSort";
+import { BaseSorter } from "~/sorting/BaseSorter";
 
 let right: number = 0;
 let down: number = 0;
@@ -25,16 +27,22 @@ const SORTING_CLASSES = {
     QuickSort: QuickSort,
 } as const satisfies RecordOfEngines<Sorter>;
 
-const { engine: SortEngine, isBaseEngine } = initialiseEngine<Sorter>(
+const { engine, isBaseEngine } = initialiseEngine<Sorter>(
     "#sortingContainer",
     SORTING_CLASSES
 );
 
 if (!isBaseEngine) {
-    const algorithmControls: SortingAlgorithmControls = new SortingAlgorithmControls(
-        SortEngine.container,
-        SortEngine
-    );
-    SortEngine.algorithmControls = algorithmControls;
+    if (engine instanceof QuickSort) {
+        engine.algorithmControls = new QuickSortAlgorithmControls(
+            engine.container,
+            engine
+        );
+    } else if (engine instanceof BaseSorter) {
+        engine.algorithmControls = new SortingAlgorithmControls(
+            engine.container,
+            engine
+        );
+    }
 }
 
