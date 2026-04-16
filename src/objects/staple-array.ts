@@ -214,19 +214,19 @@ export class StapleArray extends G {
 
     setStapleHighlight(
         i: number,
-        type: "primary" | "secondary" | "tertiary" = "primary"
+        type: "primary" | "success" | "info" = "primary"
     ) {
         this.$staples[i].addClass(`${type}Highlight`);
     }
 
     clearStapleHighlight(
         i: number,
-        type: "primary" | "secondary" | "tertiary" | "all" = "primary"
+        type: "primary" | "success" | "info" | "all" = "primary"
     ) {
         if (type === "all") {
             this.$staples[i].removeClass(`primaryHighlight`);
-            this.$staples[i].removeClass(`secondaryHighlight`);
-            this.$staples[i].removeClass(`tertiaryHighlight`);
+            this.$staples[i].removeClass(`successHighlight`);
+            this.$staples[i].removeClass(`infoHighlight`);
         } else {
             this.$staples[i].removeClass(`${type}Highlight`);
         }

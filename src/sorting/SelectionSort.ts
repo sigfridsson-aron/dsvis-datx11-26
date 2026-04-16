@@ -25,7 +25,7 @@ export class SelectionSort extends BaseSorter implements Sorter {
             let minIndex: number = i;
 
             // Highlight current min element
-            this.sortArray.setStapleHighlight(minIndex, 'tertiary');
+            this.sortArray.setStapleHighlight(minIndex, 'info');
 
             // Find the index of the minimum element in the unsorted part of the array
             for (let j = i + 1; j < sortSize; j++) {
@@ -46,10 +46,10 @@ export class SelectionSort extends BaseSorter implements Sorter {
                     ) < 0
                 ) {
                     // Update highlight and index to new min element
-                    this.sortArray.clearStapleHighlight(minIndex, 'tertiary');
+                    this.sortArray.clearStapleHighlight(minIndex, 'info');
                     minIndex = j;
                     this.sortArray.clearStapleHighlight(j, 'primary')
-                    this.sortArray.setStapleHighlight(j, 'tertiary');
+                    this.sortArray.setStapleHighlight(j, 'info');
 
 
                     // Message: Found a new minimum element
@@ -69,11 +69,11 @@ export class SelectionSort extends BaseSorter implements Sorter {
             }
 
             // Clear the highlight of newly positioned min element and highlight as sorted
-            this.sortArray.clearStapleHighlight(i, 'tertiary')
-            this.sortArray.setStapleHighlight(i, 'secondary');
+            this.sortArray.clearStapleHighlight(i, 'info')
+            this.sortArray.setStapleHighlight(i, 'success');
         }
         
-        this.sortArray.setStapleHighlight(this.sortArray.length() - 1, 'secondary');
+        this.sortArray.setStapleHighlight(this.sortArray.length() - 1, 'success');
         await this.pause("general.finished");
 
         // Reset the highlights

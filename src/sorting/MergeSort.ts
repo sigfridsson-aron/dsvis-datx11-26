@@ -151,10 +151,10 @@ export class MergeSort extends BaseSorter implements Sorter {
 
         // Remove the highlight that indicates that the arrays are sorted
         for (let i = 0; i < leftSubArr.length(); i++) {
-            leftSubArr.clearStapleHighlight(i, "secondary")
+            leftSubArr.clearStapleHighlight(i, "success")
         }
         for (let i = 0; i < rightSubArr.length(); i++) {
-            rightSubArr.clearStapleHighlight(i, "secondary")
+            rightSubArr.clearStapleHighlight(i, "success")
         }
         await this.pause("sort.merge")
 
@@ -241,7 +241,7 @@ export class MergeSort extends BaseSorter implements Sorter {
 
         // Highlight the merged array as completely sorted
         for (let i = 0; i < mergedArray.length(); i++) {
-            mergedArray.setStapleHighlight(i, "secondary")
+            mergedArray.setStapleHighlight(i, "success")
         }
         
         // Delete the old parent array

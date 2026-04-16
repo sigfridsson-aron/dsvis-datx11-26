@@ -321,11 +321,11 @@ svg .valueStaple.primaryHighlight > rect {
 	fill: blue;	
 }
 
-svg .valueStaple.secondaryHighlight > rect {
+svg .valueStaple.successHighlight > rect {
 	fill: green
 }
 
-svg .valueStaple.tertiaryHighlight > rect {
+svg .valueStaple.infoHighlight > rect {
 	fill: orange;
 }
 
