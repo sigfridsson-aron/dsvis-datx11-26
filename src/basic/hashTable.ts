@@ -329,6 +329,11 @@ export class hashTable extends G {
                 bg.back();
             }
         }
+
+        if(!this.$horizontal){
+            this.$nodeArrays[i][0].setHighlight(high)
+            this.$indices[i].setHighlight(high)
+        }
         return this;
     }
 
