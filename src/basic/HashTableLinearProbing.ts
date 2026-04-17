@@ -296,7 +296,7 @@ export class HashTableLinearProbing extends Engine implements Collection {
     }
 
     async print() {
-        throw new Error("Print not implemented");
+        console.log("Print not implemented");
     }
 
     hashString(str: string): number { // gets the mathematical expression for the hash function

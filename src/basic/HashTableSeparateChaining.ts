@@ -52,10 +52,11 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         super.initialise();
     }
 
+    /*** Resets the canvas */
     async resetAlgorithm() {
         await super.resetAlgorithm();
         const objectSize = this.getObjectSize();
-        const [x, y] = [this.$Svg.margin*4.5, this.$Svg.margin*3 + objectSize*this.baseSize/2];
+        const [x, y] = [this.$Svg.margin*6, this.$Svg.margin*3 + objectSize*this.baseSize/2];
     
         this.elementCounter = 0;
         this.sortArray = this.Svg.put(
@@ -73,17 +74,20 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             );
         }
     }
-
+    
+    /*** Inserts one or more values into the hashtable */
     async insert(...values: Array<number | string>) {
         for (const val of values) {
             await this.insertOne(val);
         }
     }
 
+    /*** Creates a new hashtable below the old one and 
+     * transfers the values over from the old table to the new before deleting old table */
     async resize(length: number){
         const objectSize = this.getObjectSize();
         const margin = this.$Svg.margin;
-        const [xRoot, yRoot] = [margin*4.5, margin*3 + objectSize*length/2];
+        const [xRoot, yRoot] = [margin*6, margin*3 + objectSize*length/2];
 
         const newArray = this.Svg.put(
             new hashTable(
@@ -155,7 +159,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         
         await this.pause(undefined);
     }
-
+    /*** Insert one value into the hashtable */
     async insertOne(value: number | string) {
         if(this.elementCounter >= this.sortArray.getSize() * this.maxLoadFactor){ // Loadfactor
             await this.pause("Load Factor exceeded!");
@@ -195,23 +199,17 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         for (let i = 0; i < this.sortArray.$nodeArrays[currentIndex].length; i++){
             this.sortArray.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
         }
-        
-        await this.pause(undefined);
-
-        
-
         this.sortArray.setIndexHighlight(currentIndex, false);
-
-        await this.pause(undefined);
     }
 
+    /*** Find one or more values in the hashtable and returning their position */
     async find(...values: (string | number)[]): Promise<void> {
         for (const val of values) {
             await this.findOne(val);
         }
     }
     
-
+    /*** Find one value in the hashtable and returning its position */
     async findOne(value: string | number): Promise<[number,number] | null> {
         await this.pause("find.start", value); //start the search
         value = String(value)
@@ -238,6 +236,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         return null;
     }
 
+    /*** Deletes value if found */
     async delete(value: string | number): Promise<void> {
         if(value != undefined){
             const indexes = await this.findOne(value);
@@ -250,11 +249,13 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         }
     }
     
+    /*** Idk */
     async print() {
         console.log("Print not implemented");
     }
-
-    hashString(str: string): number { // gets the mathematical expression for the hash function
+    
+    /*** Returns hashed value based on current hashmethod */
+    hashString(str: string): number {
         let hash = 0;
         if(this.usinghash == 0){
             for (let i = 0; i < str.length; i++) {
