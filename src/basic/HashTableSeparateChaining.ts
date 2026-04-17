@@ -35,16 +35,16 @@ export const SortMessages = {
 
 export class HashTableSeparateChaining extends Engine implements Collection {
     initialValues: Array<string> = [];
-    sortArray: hashTable;
+    hashTable: hashTable;
     baseSize: number = 8;
     usinghash: number = 0;
-    messages: MessagesObject = SortMessages;
     elementCounter: number = 0;
     maxLoadFactor: number = 0.75;
+    messages: MessagesObject = SortMessages;
 
     constructor(containerSelector: string) {
         super(containerSelector);
-        this.sortArray = new hashTable(this.baseSize, this.getObjectSize(), false); // Only added to make sure that sortArray never is null
+        this.hashTable = new hashTable(this.baseSize, this.getObjectSize(), false); // Only added to make sure that sortArray never is null
     }
 
     initialise(initialValues = []) {
@@ -55,17 +55,19 @@ export class HashTableSeparateChaining extends Engine implements Collection {
     /*** Resets the canvas */
     async resetAlgorithm() {
         await super.resetAlgorithm();
+        const dropdown = document.getElementById("hashFunction") as HTMLSelectElement;
+        this.usinghash = Number(dropdown.value);
         const objectSize = this.getObjectSize();
         const [x, y] = [this.$Svg.margin*6, this.$Svg.margin*3 + objectSize*this.baseSize/2];
     
         this.elementCounter = 0;
-        this.sortArray = this.Svg.put(
+        this.hashTable = this.Svg.put(
             new hashTable(this.baseSize, objectSize, false)
         ).init(this.baseSize, x, y)
         
         for(let i=0; i < this.baseSize; i++){
-            this.sortArray.addLinkedNode(i);
-            this.sortArray.$nodeArrays[i][0]
+            this.hashTable.addLinkedNode(i);
+            this.hashTable.$nodeArrays[i][0]
         }
 
         if (this.initialValues) {
@@ -89,6 +91,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         const margin = this.$Svg.margin;
         const [xRoot, yRoot] = [margin*6, margin*3 + objectSize*length/2];
 
+        // Put new array 1 object-size below old
         const newArray = this.Svg.put(
             new hashTable(
                 length, 
@@ -97,22 +100,22 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             )
         ).init(length, xRoot, yRoot + objectSize*(length/2 + 1));
             
-        await this.pause("copy.newSize", length);
-
+        // Add empty dummy nodes to make buckets
         for(let i=0; i < newArray.getSize() ; i++){
             newArray.addLinkedNode(i);
             newArray.$nodeArrays[i][0]
         }
+        await this.pause("copy.newSize", length);
 
         await this.pause("Copy values to the new array");
         let values:Array<string> = []
-        for(let i = 0; i < this.sortArray.getSize(); i++){
-            values = values.concat(this.sortArray.getValues(i).slice(1));
+        for(let i = 0; i < this.hashTable.getSize(); i++){
+            values = values.concat(this.hashTable.getValues(i).slice(1)); // Slices from 1 due to dummy nodes
         }
 
         for(const value of values){
             const arrayLabel = this.Svg.put(
-                new TextCircle(value, this.getObjectSize(), this.getStrokeWidth())
+                new TextCircle(value, objectSize, this.getStrokeWidth())
             ).init(...this.getNodeStart());
             await this.pause("insert.value", value);
 
@@ -123,7 +126,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             
             
             const chainLength = newArray.$nodeArrays[currentIndex].length;
-            const spacing = this.getObjectSize()*3;
+            const spacing = objectSize*3;
 
             newArray.setIndexHighlight(currentIndex, true);
 
@@ -148,22 +151,25 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
         }
         
-        this.sortArray.remove();
-        this.sortArray = newArray;
+        this.hashTable.remove();
+        this.hashTable = newArray;
         await this.pause("Remove old table");
 
-        this.sortArray.dMoveCenter(
+        // Move to original position
+        this.hashTable.dMoveCenter(
             0,
-            -objectSize*(length/2 + 1)
+            -objectSize*(length/2 + 1),
+            this.getAnimationSpeed()
         ); 
         
         await this.pause(undefined);
     }
+
     /*** Insert one value into the hashtable */
     async insertOne(value: number | string) {
-        if(this.elementCounter >= this.sortArray.getSize() * this.maxLoadFactor){ // Loadfactor
+        if(this.elementCounter >= this.hashTable.getSize() * this.maxLoadFactor){ // Loadfactor
             await this.pause("Load Factor exceeded!");
-            await this.resize(this.sortArray.getSize() * 2);
+            await this.resize(this.hashTable.getSize() * 2);
         }
         value = String(value);
         const arrayLabel = this.Svg.put(
@@ -174,32 +180,32 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         const hash = this.hashString(value);
         await this.pause("hash.hash", value, hash);
 
-        let currentIndex = hash % this.sortArray.getSize();
+        let currentIndex = hash % this.hashTable.getSize();
         
         
-        const chainLength = this.sortArray.$nodeArrays[currentIndex].length;
+        const chainLength = this.hashTable.$nodeArrays[currentIndex].length;
         const spacing = this.getObjectSize() * 3;
 
-        this.sortArray.setIndexHighlight(currentIndex, true);
+        this.hashTable.setIndexHighlight(currentIndex, true);
 
         await this.pause("hash.mod", currentIndex);
-        for (let i = 0; i < this.sortArray.$nodeArrays[currentIndex].length; i++){
-            this.sortArray.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(true));
+        for (let i = 0; i < this.hashTable.$nodeArrays[currentIndex].length; i++){
+            this.hashTable.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(true));
         }
         arrayLabel.setCenter(
-            this.sortArray.getCX(currentIndex) + spacing * (chainLength),
-            this.sortArray.getCY(currentIndex),
+            this.hashTable.getCX(currentIndex) + spacing * (chainLength),
+            this.hashTable.getCY(currentIndex),
             this.getAnimationSpeed()
         );
-        this.sortArray.addLinkedNode(currentIndex, value);
+        this.hashTable.addLinkedNode(currentIndex, value);
         this.elementCounter++
         await this.pause("insert.insertAt", String(currentIndex));
         arrayLabel.remove();
 
-        for (let i = 0; i < this.sortArray.$nodeArrays[currentIndex].length; i++){
-            this.sortArray.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
+        for (let i = 0; i < this.hashTable.$nodeArrays[currentIndex].length; i++){
+            this.hashTable.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
         }
-        this.sortArray.setIndexHighlight(currentIndex, false);
+        this.hashTable.setIndexHighlight(currentIndex, false);
     }
 
     /*** Find one or more values in the hashtable and returning their position */
@@ -214,23 +220,22 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         await this.pause("find.start", value); //start the search
         value = String(value)
         const hash = this.hashString(value);
-        let curIndex = hash % this.sortArray.getSize();
+        let curIndex = hash % this.hashTable.getSize();
         await this.pause("hash.hash",value, String(hash));
         await this.pause("hash.mod", curIndex);
         await this.pause("find.read", curIndex);
-        ////////////////////////
+        
         await this.pause("find.lookStart", curIndex);
-        for (let i = 1; this.sortArray.$nodeArrays[curIndex].length;i++){
-            this.sortArray.$nodeArrays[curIndex][i].setHighlight(true);
+        for (let i = 1; this.hashTable.$nodeArrays[curIndex].length;i++){ // Start from 1 due to dummy node
+            this.hashTable.$nodeArrays[curIndex][i].setHighlight(true);
             await this.pause("find.look", i);
-            if(String(this.sortArray.$nodeArrays[curIndex][i].value) == value){
+            if(String(this.hashTable.$nodeArrays[curIndex][i].value) == value){
                 await this.pause("find.found", i);
-                this.sortArray.$nodeArrays[curIndex][i].setHighlight(false);
+                this.hashTable.$nodeArrays[curIndex][i].setHighlight(false);
                 return [curIndex, i]
             }
-            this.sortArray.$nodeArrays[curIndex][i].setHighlight(false);
+            this.hashTable.$nodeArrays[curIndex][i].setHighlight(false);
         }
-        ///////////////////////
         
         await this.pause("find.notFound", value);
         return null;
@@ -241,7 +246,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         if(value != undefined){
             const indexes = await this.findOne(value);
             if(indexes){
-                this.sortArray.removeLinkedNode(...indexes)
+                this.hashTable.removeLinkedNode(...indexes)
                 await this.pause("delete.delete", value);
                 this.elementCounter--
             }
