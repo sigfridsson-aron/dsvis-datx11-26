@@ -43,20 +43,20 @@
               A B C D E &hellip; X Y Z
             </option>
           </select>
-          <input class="insertField disableWhenRunning form-control form-control-sm w-auto" type="text" size="10" maxlength="20" />
-          <input class="insertSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Insert" />
+          <div class="input-group input-group-sm w-auto flex-grow-0">
+            <input class="insertField disableWhenRunning form-control form-control-sm w-auto" type="text" placeholder="Insert" size="10" maxlength="20" />
+            <input class="insertSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Insert" />
+          </div>
         </span>
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="findField disableWhenRunning form-control form-control-sm w-auto" type="text" size="4" maxlength="4" />
+        <div class="input-group input-group-sm w-auto flex-grow-0">
+          <input class="findField disableWhenRunning form-control form-control-sm w-auto" type="text" size="4" placeholder="Find" maxlength="4" />
           <input class="findSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Find" />
-        </span>
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="deleteField disableWhenRunning form-control form-control-sm w-auto" type="text" size="4" maxlength="4" />
+        </div>
+        <div class="input-group input-group-sm w-auto flex-grow-0">
+          <input class="deleteField disableWhenRunning form-control form-control-sm w-auto" type="text" placeholder="Delete" size="4" maxlength="4" />
           <input class="deleteSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Delete" />
-        </span>
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="printSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Print" />
-        </span>
+        </div>
+        <input class="printSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Print" />
         <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
           <input class="clearSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Clear" />
         </span>

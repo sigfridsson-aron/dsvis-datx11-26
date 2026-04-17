@@ -21,8 +21,8 @@
         </select>
       </div>
 
-      <fieldset class="algorithmControls canvas-controls-attached-top d-flex flex-wrap justify-content-start gap-2 text-start">
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
+      <fieldset class="algorithmControls canvas-controls-attached-top d-flex flex-nowrap align-items-center justify-content-start gap-2 text-start overflow-auto">
+        <span class="formgroup d-inline-flex flex-nowrap align-items-center gap-2">
           <select class="insertSelect disableWhenRunning form-select form-select-sm w-auto">
             <option value="" selected>Insert many values</option>
             <option value="A L G O R I T H M">A L G O R I T H M</option>
@@ -32,13 +32,15 @@
             <option value="Z Y X V T S P O M L">Z Y X V T S P O M L</option>
             <option value="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z">A B C D E &hellip; X Y Z</option>
           </select>
-          <input class="insertField disableWhenRunning form-control form-control-sm w-auto" type="text" size="10" maxlength="20" />
-          <input class="insertSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Insert" />
+          <div class="input-group input-group-sm w-auto flex-grow-0">
+            <input class="insertField disableWhenRunning form-control form-control-sm w-auto" type="text" size="15" maxlength="20" placeholder="Insert Value"/>
+            <input class="insertSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Insert" />
+          </div>
         </span>
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
-          <input class="deleteSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Remove smallest" />
+        <span class="formgroup d-inline-flex flex-nowrap align-items-center gap-2">
+          <input class="deleteSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Remove smallest"/>
         </span>
-        <span class="formgroup d-inline-flex flex-wrap align-items-center gap-2">
+        <span class="formgroup d-inline-flex flex-nowrap align-items-center gap-2">
           <input class="clearSubmit disableWhenRunning btn btn-outline-light btn-sm" type="submit" value="Clear" />
         </span>
       </fieldset>
