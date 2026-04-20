@@ -46,6 +46,7 @@ export class BaseSorter extends Engine implements Sorter {
         await super.resetAlgorithm();
         // this.indexLength = 0; // TODO: Remove
         const [xRoot, yRoot] = this.getTreeRoot();
+        this.sortArray.remove();
         this.sortArray = this.Svg.put(
             new StapleArray(this.initialValues, this.STAPLE_MAX_HEIGHT, this.getObjectSize()) // det stod new DSArray(1, this.getObjectSize())
         ).init(xRoot, yRoot + this.$Svg.margin * 4); // det stod this.sortArray = new DSArray(1, this.getObjectSize());
