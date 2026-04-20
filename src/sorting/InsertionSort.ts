@@ -75,5 +75,14 @@ export class InsertionSort extends BaseSorter implements Sorter {
             );
             await this.pause("Advance pointer.");
         }
+
+        progressionArrow.remove();
+        for (let i = 0; i < this.sortArray.length(); i++) {
+            this.sortArray.setStapleHighlight(i, 'success');
+        }
+        await this.pause("general.finished");
+        for (let i = 0; i < this.sortArray.length(); i++) {
+            this.sortArray.clearStapleHighlight(i, 'all');
+        }
     }
 }
