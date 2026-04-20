@@ -15,17 +15,11 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
     }
 
     private initialize(): void {
-        this.svgContainer.addEventListener("mousedown", () => {
-            this.startPanning();
-        });
+        this.svgContainer.addEventListener("mousedown", this.startPanning);
 
-        this.svgContainer.addEventListener("mouseleave", () => {
-            this.stopPanning();
-        });
+        this.svgContainer.addEventListener("mouseleave", this.stopPanning);
 
-        this.svgContainer.addEventListener("mouseup", () => {
-            this.stopPanning();
-        });
+        this.svgContainer.addEventListener("mouseup", this.stopPanning);
 
         this.svgContainer.addEventListener("mousemove", (e: MouseEvent) => {
             if (this.isPanning) {
@@ -233,12 +227,12 @@ export default class PanAndZoomHelper implements PannableAndZoomable {
         return this.engine.$Svg.width / this.engine.$Svg.height;
     }
 
-    private startPanning() {
+    private startPanning = () => {
         this.isPanning = true;
         this.svgContainer.classList.add("panning");
     }
 
-    private stopPanning() {
+    private stopPanning = () => {
         this.isPanning = false;
         this.lastPointerPosition = {};
         this.svgContainer.classList.remove("panning");
