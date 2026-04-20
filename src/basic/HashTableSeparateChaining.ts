@@ -9,10 +9,10 @@ export const SortMessages = {
         value: (value: string) => `Insert value: ${value}`,
         hash: (value : string, hash: string) => `Hash value of ${value}: ${hash}`,
         mod: (value: string) => `Mod hash value by length of hash table: ${value}`,
-        insertAt: (value: string) => `Insert at en of bucket index ${value}`,
+        insertAt: (value: string) => `Insert at end of bucket index ${value}`,
     },
     hash:{
-        hash: (value : string, hash: string) => `Hash value of ${value}: ${hash}`,
+        hash: (info: [string, string]) => `Hash value of ${info[0]}: ${info[1]}`,
         mod: (value: string) => `Mod hash value by length of hash table: ${value}`,
     },    
     find: {
@@ -120,7 +120,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             await this.pause("insert.value", value);
 
             const hash = this.hashString(value);
-            await this.pause("hash.hash", value, hash);
+            await this.pause("hash.hash", [value, this.hashInfo(value)]);
 
             let currentIndex = hash % newArray.getSize();
             
@@ -178,7 +178,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         await this.pause("insert.value", value);
 
         const hash = this.hashString(value);
-        await this.pause("hash.hash", value, hash);
+        await this.pause("hash.hash", [value, this.hashInfo(value)]);
 
         let currentIndex = hash % this.hashTable.getSize();
         
@@ -197,10 +197,14 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             this.hashTable.getCY(currentIndex),
             this.getAnimationSpeed()
         );
+
+        await this.pause(undefined);
+
         this.hashTable.addLinkedNode(currentIndex, value);
         this.elementCounter++
-        await this.pause("insert.insertAt", String(currentIndex));
         arrayLabel.remove();
+
+        await this.pause("insert.insertAt", String(currentIndex));
 
         for (let i = 0; i < this.hashTable.$nodeArrays[currentIndex].length; i++){
             this.hashTable.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
@@ -221,7 +225,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         value = String(value)
         const hash = this.hashString(value);
         let curIndex = hash % this.hashTable.getSize();
-        await this.pause("hash.hash",value, String(hash));
+        await this.pause("hash.hash", [value, this.hashInfo(value)]);
         await this.pause("hash.mod", curIndex);
         await this.pause("find.read", curIndex);
         
@@ -273,6 +277,36 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         else if(this.usinghash == 2){
             for (let i = 0; i < str.length; i++) {
               hash = hash + str.charCodeAt(i); 
+            }
+        }
+        return hash;
+    }
+
+    hashInfo(str: string): string { // gets the hash value 
+        let hash = "";
+        if(this.usinghash == 0){
+            for (let i = 0; i < str.length; i++) {
+                hash = hash + str.charCodeAt(i);
+                if(i < str.length - 1){
+                    hash = "(" + hash + ")" + " * 31 + ";
+                }
+            }
+            if(str.length > 1){
+                hash = hash + " = " + this.hashString(str);
+            }
+        }
+        else if(this.usinghash == 1){
+            hash = "str.charCodeAt(" + str.charAt(0) +  ")" + " = " + str.charCodeAt(0);
+        }
+        else if(this.usinghash == 2){
+            for (let i = 0; i < str.length; i++) {
+              hash = hash + str.charCodeAt(i); 
+                if(i < str.length - 1){
+                    hash = hash + " + ";
+                }
+            }
+            if(str.length > 1){
+                hash = hash + " = " + this.hashString(str);
             }
         }
         return hash;
