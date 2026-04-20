@@ -51,8 +51,12 @@ export class StapleArray extends G {
      * which is why this separate method is needed.
      */
     init(centerX: number, centerY: number): this {
+        this.$staples.forEach((staple, i) => {
+            staple.init();
+        });
+
         this.$boundingBox?.remove();
-        // Width of bounding box can not be 0, then the array
+        // Width of bounding box can not be 0, because then the array
         // won't be positioned in the center when there are no staples in the array
         this.$boundingBox = this.rect(
             Math.max(
@@ -64,11 +68,9 @@ export class StapleArray extends G {
         )
             .center(0, 0)
             .dy(-this.$stapleMaxHeight / 2) // Move bounding box to cover staples
-            .height(this.$stapleMaxHeight + (this.$stapleWidth < 25 ? 0 : 20)) // Add size of 30 to cover the text
+            .height(this.$stapleMaxHeight + (this.getStaple(0) ? this.getStaple(0).getTextHeight() : 0)) // Add height to cover the text
             .addClass("invisible");
-        this.$staples.forEach((staple, i) => {
-            staple.init();
-        });
+        
         this.positionStaples();
         this.center(centerX, centerY);
 
