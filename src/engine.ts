@@ -68,6 +68,8 @@ export class Engine implements PannableAndZoomable {
     timeline: Timeline;
     panAndZoomHelper: PanAndZoomHelper;
 
+    resetPromise: Promise<void> | undefined;
+
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
     }
@@ -165,8 +167,18 @@ export class Engine implements PannableAndZoomable {
     }
 
     initialise(): void {
-        this.resetAll();
-        this.generalControls.setRunning(true);
+        if (this.resetPromise) {
+            this.resetPromise
+                .then(() => this.resetAll())
+                .then(() => {
+                    this.generalControls.setRunning(true);
+                    this.resetPromise = undefined;
+                });
+        } else {
+            this.resetPromise = this.resetAll().then(() => {
+                this.resetPromise = undefined
+            });
+        }
     }
 
     async resetAll(): Promise<void> {
