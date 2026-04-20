@@ -51,6 +51,7 @@ export class MergeSort extends BaseSorter implements Sorter {
     async mergeSort(arr: StapleArray, iteration: number) {
         {
             if (arr.length() === 1) {
+                arr.setStapleHighlight(0, 'success')
                 await this.pause("sort.singleElement", arr.getValue(0))
                 return arr;
             }
@@ -96,7 +97,9 @@ export class MergeSort extends BaseSorter implements Sorter {
                 if (this.isFollowingRecursion)
                     this.setViewBoxCenter(arr.cx(), arr.cy(), true)
 
-                await this.pause(undefined);
+                if (leftSubArr.length() > 1) {
+                    await this.pause(undefined);
+                }
                                 
                 // Create a copy of the right part of the array an place it on top of the existing
                 let rightSubArr: StapleArray = this.Svg.put(
