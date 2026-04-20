@@ -46,6 +46,11 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
         );
 
         this.initialize();
+
+        this.presetSizeSelect.value = 'tiny'
+        this.presetSizeSelect.dispatchEvent(
+            new Event("change")
+        );
     }
 
     initialize() {
