@@ -2,6 +2,7 @@ import { MessagesObject, NBSP } from "~/engine";
 import { compare, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "./BaseSorter";
+import { Arrow } from "~/objects/arrow";
 
 export const SelectionSortMessages = {
     sort: {
@@ -20,6 +21,19 @@ export class SelectionSort extends BaseSorter implements Sorter {
             await this.pause("general.empty");
             return;
         }
+
+        const progressionArrow = new Arrow(
+            Math.max((this.getObjectSize() * 2) / 3, 7),
+            90
+        );
+        this.Svg.put(progressionArrow)
+            .cx(
+                this.sortArray.getStapleX(0) +
+                    this.sortArray.getStapleWidth() / 2
+            )
+            .y(Number(this.sortArray.y()) + Number(this.sortArray.height()) + 5)
+            .css({ stroke: "none", fill: "blue" });
+        await this.pause("Initialize progress pointer.");
 
         for (let i = 0; i < sortSize - 1; i++) {
             let minIndex: number = i;
@@ -71,8 +85,14 @@ export class SelectionSort extends BaseSorter implements Sorter {
             // Clear the highlight of newly positioned min element and highlight as sorted
             this.sortArray.clearStapleHighlight(i, 'info')
             this.sortArray.setStapleHighlight(i, 'success');
+
+            this.animate(progressionArrow).cx(
+                this.sortArray.getStapleX(i + 1) + this.sortArray.getStapleWidth() / 2
+            );
+            await this.pause("Advance pointer.");
         }
         
+        progressionArrow.remove();
         this.sortArray.setStapleHighlight(this.sortArray.length() - 1, 'success');
         await this.pause("general.finished");
 
