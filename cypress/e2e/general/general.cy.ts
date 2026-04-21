@@ -25,4 +25,18 @@ describe("General controls", () => {
             });
         });
     });
+
+    it("Selecting different node sizes should work", () => {
+        cy.checkForAllPages(() => {
+            cy.checkForAllAlgorithms(() => {
+                const nodeSizes = ["tiny", "small", "medium", "large", "huge"]
+                cy.log("WHat")
+                for (let size of nodeSizes) {
+                    cy.get(".objectSize").select(size)
+                    cy.get(".objectSize").find(":selected").should("contain.text", size)
+                }
+                    
+            })
+        })
+    })
 });
