@@ -199,4 +199,40 @@ export class Prim extends BaseGraph implements Graph {
         node.$dir = false
         return node
     }
+
+    override link( ourNode: WeightedGraphNode
+                 , theirNode: WeightedGraphNode
+                 , weight: number
+                 , dir: string): WeightedGraphNode {
+        if (dir === "to") {
+            if (!theirNode.$outgoing[ourNode.getText()])
+                ourNode.setSuccessor(
+                    theirNode.getText(), 
+                    ourNode.getText(), 
+                    theirNode, 
+                    this.getStrokeWidth(), 
+                    weight
+                )
+        } else if (dir === "from") {
+            if (!ourNode.$outgoing[theirNode.getText()])
+                ourNode.setPredecessor(
+                    theirNode.getText(), 
+                    ourNode.getText(), 
+                    theirNode, 
+                    this.getStrokeWidth(), 
+                    weight
+                )
+        } else if (dir === "both") {
+            ourNode.setSuccessor(
+                theirNode.getText(), 
+                ourNode.getText(), 
+                theirNode, 
+                this.getStrokeWidth(), 
+                weight
+            )
+        } else {
+            throw new Error ("Internal error, you've spelt the direction wrong")
+        }
+        return ourNode
+    }
 }

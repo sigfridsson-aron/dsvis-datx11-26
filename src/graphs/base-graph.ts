@@ -137,15 +137,15 @@ export abstract class BaseGraph extends Engine implements Graph {
     async chosenGraph(graf: string | number) {
         if (graf === "") {
             await this.resetAlgorithm()
-        } else if (graf === "Directed") {
+        } else if (graf === "Simple") {
             await this.resetAlgorithm()
-            this.directedGraph()
+            this.simpleGraph()
         } else if (graf === "Tree") {
             await this.resetAlgorithm()
             this.treeGraph()
-        } else if (graf === "Mixed") {
+        } else if (graf === "Simple_2") {
             await this.resetAlgorithm()
-            this.mixedGraph()
+            this.simple2Graph()
         } else if (graf === "Cyclic") {
             await this.resetAlgorithm()
             this.cyclicGraph()
@@ -212,7 +212,7 @@ export abstract class BaseGraph extends Engine implements Graph {
 
     //This is just the connect function but i didn't wanna bother with
     //sending along a unique key to every node.
-    private link(
+    link(
         ourNode: WeightedGraphNode, 
         theirNode: WeightedGraphNode,
         weight: number,
@@ -279,7 +279,7 @@ export abstract class BaseGraph extends Engine implements Graph {
 
     //Implement default graphs below
 
-    private directedGraph(): void {
+    private simpleGraph(): void {
         //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2 - 250
         const midH = this.$Svg.height/2 + 150
@@ -330,9 +330,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.link(G, J, 8, "to")
     }
 
-    private mixedGraph(): void {
-        //Looks pretty ugly if you've got suggestions please tell me
-        //or feel free to make them yourself
+    private simple2Graph(): void {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 + 100
 
