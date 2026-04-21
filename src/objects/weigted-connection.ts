@@ -6,7 +6,7 @@ import { GraphNode } from "./graph-node";
 
 export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> extends Connection<T> {
     $weight: number
-    $textObj!: G
+    $textObj: G = new G()
 
     constructor(start: T, end: T, weight: number) {
         super(start, end)
@@ -18,6 +18,25 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         super.setHighlight(high)
         this.$textObj.setHighlight(high)
         return this
+    }
+
+    override setHighlightColor( enabled: boolean
+                              , cssClass?: string): void {
+        super.setHighlightColor(enabled, cssClass)
+
+        const highlightClasses = [
+            'highlight',
+            'highlight-blue',
+            'highlight-green'
+        ];
+        
+        highlightClasses.forEach(c => this.$textObj.removeClass(c));
+
+        if (enabled) {
+            const classToApply = cssClass ?? 'highlight';
+
+            this.$textObj.addClass(classToApply)
+        }
     }
 
     // for the overridden functions i only added _createWeight and _redrawWeight

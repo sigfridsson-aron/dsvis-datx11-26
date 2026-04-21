@@ -2,7 +2,6 @@ import { G } from "@svgdotjs/svg.js";
 import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
-import { Connection } from "~/objects/connection";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { WeightedConnection } from "~/objects/weigted-connection";
 
@@ -121,6 +120,10 @@ export abstract class BaseGraph extends Engine implements Graph {
     }
 
     async startNode(value: string | number) {
+        if (!this.graph) {
+            await this.pause("warning.nullGraph")
+            return
+        }
         this.resetHighlights()
         this.graph?.setHighlight(false)
         for (const k of this.createdNodes) {

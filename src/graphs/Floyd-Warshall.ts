@@ -8,7 +8,10 @@ import { HighlightCircle } from "~/objects/highlight-circle";
 import { Text } from "@svgdotjs/svg.js";
 
 export const FloydWarshallMessages = {
-    floydWarshall: {
+    warning: {
+        floydWarshall: `Please run the algorithm first, then pick start node`
+    }
+    , floydWarshall: {
         start1: `Create a nodes X nodes sized matrix`
       , start2: `This matrix contains the path weight between nodes`
       , start3: `Nodes that go to themselves cost 0`
@@ -158,6 +161,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
     private body: string = "Warning! this algorithm takes a lot of time to complete".concat(
                            "\nIts time complexity is cubic O(N^3)").concat(
                            "\nChoose a small graph or be prepared for a long wait")
+    private run: boolean = false
 
     override setIdleTitle(): void {
         this.info.setTitle("Select an action from the menu above");
@@ -165,22 +169,40 @@ export class FloydWarshall extends BaseGraph implements Graph {
     }
 
     override async startNode(value: string | number): Promise<void> {
+        if (!this.graph) {
+            await this.pause("warning.nullGraph")
+            return
+        }
+        if (!this.run) {
+            await this.pause("warning.floydWarshall")
+            return
+        }
         try {
+            // this code is only here to trigger the error early
+            // so the paths don't get reset unnecessarily
+            this.paths[value][this.createdNodes[0].getText()]
+
             this.resetHighlights()
             for (const path of Object.values(this.paths[value])) {
                 for (const edge of path) {
                     edge.setHighlight(true)
+                    const edgeBack = edge.$end.$outgoing[edge.$start.getText()]
+                    if (edgeBack && edgeBack.$weight === edge.$weight)
+                        edgeBack.setHighlight(true)
                 }
             }
             for (let i = 0;  i < this.createdNodes.length; i++) {
                 if (this.createdNodes[i].getText() === value) {
+                    this.graph = this.createdNodes[i]
+                    this.graph.setHighlight(true)
                     for (let j = 1; j < this.matrix[i].length; j++) {
                         this.matrix[i+1][j].setHighlight(true)
                     }
+                    return
                 }
             }
         } catch {
-            await this.pause("warning.incorrectStart")
+            await this.pause("warning.incorrectStart", value, this.graph)
         }
     }
 
@@ -420,6 +442,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
             kPointer.remove()
         }
         this.body = NBSP
+        this.run = true
     }
 
     async nodeTraversalVisualisation(): Promise<void> {
@@ -576,14 +599,11 @@ export class FloydWarshall extends BaseGraph implements Graph {
             const inc = k.$incoming
             const out = k.$outgoing
             for (const c in inc) {
-                inc[c]?.setHighlight(false)
                 inc[c]?.setHighlightColor(false)
             }
             for (const c in out) {
-                out[c]?.setHighlight(false)
                 out[c]?.setHighlightColor(false)
             }
-            k.setHighlight(false)
             k.setHighlightColor(false)
         }
         this.graph?.setHighlightColor(false)

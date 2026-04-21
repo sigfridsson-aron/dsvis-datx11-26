@@ -236,14 +236,6 @@ svg .highlight, svg .highlight > * {
     stroke: #C00;
 }
 
-svg .highlight-blue, svg .highlight-blue > * {
-    stroke: blue;
-}
-
-svg .highlight-green, svg .highlight-green > * {
-    stroke: green;
-}
-
 svg .highlight.filled, svg text.highlight, svg .highlight > .filled, svg .highlight > text {
 	stroke: none;
 	fill: #C00;
@@ -254,9 +246,27 @@ svg .marked.highlight > * {
 	fill:#C00
 }
 
+svg .highlight-blue, svg .highlight-blue > * {
+    stroke: blue;
+}
+
+svg .highlight-blue.filled, svg text.highlight-blue, svg .highlight-blue > .filled, svg .highlight-blue > text {
+	stroke: none;
+	fill: blue;
+}
+
 svg .marked.highlight-blue > * {
 	stroke:none;
 	fill:blue
+}
+
+svg .highlight-green, svg .highlight-green > * {
+    stroke: green;
+}
+
+svg .highlight-green.filled, svg text.highlight-green, svg .highlight-green > .filled, svg .highlight-green > text {
+	stroke: none;
+	fill: green;
 }
 
 svg .marked.highlight-green > * {
