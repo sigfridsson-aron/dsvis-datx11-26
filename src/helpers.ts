@@ -178,7 +178,28 @@ export function initialiseEngine<T extends Engine = Engine>(
 
     const EngineClass = engineSubclasses[algo] || Engine;
     const engine = new EngineClass(containerID);
-    engine.initialise([32, 83, 22, 15, 8, 12, 43, 54, 23 ,34, 76 ,87, 32]);
+    
+    // Check if there's an array query parameter, otherwise use default
+    const arrayParam = new URL(window.location.href).searchParams.get("array");
+    let initialValues: number[];
+    
+    if (arrayParam) {
+        // Parse the array from the query parameter (comma-separated values)
+        initialValues = arrayParam
+            .split(",")
+            .map(val => parseInt(val.trim()))
+            .filter(val => !isNaN(val));
+    } else {
+        // Use default initial values
+        initialValues = [32, 83, 22, 15, 8, 12, 43, 54, 23 ,34, 76 ,87, 32];
+    }
+    
+    // Call initialise with parameters if it's a Sorter, otherwise without
+    if (algo in engineSubclasses) {
+        (engine as any).initialise(initialValues);
+    } else {
+        engine.initialise();
+    }
 
     algoSelector.addEventListener("change", () => {
         if (algoSelector.value in engineSubclasses) {

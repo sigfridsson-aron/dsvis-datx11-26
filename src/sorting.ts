@@ -16,6 +16,7 @@ export interface Sorter extends Engine {
     insert: SubmitFunction;
     shuffle: SubmitFunction;
     setArraySize: SubmitFunction;
+    generateShuffledArray: (shuffleType: string) => number[];
 }
 
 const SORTING_CLASSES = {
