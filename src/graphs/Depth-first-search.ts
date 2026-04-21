@@ -133,7 +133,11 @@ export class Depth extends BaseGraph implements Graph {
 
         visitedEdges.add(edge)
 
+        const edgeBack = edge.$end.$outgoing[edge.$start.getText()]
         // highlight the traversed edge
+        if (edgeBack && edgeBack.$weight === edge.$weight)
+            // highlight the way back as well if the edge is undirected
+            edgeBack.setHighlight(true)
         edge.setHighlight(true)
 
         const endNode = edge.$end

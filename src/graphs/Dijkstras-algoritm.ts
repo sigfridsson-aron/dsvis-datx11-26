@@ -96,7 +96,13 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
         await this.pause(`Add ${node.getText()} to visited nodes`)
         visited.add(node);
         
-        if(parent) {this.getEdge(parent,node).setHighlightColor(true,"highlight-green")}
+        if(parent) {
+            const edgeTo   = this.getEdge(parent,node)
+            const edgeBack = edgeTo.$end.$outgoing[edgeTo.$start.getText()]
+            edgeTo.setHighlightColor(true,"highlight-green")
+            if (edgeBack && edgeBack.$weight === edgeTo.$weight)
+                edgeBack.setHighlightColor(true, `highlight-green`)
+        }
        
 
         node.setHighlightColor(true,"highlight")

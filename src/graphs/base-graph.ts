@@ -3,8 +3,8 @@ import { Engine, MessagesObject } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { Connection } from "~/objects/connection";
-import { GraphNode } from "~/objects/graph-node";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
+import { WeightedConnection } from "~/objects/weigted-connection";
 
 export const BaseGraphMessages = {
     warning: {
@@ -770,7 +770,8 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(L, K, 150)
     }
 
-    getEdge(startNode:GraphNode,endNode:GraphNode): Connection<GraphNode> {
+    getEdge( startNode:WeightedGraphNode
+           , endNode:WeightedGraphNode): WeightedConnection<WeightedGraphNode> {
         for (const key in startNode.$outgoing) {
             if (!startNode.$outgoing[key]) continue
 
