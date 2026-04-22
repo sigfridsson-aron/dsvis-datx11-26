@@ -234,7 +234,7 @@ export class HashTableSeparateChaining extends Engine implements Collection {
             this.hashTable.$nodeArrays[curIndex][i].setHighlight(true);
             await this.pause("find.look", i);
             if(String(this.hashTable.$nodeArrays[curIndex][i].value) == value){
-                await this.pause("find.found", i);
+                await this.pause("find.found", value);
                 this.hashTable.$nodeArrays[curIndex][i].setHighlight(false);
                 return [curIndex, i]
             }
