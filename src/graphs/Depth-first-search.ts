@@ -117,7 +117,6 @@ export class Depth extends BaseGraph implements Graph {
         this.updateTable([...knownEdges])
         await this.pause("traversal.chooseEdge", startNode.getText())
         this.updateTable([...knownEdges], {node:startNode,weight:edge.$weight,node2:edge.$end})
-        await this.pause("traversal.move", startNode.getText())
 
         visitedNodes.add(edge.$end)
         if (lastNode !== startNode) {
