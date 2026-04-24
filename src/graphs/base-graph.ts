@@ -699,7 +699,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(B, A, 135)
 
         this.link(C, B, 5, "from")
-        this.link(C, A, 1, "to")
+        this.link(C, A, 1, "from")
         this.putAtDeg(C, A, 45)
 
         this.link(D, C, 3, "from")
@@ -708,7 +708,7 @@ export abstract class BaseGraph extends Engine implements Graph {
 
         this.link(E, D, 9, "from")
         this.link(E, B, 8, "to")
-        this.link(E, A, 1, "to")
+        this.link(E, A, 1, "from")
         this.putAtDeg(E, A, -135)
     }
 
