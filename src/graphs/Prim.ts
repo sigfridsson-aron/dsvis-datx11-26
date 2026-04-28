@@ -39,7 +39,7 @@ export class Prim extends BaseGraph implements Graph {
             return
         }
 
-        this.graph?.setHighlight(false)
+        this.resetHighlights()
         await this.primsAlg()
         this.edgeTable.clear()
         for (const node of this.createdNodes) {

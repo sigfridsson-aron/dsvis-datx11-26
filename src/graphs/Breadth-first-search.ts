@@ -23,7 +23,7 @@ export class Breadth extends BaseGraph implements Graph {
             await this.pause("warning.nullGraph")
             return
         }
-        this.graph.setHighlight(false)
+        this.resetHighlights()
         this.graphTraversal = this.breadthSearch()
         await this.nodeTraversalVisualisation()
         this.graph.setHighlight(true)
