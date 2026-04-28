@@ -433,6 +433,9 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         this.resetHighlights()
                     } else {
                         await this.pause("floydWarshall.final.compareOutcome1", k, i)
+                        this.graphTraversal = this.paths[i][j]
+                        await this.nodeTraversalVisualisation()
+                        
                         this.resetHighlights()
                     }
                     jPointer.remove()
