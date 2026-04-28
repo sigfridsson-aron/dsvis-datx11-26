@@ -739,37 +739,37 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.link(C, B, 1, "both")
         this.putAtDeg(C, A, 50, 90)
 
-        this.link(D, A, 2, "from")
+        this.link(D, A, 2, "both")
         this.putAtDeg(D, A, -90)
 
-        this.link(E, D, 4, "from")
-        this.link(E, A, 1, "from")
+        this.link(E, D, 4, "both")
+        this.link(E, A, 1, "both")
         this.putAtDeg(E, D, 150, 100)
 
-        this.link(F, E, 7, "from")
-        this.link(F, A, 2, "from")
+        this.link(F, E, 7, "both")
+        this.link(F, A, 2, "both")
         this.putAtDeg(F, E, 120, 100)
 
-        this.link(G, F, 5, "from")
-        this.link(G, A, 3, "to")
+        this.link(G, F, 5, "both")
+        this.link(G, A, 3, "both")
         this.putAtDeg(G, F, 60, 100)
 
-        this.link(H, B, 4, "from")
+        this.link(H, B, 4, "both")
         this.putAtDeg(H, B, -80)
 
-        this.link(I, H, 1, "from")
-        this.link(I, B, 7, "from")
+        this.link(I, H, 1, "both")
+        this.link(I, B, 7, "both")
         this.putAtDeg(I, H, 45, 100)
 
-        this.link(J, I, 6, "from")
-        this.link(J, B, 4, "to")
+        this.link(J, I, 6, "both")
+        this.link(J, B, 4, "both")
         this.putAtDeg(J, I, 95, 100)
 
-        this.link(K, C, 2, "from")
+        this.link(K, C, 2, "both")
         this.putAtDeg(K, C, 20)
 
-        this.link(L, K, 1, "from")
-        this.link(L, C, 3, "to")
+        this.link(L, K, 1, "both")
+        this.link(L, C, 3, "both")
         this.putAtDeg(L, K, 150)
     }
 
