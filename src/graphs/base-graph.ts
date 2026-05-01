@@ -1,5 +1,5 @@
 import { G } from "@svgdotjs/svg.js";
-import { Engine, MessagesObject } from "~/engine";
+import { Engine, MessagesObject, NBSP } from "~/engine";
 import { EngineGeneralControls } from "~/general-controls/engine-general-controls";
 import { Graph } from "~/graph";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
@@ -184,6 +184,7 @@ export abstract class BaseGraph extends Engine implements Graph {
             .font({ size: 10 })
             .stroke({ color: "#f44444", width: 0.5 })
         }
+        this.body = NBSP;
     }
 
     //defines a new Node object and puts it under where messages
@@ -261,7 +262,7 @@ export abstract class BaseGraph extends Engine implements Graph {
     //Puts a Node a 125(px not sure what unit we have) away from
     //another node at a degree(not radians!)
     //does not have animation implemented
-    private putAtDeg(
+    putAtDeg(
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
         degree: number,
@@ -622,14 +623,14 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.graph = A
         A.setCenter(midW, midH)
 
-        this.link(B, A, 1, "from")
+        this.link(B, A, 1, "to")
         this.putAtDeg(B, A, 80)
 
-        this.link(C, B, 3, "to")
+        this.link(C, B, 3, "from")
         this.putAtDeg(C, B, 110)
 
         this.link(D, A, 5, "from")
-        this.link(D, B, 2, "from")
+        this.link(D, B, 2, "to")
         this.putAtDeg(D, A, 20)
 
         this.link(E, C, 1, "from")
@@ -637,7 +638,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(E, C, -120)
     }
 
-    private eulerianGraph(): void {
+    eulerianGraph(): void {
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 50
 

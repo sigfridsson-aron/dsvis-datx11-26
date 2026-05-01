@@ -2,7 +2,7 @@ import { Graph } from "~/graph";
 import { BaseGraph, BaseGraphMessages, rowHighlight } from "./base-graph";
 import { WeightedGraphNode } from "~/objects/weightedgraph-node";
 import { MessagesObject } from "~/engine";
-import { updateDefault } from "~/helpers";
+import { querySelector, updateDefault } from "~/helpers";
 import { WeightedConnection } from "~/objects/weigted-connection";
 import { MinPriorityStack } from "~/basic/MinPriorityStack";
 
@@ -23,7 +23,7 @@ export const PrimMessages = {
 
 type path = { path: WeightedConnection<WeightedGraphNode>
             , weight: number
-            , incoming: boolean}
+            , incoming: boolean }
 
 type tableInformation = { node: WeightedGraphNode
                         , node2?: WeightedGraphNode
@@ -32,6 +32,24 @@ type tableInformation = { node: WeightedGraphNode
 
 export class Prim extends BaseGraph implements Graph {
     messages: MessagesObject = updateDefault(PrimMessages, BaseGraphMessages);
+    body: string = "Prim only works on undirected graphs, therefore some graphs".concat(
+                   "\nhave been altered to retain the aspects of their description");
+
+    constructor(containorSelector: string) {
+        super(containorSelector)
+
+        const test = querySelector<HTMLSelectElement>(
+                    "select.chooseGraphI",
+                    this.container
+                );
+        
+                Array.from(test.options).forEach(option => {
+                    if (option.value === "Weakly" || option.value === "Strongly") {
+                        option.hidden = true
+                        option.disabled = true
+                    }
+                })
+    }
 
     async runningAlgorithm(): Promise<void> {
         if (!this.graph) {
@@ -127,9 +145,8 @@ export class Prim extends BaseGraph implements Graph {
     tableInf(queue: MinPriorityStack<path>): tableInformation[] {
         const tableInf = []
 
-        for (let i = queue.size-1; i >= 0;i--) {
+        for (let i = queue.size-1; i >= 0; i--) {
             const path = queue.get(i)
-            let Inf: tableInformation;
             tableInf.push({ node: path.path.$start
                           , node2: path.path.$end
                           , weight: path.path.$weight
@@ -234,5 +251,41 @@ export class Prim extends BaseGraph implements Graph {
             throw new Error ("Internal error, you've spelt the direction wrong")
         }
         return ourNode
+    }
+
+    override async chosenGraph(graf: string | number): Promise<void> {
+        await super.chosenGraph(graf)
+
+        if (graf === "DAG") {
+            this.body = "Since Prim fundamentally is undirected, a directed acyclic graph".concat(
+                        "\nis impossible to make. So this is not a DAG here")
+        }
+    }
+
+    override acyclicGraph(): void {
+        super.acyclicGraph()
+
+        this.createdNodes[3].setSuccessor("E", "D", null, this.getStrokeWidth())
+        this.createdNodes[4].setSuccessor("D", "E", null, this.getStrokeWidth())
+    }
+
+    override eulerianGraph(): void {
+        super.eulerianGraph()
+
+        const G = this.newNode("G")
+        const H = this.newNode("H")
+        const I = this.newNode("I")
+
+        this.putAtDeg(G, this.createdNodes[2], -135, 88)
+        this.link(G, this.createdNodes[2], 2, "both")
+        this.link(G, this.createdNodes[1], 3, "both")
+
+        this.putAtDeg(H, this.createdNodes[4], 90, 145)
+        this.link(H, this.createdNodes[4], 7, "both")
+        this.link(H, this.createdNodes[3], 4, "both")
+
+        this.putAtDeg(I, this.createdNodes[5], 90, 145)
+        this.link(I, this.createdNodes[5], 6, "both")
+        this.link(I, this.createdNodes[3], 1, "both")
     }
 }
