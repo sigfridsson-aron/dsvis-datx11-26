@@ -158,15 +158,10 @@ export class FloydWarshall extends BaseGraph implements Graph {
     private paths: Record<string, 
                           Record<string, 
                                  WeightedConnection<WeightedGraphNode>[]>> = {};
-    private body: string = "Warning! this algorithm takes a lot of time to complete".concat(
-                           "\nIts time complexity is cubic O(N^3)").concat(
-                           "\nChoose a small graph or be prepared for a long wait")
     private run: boolean = false
-
-    override setIdleTitle(): void {
-        this.info.setTitle("Select an action from the menu above");
-        this.info.setBody(this.body);
-    }
+    body: string = "Warning! this algorithm takes a lot of time to complete".concat(
+                    "\nIts time complexity is cubic O(N^3)").concat(
+                    "\nChoose a small graph or be prepared for a long wait")
 
     override async startNode(value: string | number): Promise<void> {
         if (!this.graph) {
