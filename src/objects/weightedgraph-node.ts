@@ -32,6 +32,7 @@ export class WeightedGraphNode extends GraphNode {
             const oldIncoming = oldSuccessor.$incoming;
             for (const k in oldIncoming) {
                 if (oldIncoming[k] === outEdge) {
+                    oldIncoming[k].$textObj.remove();
                     delete oldIncoming[k];
                 }
             }
@@ -44,6 +45,7 @@ export class WeightedGraphNode extends GraphNode {
                 const oldOutgoing = oldPredecessor.$outgoing;
                 for (const k in oldOutgoing) {
                     if (oldOutgoing[k] === inEdge) {
+                        oldOutgoing[k].$textObj.remove();
                         delete oldOutgoing[k];
                     }
                 }
@@ -67,6 +69,7 @@ export class WeightedGraphNode extends GraphNode {
             this.$weights[outKey] = weight
             successor.$incoming[inKey] = edge;
         } else {
+            this.$outgoing[outKey]?.$textObj.remove();
             delete this.$outgoing[outKey];
         }
         this._updateNullary();
