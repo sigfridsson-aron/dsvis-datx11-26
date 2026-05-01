@@ -258,7 +258,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         return ourNode
     }
 
-    //Puts a Node a 100(px not sure what unit we have) away from
+    //Puts a Node a 125(px not sure what unit we have) away from
     //another node at a degree(not radians!)
     //does not have animation implemented
     private putAtDeg(
@@ -283,7 +283,6 @@ export abstract class BaseGraph extends Engine implements Graph {
     //Implement default graphs below
 
     private simpleGraph(): void {
-        //copied the undirected graph and made it directed
         const midW = this.$Svg.width/2 - 250
         const midH = this.$Svg.height/2 + 150
 
@@ -446,7 +445,6 @@ export abstract class BaseGraph extends Engine implements Graph {
     }
 
     private cyclicGraph(): void {
-        //Neutered sign
         const midW = this.$Svg.width/2 - 80
         const midH = this.$Svg.height/2 - 50
 
@@ -500,8 +498,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(K, H, -60)
     }
 
-    private acyclicGraph(): void {
-        //Somewhat basic
+    acyclicGraph(): void {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 + 100
 
@@ -585,8 +582,6 @@ export abstract class BaseGraph extends Engine implements Graph {
     }
 
     private weaklyConnectedGraph(): void {
-        //Somewhat small but I thought it might be better to
-        //focus on it being weakly connected
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 200
 
@@ -615,8 +610,6 @@ export abstract class BaseGraph extends Engine implements Graph {
     }
 
     private stronglyConnectedGraph(): void {
-        //Somewhat small but I thought it might be better to
-        //focus on it being strongly connected
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 200
 
@@ -682,7 +675,6 @@ export abstract class BaseGraph extends Engine implements Graph {
     }
 
     private hamiltonianGraph(): void {
-        //Very simple could probably be expanded
         const midW = this.$Svg.width/2 - 150
         const midH = this.$Svg.height/2
 
