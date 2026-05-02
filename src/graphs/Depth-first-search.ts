@@ -34,7 +34,7 @@ export class Depth extends BaseGraph implements Graph {
         const visitedNodes: WeightedGraphNode[] = []
         const result:WeightedConnection<WeightedGraphNode>[] = []
         this.searchGraphRecursion(startNode,visitedNodes,result)
-        console.log(result)
+        
         return result
     }
 
