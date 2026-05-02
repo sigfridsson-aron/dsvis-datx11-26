@@ -10,7 +10,12 @@ import { GraphNode } from "~/objects/graph-node";
 
 export const BreadthMessages = {
     traversal: {
-        chooseEdge: (value: string) => `Exploring all of ${value}'s edges`
+        start: (value: string) => `Starting search at ${value}`
+      , atNode: (value: string) => `At node ${value}`
+      , cleanUp: (value: string) => `Remove edges that visit ${value}`
+      , edgeUpdate: (value: string) => `Add ${value}'s edges`
+      , chooseEdge: (value: string) => `Choose ${value}'s next outgoing edge`
+      , explore: (value: string) => `Exploring all of ${value}'s outgoing edges`
     }
 } as const satisfies MessagesObject
 
@@ -23,12 +28,18 @@ export class Breadth extends BaseGraph implements Graph {
             await this.pause("warning.nullGraph")
             return
         }
-        this.graph.setHighlight(false)
+        this.resetHighlights()
         this.graphTraversal = this.breadthSearch()
         await this.nodeTraversalVisualisation()
         this.graph.setHighlight(true)
     }
 
+    /**
+     * A basic implementation of breadth-first search that stores edges
+     * as they are visited
+     * 
+     * @returns An array of edges in the order of which they were visited in the algorithm
+     */
     breadthSearch(): WeightedConnection<WeightedGraphNode>[] {
         const visitOrder: Queue<WeightedGraphNode> = new Queue();
         const edges: WeightedConnection<WeightedGraphNode>[] = [];
@@ -98,17 +109,18 @@ export class Breadth extends BaseGraph implements Graph {
             visitedNodes.add(startNode)
 
             this.updateTable([...knownEdges])
-            await this.pause("traversal.chooseEdge", startNode.getText())
+            if (i === 0 || this.graphTraversal[i-1].$start != startNode)
+                await this.pause("traversal.explore", startNode.getText())
+            else
+                await this.pause("traversal.chooseEdge", startNode.getText())
             this.updateTable([...knownEdges], {node:startNode,weight:edge.$weight,node2:edge.$end})
-            await this.pause("traversal.move", startNode.getText())
 
             visitedNodes.add(edge.$end)
             if (lastNode !== startNode) {
                 // animate pointer to node
                 pointer.setCenter(
                     startNode.cx(),
-                    startNode.cy(),
-                    this.getAnimationSpeed()
+                    startNode.cy()
                 )
 
                 await this.pause(`traversal.atNode`, startNode.getText())
@@ -165,7 +177,7 @@ export class Breadth extends BaseGraph implements Graph {
 
     async updateTable(
         tableInformation:tableInformation[]
-    , highlightEdge?:rowHighlight
+      , highlightEdge?:rowHighlight
     ) {
         const columns = ["From", "Weight", "To"];
         const edges = tableInformation
@@ -175,7 +187,6 @@ export class Breadth extends BaseGraph implements Graph {
 
         const startX = this.$Svg.width-cellWidth*columns.length;
         const startY = 0;
-        
 
         // Clear previous content
         this.edgeTable.clear();
@@ -189,12 +200,10 @@ export class Breadth extends BaseGraph implements Graph {
                             ,currEdge.weight.toString()
                             ,currEdge.node2!.getText()]
 
-
             //Check if this edge is the one that should be highlight
             let bool_highlight: boolean 
             if (highlightEdge?.node === currEdge.node && highlightEdge.node2 === currEdge.node2) bool_highlight = true
             else bool_highlight = false
-        
             
             this.drawRow(
                 rowData,
@@ -207,7 +216,6 @@ export class Breadth extends BaseGraph implements Graph {
             );
             k++
         }           
-
         this.Svg.add(this.edgeTable)
     }
 }

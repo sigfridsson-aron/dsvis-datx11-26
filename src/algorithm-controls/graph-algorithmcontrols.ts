@@ -45,8 +45,6 @@ export class GraphAlgorithmControl extends EngineAlgorithmControl {
     }
 
     initialize() {
-        //this.engine.(name of SubmitFunction) needs a defined function in
-        //the implementation of your engine with the same name as SubmitFunction
         this.chooseGraphI.addEventListener("change", () => {
             this.chosenGraph.value = this.chooseGraphI.value
             this.chooseGraphI.value = ""

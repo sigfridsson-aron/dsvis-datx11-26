@@ -59,6 +59,8 @@ export class Engine {
     debugger: Debugger;
     state: State;
     info: Info;
+    title: string = "Select an action from the menu above";
+    body: string = NBSP;
 
     getAnimationSpeed(): number {
         return parseInt(this.generalControls.animationSpeedSelect.value);
@@ -195,8 +197,8 @@ export class Engine {
     }
 
     setIdleTitle(): void {
-        this.info.setTitle("Select an action from the menu above");
-        this.info.setBody(NBSP);
+        this.info.setTitle(this.title);
+        this.info.setBody(this.body);
 
     }
 
