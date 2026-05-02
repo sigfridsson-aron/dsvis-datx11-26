@@ -20,8 +20,10 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         return this
     }
 
-    override setHighlightColor( enabled: boolean
-                              , cssClass?: string): void {
+    override setHighlightColor(
+        enabled: boolean
+      , cssClass?: string
+    ): void {
         super.setHighlightColor(enabled, cssClass)
 
         const highlightClasses = [
@@ -71,8 +73,10 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         return this;
     }
 
-    // Creates a text object that contains the weight value
-    // of this connection
+    /**
+    * Creates a text object that contains the weight value
+    * of this connection
+    **/
     _createWeight(): void {
         const C = this.$coords
         var [offx, offy] = [0, 0]
@@ -99,15 +103,23 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
                      .back()
     }
 
-    // When update gets called this animates the text object
-    // so it stays in the middle of the connection
-    _redrawWeight(newCoords: Partial<{ x1: number; 
-                                       y1: number; 
-                                       x2: number; 
-                                       y2: number; 
-                                       r2: number; 
-                                    }>,
-                  animationDuration: number = 0): void {
+    /** 
+    * When update gets called this animates the text object
+    * so it stays in the middle of the connection
+    * 
+    * @param newCoords - If there are new coordinates we use them
+    * 
+    * @param animationDuration - Determines if it gets animated and how fast
+    **/
+    _redrawWeight(
+        newCoords: Partial<{ x1: number; 
+                             y1: number; 
+                             x2: number; 
+                             y2: number; 
+                             r2: number; 
+                          }>,
+        animationDuration: number = 0
+    ): void {
         const C = this.$coords
 
         const x1 = newCoords.x1 ? newCoords.x1 : C.x1
@@ -128,6 +140,11 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         )
     }
 
+    /**
+     * Creates an offset that will be perpendicular to this edge
+     * 
+     * @returns [offset for x-level, offset for y-level]
+     */
     _offset(): [number, number] {
         const preX1 = (this.$coords.x2 - this.$coords.x1)
         const preY1 = (this.$coords.y2 - this.$coords.y1)

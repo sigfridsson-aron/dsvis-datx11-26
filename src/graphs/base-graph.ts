@@ -12,23 +12,17 @@ export const BaseGraphMessages = {
             `Could not find ${value}; current start node is ${graph}`
     }
     , traversal: {
-        start: (value: string) => `Starting search at ${value}`
-      , atNode: (value: string) => `At node ${value}`
-      , cleanUp: (value: string) => `Remove edges that visit ${value}`
-      , edgeUpdate: (value: string) => `Add ${value}'s edges`
-      , move: (value: string) => `move to start node ${value}`
-      , chooseEdge: "Choose next edge based on its remaining depth"
-      , complete: "Done!"
+        complete: "Done!"
     }
 } as const satisfies MessagesObject
 
 export type tableInformation = { node:   WeightedGraphNode
                                , weight: number
-                               , node2?: WeightedGraphNode}
+                               , node2?: WeightedGraphNode }
 
 export type rowHighlight = { node:   WeightedGraphNode
                            , weight: number
-                           , node2?: WeightedGraphNode}
+                           , node2?: WeightedGraphNode }
 
 export abstract class BaseGraph extends Engine implements Graph {
     edgeTable: G;
@@ -43,16 +37,22 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.edgeTable = this.Svg.group()
     }
 
+
+    /**
+     * Function for running the graph algorithm
+     */
     abstract runningAlgorithm(): Promise<void>
 
-    abstract nodeTraversalVisualisation():void
-
+    /**
+     * Function for visualizing how the graph algorithm iterates through the graph
+     */
+    abstract nodeTraversalVisualisation(): void
 
     //knownEdges:Set<WeightedConnection<WeightedGraphNode>>
     abstract updateTable(
         tableInformation:tableInformation[]
-    , rowHighlight:rowHighlight
-    )  : Promise<void>
+      , rowHighlight:rowHighlight
+    ): Promise<void>
 
     drawRow(
         rowData: string[],
@@ -62,7 +62,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         cellWidth: number,
         cellHeight: number,
         highlight?: boolean
-    ) {
+    ): G {
         const rowY = startY + rowIndex * cellHeight;
         const rowWidth = rowData.length * cellWidth;
 
@@ -103,7 +103,10 @@ export abstract class BaseGraph extends Engine implements Graph {
         return rowGroup;
     }
 
-    resetHighlights() {
+    /**
+     * Resets all highlighted edges and nodes and clears the edgetable
+     */
+    resetHighlights(): void {
         for (const k of this.createdNodes) {
             const inc = k.$incoming
             const out = k.$outgoing
@@ -115,11 +118,15 @@ export abstract class BaseGraph extends Engine implements Graph {
             }
             k.setHighlightColor(false)
         }
-        this.graph?.setHighlightColor(false)
         this.edgeTable.clear()
     }
 
-    async startNode(value: string | number) {
+    /**
+     * Chooses a new start node for the graph algorithm
+     * 
+     * @param value - A string or number that the new start node has, if no created node has this value then it sends a warning
+     */
+    async startNode(value: string | number): Promise<void> {
         if (!this.graph) {
             await this.pause("warning.nullGraph")
             return
@@ -137,7 +144,12 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.graph?.setHighlight(true)
     }
 
-    async chosenGraph(graf: string | number) {
+    /**
+     * Chooses the next graph that the algorithm can run on
+     * 
+     * @param graf - The name of an existing graph, if non existant it sends a warning
+     */
+    async chosenGraph(graf: string | number): Promise<void> {
         if (graf === "") {
             await this.resetAlgorithm()
         } else if (graf === "Simple") {
@@ -187,8 +199,13 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.body = NBSP;
     }
 
-    //defines a new Node object and puts it under where messages
-    //are, will not define connections to different nodes.
+    /**
+     * Initiates a new node, puts it on the canvas and stores it in this.creatednodes
+     * 
+     * @param text - The text that will be displayed on the new node
+     * 
+     * @returns - The new node
+     */
     newNode(text: string): WeightedGraphNode {
         const newNode = new WeightedGraphNode(text, this.getObjectSize(), this.getStrokeWidth())
         this.createdNodes.push(newNode)
@@ -197,7 +214,11 @@ export abstract class BaseGraph extends Engine implements Graph {
         ).init(...this.getNodeStart());
     }
 
-    async resetAlgorithm() {
+    /**
+     * Removes all nodes and edges from canvas and 
+     * resets this.creatednodes and the edgetable
+     */
+    async resetAlgorithm(): Promise<void> {
         await super.resetAlgorithm();
         for (const k of this.createdNodes) {
             k.remove()
@@ -214,14 +235,36 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.edgeTable.clear()
     }
 
-    //This is just the connect function but i didn't wanna bother with
-    //sending along a unique key to every node.
+    getEdge( startNode:WeightedGraphNode
+           , endNode:WeightedGraphNode): WeightedConnection<WeightedGraphNode> {
+        for (const key in startNode.$outgoing) {
+            if (!startNode.$outgoing[key]) continue
+
+            if (endNode === startNode.$outgoing[key].$end) return startNode.$outgoing[key]
+
+        }
+        throw new Error("There exists no edge between startNode and endNode")
+    }
+
+    /**
+     * Creates an edge between two nodes
+     * 
+     * @param ourNode - The starting point for the edge
+     * 
+     * @param theirNode - The end point for the edge
+     * 
+     * @param weight - The weight of the edge
+     * 
+     * @param dir - Determines which way the edge is directed, to(our -> their)/from(their -> our)/both(our <-> their)
+     * 
+     * @returns - Returns the graph
+     */
     link(
         ourNode: WeightedGraphNode, 
         theirNode: WeightedGraphNode,
         weight: number,
         dir: string
-    ): WeightedGraphNode {
+    ): this {
         if (dir === "to") {
             ourNode.setSuccessor(
                 theirNode.getText(), 
@@ -256,12 +299,23 @@ export abstract class BaseGraph extends Engine implements Graph {
         } else {
             throw new Error ("Internal error, you've spelt the direction wrong")
         }
-        return ourNode
+        return this
     }
 
-    //Puts a Node a 125(px not sure what unit we have) away from
-    //another node at a degree(not radians!)
-    //does not have animation implemented
+    /**
+     * Puts a node relative to another node a certain distance away 
+     * (standard 125, not sure which unit)
+     * 
+     * @param putNode - The node your are moving
+     * 
+     * @param relativNode - The node you are basing the moving of putNode around
+     * 
+     * @param degree - The degree relativ relativNode you are putting putNode
+     * 
+     * @param distance - The distance from relativNode that you are putting putNode
+     * 
+     * @param animation - Determines if it will be animated (currently buggy)
+     */
     putAtDeg(
         putNode: WeightedGraphNode,
         relativNode: WeightedGraphNode,
@@ -499,7 +553,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(K, H, -60)
     }
 
-    acyclicGraph(): void {
+    private acyclicGraph(): void {
         const midW = this.$Svg.width/2 - 100
         const midH = this.$Svg.height/2 + 100
 
@@ -638,7 +692,7 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.putAtDeg(E, C, -120)
     }
 
-    eulerianGraph(): void {
+    private eulerianGraph(): void {
         const midW = this.$Svg.width/2 - 200
         const midH = this.$Svg.height/2 + 50
 
@@ -764,16 +818,5 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.link(L, K, 1, "both")
         this.link(L, C, 3, "both")
         this.putAtDeg(L, K, 150)
-    }
-
-    getEdge( startNode:WeightedGraphNode
-           , endNode:WeightedGraphNode): WeightedConnection<WeightedGraphNode> {
-        for (const key in startNode.$outgoing) {
-            if (!startNode.$outgoing[key]) continue
-
-            if (endNode === startNode.$outgoing[key].$end) return startNode.$outgoing[key]
-
-        }
-        throw new Error("There exists no edge between startNode and endNode")
     }
 }

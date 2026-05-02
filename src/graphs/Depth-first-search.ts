@@ -8,7 +8,13 @@ import { updateDefault } from "~/helpers";
 import { HighlightCircle } from "~/objects/highlight-circle";
 
 export const DepthMessages = {
-    
+    traversal: {
+        start: (value: string) => `Starting search at ${value}`
+      , atNode: (value: string) => `At node ${value}`
+      , cleanUp: (value: string) => `Remove edges that visit ${value}`
+      , edgeUpdate: (value: string) => `Add ${value}'s edges`
+      , chooseEdge: "Choose next edge based on its remaining depth"
+    }
 } as const satisfies MessagesObject
 
 export class Depth extends BaseGraph implements Graph {

@@ -18,7 +18,7 @@ export const FloydWarshallMessages = {
       , start4: `Nodes that have no path between them cost ∞`
 
       , intermission1: `After the matrix have been created`
-      , intermission2: `Look if adding a random node to a path gives better weight`
+      , intermission2: `Look if adding a middle node to a path gives better weight`
 
       , prelim: {
             base: (from: string) => `Iterate through all nodes, current: ${from}`
@@ -49,39 +49,39 @@ export const FloydWarshallMessages = {
 
       , final: {
             base1: (inter: string) => 
-                `Iterate through all nodes, current random node: ${inter}`
+                `Iterate through all nodes, current middle node: ${inter}`
           , base2: (inter: string, from: string) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`
                 )
                 
           , lookup: ( inter: string
                     , from: string
                     , to: string ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nLookup path to ${to}`
                 )
                 )
 
           , noPath1: (inter: string, from: string) =>
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
-                `\nNo path found between start node(${from}) and random node(${inter})`
+                `\nNo path found between start node(${from}) and middle node(${inter})`
                 )
                 )
             
           , noPath2: (inter: string, from: string, to: string) =>
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
-                `\nNo path found between random node(${inter}) and end node(${to})`
+                `\nNo path found between middle node(${inter}) and end node(${to})`
                 )
                 )
 
           , compare1: ( inter: string
                       , from: string
                       , weight: number ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nLookup path ${from} -> ${inter}, cost = ${weight}`
                 )
@@ -90,7 +90,7 @@ export const FloydWarshallMessages = {
                       , from: string
                       , to: string
                       , weight: number ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nLookup path ${inter} -> ${to}, cost = ${weight}`
                 )
@@ -99,7 +99,7 @@ export const FloydWarshallMessages = {
                       , from: string
                       , to: string
                       , weight: number ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nLookup path ${from} -> ${to}, cost = ${weight}`
                 )
@@ -107,7 +107,7 @@ export const FloydWarshallMessages = {
           , compare4: ( inter: string
                       , from: string
                       , to: string ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nCompare ${from} -> ${inter} -> ${to} to ${from} -> ${to}`
                 )
@@ -117,7 +117,7 @@ export const FloydWarshallMessages = {
                       , weight1: number 
                       , weight2: number
                       , weight3: number ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nCompare ${weight1} + ${weight2} to ${weight3}`
                 )
@@ -125,7 +125,7 @@ export const FloydWarshallMessages = {
 
           , compareOutcome1: ( inter: string
                              , from: string ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nKeeping old weight and path`
                 )
@@ -134,7 +134,7 @@ export const FloydWarshallMessages = {
                              , from: string
                              , to: string
                              , weight: number ) => 
-                `Iterate through all nodes, current random node: ${inter}`.concat(
+                `Iterate through all nodes, current middle node: ${inter}`.concat(
                 `\nIterate through all nodes, current start node: ${from}`.concat(
                 `\nNew path ${from} -> ${inter} -> ${to} with weight: ${weight}`
                 )
@@ -173,11 +173,13 @@ export class FloydWarshall extends BaseGraph implements Graph {
             return
         }
         try {
-            // this code is only here to trigger the error early
+            // This code is only here to trigger the error early
             // so the paths don't get reset unnecessarily
             this.paths[value][this.createdNodes[0].getText()]
 
             this.resetHighlights()
+
+            // Highlight every edge that starts at value
             for (const path of Object.values(this.paths[value])) {
                 for (const edge of path) {
                     edge.setHighlight(true)
@@ -186,6 +188,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         edgeBack.setHighlight(true)
                 }
             }
+            // Highlight the start node's row and sets it as this.graph
             for (let i = 0;  i < this.createdNodes.length; i++) {
                 if (this.createdNodes[i].getText() === value) {
                     this.graph = this.createdNodes[i]
@@ -208,15 +211,21 @@ export class FloydWarshall extends BaseGraph implements Graph {
         }
         this.graph.setHighlight(false)
         await this.floydWarshallSearch()
+        await this.pause("traversal.complete")
     }
 
+    /**
+     * Goes through the Floyd-Warshall algorithm and pauses to highlight
+     * relevant steps, as well as uses nodeTraversalVisualisation
+     * to show which paths are being considered
+     */
     async floydWarshallSearch(): Promise<void> {
         var tableInf: tableInformation[] = [];
         var high: rowHighlight
 
         await this.pause("floydWarshall.start1")
 
-        await this.createTable()
+        this.createTable()
 
         await this.pause("floydWarshall.start2")
 
@@ -224,6 +233,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
 
         await this.pause("floydWarshall.start4")
         
+        // Creates the preliminary matrix (only paths between immediate neighbours)
         for (const nodeFrom of this.createdNodes) {
             const tempWeights: Record<string, number> = {}
             const tempPaths: Record<string,
@@ -243,6 +253,8 @@ export class FloydWarshall extends BaseGraph implements Graph {
             
             const nodeFromT = nodeFrom.getText()
             await this.pause("floydWarshall.prelim.base", nodeFromT)
+
+            // Checks if nodeFrom has a path to nodeTo
             for (const nodeTo of this.createdNodes) {
                 const nodeToT   = nodeTo.getText()
                 const path: WeightedConnection<WeightedGraphNode>[] = []
@@ -252,15 +264,20 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     nodeTo.cy(),
                     this.getObjectSize(),
                     this.getStrokeWidth()
-                ).removeClass('highlight-circle').addClass(`highlight-circle-green`)
+                ).addClass(`highlight-circle-green`)
+
                 await this.pause("floydWarshall.prelim.lookup", nodeFromT, nodeToT)
+
                 if (nodeFrom === nodeTo) {
+                    // Path starting and ending in the same node has 0 weight
                     await this.pause("floydWarshall.prelim.same", nodeFromT, nodeToT)
                     weight = 0
                     tableInf = [{ node: nodeFrom
                                 , node2: nodeTo
                                 , weight: weight }]
                 } else if (out.includes(nodeTo)) {
+                    // nodeTo is an immediate neighbour and can therefore
+                    // update the path and weight
                     await this.pause("floydWarshall.prelim.found", nodeFromT, nodeToT)
                     weight = nodeFrom.$outgoing[nodeToT]!.$weight
                     path[0] = nodeFrom.$outgoing[nodeToT]!
@@ -268,11 +285,14 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     tableInf = [{ node: nodeFrom
                                 , node2: nodeTo
                                 , weight: weight}]
+
                     this.traversalMsg.k = nodeFromT
                     this.traversalMsg.i = nodeToT
                     this.traversalMsg.msg = "floydWarshall.prelim.found"
                     await this.nodeTraversalVisualisation()
                 } else {
+                    // Only option left is no path between nodeFrom and nodeTo
+                    // the path between them then get infinte weight
                     await this.pause("floydWarshall.prelim.notFound", nodeFromT, nodeToT)
                     weight = Infinity
                     tableInf = [{ node: nodeFrom
@@ -280,13 +300,15 @@ export class FloydWarshall extends BaseGraph implements Graph {
                                 , weight: weight }]
                 }
 
+                // Update the path
                 tempPaths[nodeToT] = path
                 this.paths[nodeFromT] = tempPaths
 
+                // Update the weight
                 tempWeights[nodeToT] = weight
                 this.weights[nodeFromT] = tempWeights
                 
-                await this.updateTable(tableInf)
+                this.updateTable(tableInf)
                 await this.pause("floydWarshall.prelim.updateEdgetable", nodeFromT, nodeToT)
 
                 toPointer.remove()
@@ -299,16 +321,21 @@ export class FloydWarshall extends BaseGraph implements Graph {
 
         await this.pause("floydWarshall.intermission2")
         
+        // Creates the final matrix
         for (const kNode of this.createdNodes) {
             const k = kNode.getText()
+
             const kPointer = this.Svg.put(new HighlightCircle()).init(
                 kNode.cx(),
                 kNode.cy(),
                 this.getObjectSize(),
                 this.getStrokeWidth()
-            ).removeClass('highlight-circle').addClass(`highlight-circle-blue`)
+            ).addClass(`highlight-circle-blue`)
+
             await this.pause("floydWarshall.final.base1", k)
+
             for (const iNode of this.createdNodes) {
+                // We skip if middle and start node is the same
                 if (kNode === iNode) continue
 
                 const i = iNode.getText()
@@ -321,26 +348,30 @@ export class FloydWarshall extends BaseGraph implements Graph {
 
                 await this.pause("floydWarshall.final.base2", k, i)
 
+                // We skip if there is no path between start and middle node
                 if (this.weights[i][k] === Infinity) {
                     high = { node: iNode
                            , node2: kNode
                            , weight: this.weights[i][k] }
-                    await this.updateTable([], high)
+                    this.updateTable([], high)
                     await this.pause("floydWarshall.final.noPath1", k, i)
-                    await this.updateTable([])
+                    this.updateTable([])
 
                     iPointer.remove()
                     continue
                 }
+
                 for (const jNode of this.createdNodes) {
+                    // Skip if middle, start or end node are the same
                     if (jNode === kNode || jNode === iNode) continue
+
                     const j = jNode.getText()
                     const jPointer = this.Svg.put(new HighlightCircle()).init(
                         jNode.cx(),
                         jNode.cy(),
                         this.getObjectSize(),
                         this.getStrokeWidth()
-                    ).removeClass('highlight-circle').addClass(`highlight-circle-green`)
+                    ).addClass(`highlight-circle-green`)
 
                     this.traversalMsg.k = k
                     this.traversalMsg.i = i
@@ -348,13 +379,14 @@ export class FloydWarshall extends BaseGraph implements Graph {
 
                     await this.pause("floydWarshall.final.lookup", k, i, j)
 
+                    // Skip if there is no path between middle and end node
                     if (this.weights[k][j] === Infinity) {
                         high = { node: kNode
                                , node2: jNode
                                , weight: this.weights[k][j] }
-                        await this.updateTable([], high)
+                        this.updateTable([], high)
                         await this.pause("floydWarshall.final.noPath2", k, i, j)
-                        await this.updateTable([])
+                        this.updateTable([])
 
                         jPointer.remove()
                         continue
@@ -363,22 +395,22 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     high = { node: iNode
                            , node2: kNode
                            , weight: this.weights[i][k] }
-                    await this.updateTable([], high)
+                    this.updateTable([], high)
                     await this.pause("floydWarshall.final.compare1", k, i, this.weights[i][k])
                     
-                    if (this.paths[i][k].length > 0) {
-                        this.traversalMsg.msg = "floydWarshall.final.compare1"
-                        this.traversalMsg.weight = this.weights[i][k]
-                        this.graphTraversal = this.paths[i][k]
-                        await this.nodeTraversalVisualisation()
-                    }
+                    this.traversalMsg.msg = "floydWarshall.final.compare1"
+                    this.traversalMsg.weight = this.weights[i][k]
+                    this.graphTraversal = this.paths[i][k]
+                    await this.nodeTraversalVisualisation()
 
                     high = { node: kNode
                            , node2: jNode
                            , weight: this.weights[k][j]}
-                    await this.updateTable([], high)
+                    this.updateTable([], high)
                     await this.pause("floydWarshall.final.compare2", k, i, j, this.weights[k][j])
                     
+                    // Only run if paths have a length greater than zero
+                    // nodeTraversalVisualisation sends an error otherwise
                     if (this.paths[k][j].length > 0) {
                         this.traversalMsg.msg = "floydWarshall.final.compare2"
                         this.traversalMsg.weight = this.weights[k][j]
@@ -389,9 +421,12 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     high = { node: iNode
                            , node2: jNode
                            , weight: this.weights[i][j] }
-                    await this.updateTable([], high)
+
+                    this.updateTable([], high)
                     await this.pause("floydWarshall.final.compare3", k, i, j, this.weights[i][j])
 
+                    // Only run if paths have a length greater than zero
+                    // nodeTraversalVisualisation sends an error otherwise
                     if (this.paths[i][j].length > 0) {
                         this.traversalMsg.msg = "floydWarshall.final.compare3"
                         this.traversalMsg.weight = this.weights[i][j]
@@ -399,7 +434,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         await this.nodeTraversalVisualisation()
                     }
 
-                    await this.updateTable([])
+                    this.updateTable([])
 
                     await this.pause("floydWarshall.final.compare4", k, i, j)
 
@@ -410,6 +445,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                     )
 
                     if (this.weights[i][j] > this.weights[i][k] + this.weights[k][j]) {
+                        // The new path has less weight so we update
                         this.weights[i][j] = this.weights[i][k] + this.weights[k][j]
                         const path  = this.paths[i][k].concat(this.paths[k][j])
                         this.paths[i][j] = path
@@ -417,7 +453,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         tableInf = [{ node: iNode
                                     , node2: jNode
                                     , weight: this.weights[i][j] }]
-                        await this.updateTable(tableInf)
+                        this.updateTable(tableInf)
                         await this.pause("floydWarshall.final.compareOutcome2", k, i, j, this.weights[i][j])
 
                         this.traversalMsg.msg = "floydWarshall.final.compareOutcome2"
@@ -427,6 +463,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         
                         this.resetHighlights()
                     } else {
+                        // New path has more weight so we keep the old path
                         await this.pause("floydWarshall.final.compareOutcome1", k, i)
                         this.traversalMsg.msg = "floydWarshall.final.compareOutcome1"
                         this.graphTraversal = this.paths[i][j]
@@ -441,10 +478,14 @@ export class FloydWarshall extends BaseGraph implements Graph {
             kPointer.remove()
         }
         this.body = NBSP
+
+        // Set that we have run the algorithm, this is so that startNode
+        // knows it has paths it can print out, otherwise it sends a warning
         this.run = true
     }
 
     async nodeTraversalVisualisation(): Promise<void> {
+
         if(this.graphTraversal.length === 0) {
             throw new Error ("graphTraversal is empty, shouldn't happen")
         }
@@ -452,10 +493,15 @@ export class FloydWarshall extends BaseGraph implements Graph {
         let highColor = `highlight`
         let circColor = `highlight-circle`
 
+        // The message being checked for means the nodeTraversal was
+        // called during the preliminary matrix, meaning we would only
+        // work with red colors
         if (this.traversalMsg.msg != "floydWarshall.prelim.found")
             for (const edge of this.graphTraversal) {
                 if (edge.$start.getText() === this.traversalMsg.k ||
                     edge.$end.getText() === this.traversalMsg.k) {
+                    // The conditions being checked imply that the
+                    // path is a new path, thus it would be blue
                     highColor = `highlight-blue`
                     circColor = `highlight-circle-blue`
                     break
@@ -473,8 +519,9 @@ export class FloydWarshall extends BaseGraph implements Graph {
                         firstNode.cy(),
                         this.getObjectSize(),
                         this.getStrokeWidth()
-        ).removeClass(`highlight-circle`).addClass(circColor)
+        ).addClass(circColor)
     
+        // For every edge animate the pointers and set highlights
         for (let i = 0; i < this.graphTraversal.length;i++) {
             const edge = this.graphTraversal[i]
             const startNode = edge.$start
@@ -502,6 +549,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                 endNode.cy(),
                 this.getAnimationSpeed()
             )
+
             if (this.traversalMsg.msg === "floydWarshall.final.compare1") {
                 await this.pause( this.traversalMsg.msg
                                 , this.traversalMsg.k
@@ -521,6 +569,13 @@ export class FloydWarshall extends BaseGraph implements Graph {
         pointer?.remove()
     }
 
+    /**
+     * Updates the edgetable
+     * 
+     * @param tableInformation - Contains the information of what should change
+     * 
+     * @param highlightEdge - Is used to highlight without changing
+     */
     async updateTable(
           tableInformation: tableInformation[]
         , highlightEdge?: rowHighlight
@@ -538,6 +593,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
             this.matrix[row][col].setHighlight(true)
             this.matrix[0][col].setHighlight(true)
             this.matrix[row][0].setHighlight(true)
+
             if (tab.weight === Infinity)
                 this.matrix[row][col].text("∞")
             else
@@ -554,7 +610,10 @@ export class FloydWarshall extends BaseGraph implements Graph {
         }
     }
 
-    async createTable() {
+    /**
+     * Creates an empty matrix
+     */
+    async createTable(): Promise<void> {
         const columns = [""].concat(this.createdNodes.map(item => item.getText()))
         
         const cellHeight = 20;
@@ -592,6 +651,9 @@ export class FloydWarshall extends BaseGraph implements Graph {
         this.Svg.add(this.edgeTable)
     }
 
+    /**
+     * Resets all highlighted edges and nodes
+     */
     override resetHighlights(): void {
         this.updateTable([])
         for (const k of this.createdNodes) {
@@ -608,14 +670,28 @@ export class FloydWarshall extends BaseGraph implements Graph {
         this.graph?.setHighlightColor(false)
     }
 
+    /**
+     * Draws a row for the matrix
+     * 
+     * @param rowData - Contains the data for the row, set as | rowData[0] | rowData[1] | ...
+     * 
+     * @param rowIndex - Which index the row is, determines y-level for the row
+     * 
+     * @param startX - Where the matrix starts in the x-level, includes all previous drawn rows
+     * 
+     * @param startY - Where the matrix starts in the y-level, includes all previous drawn rows
+     * 
+     * @param cellWidth - Determines how wide each individual cell is
+     * 
+     * @param cellHeight - Determines how tall each individual cell is
+     */
     override drawRow (
         rowData: string[],
         rowIndex: number,
         startX: number,
         startY: number,
         cellWidth: number,
-        cellHeight: number,
-        highlight?: boolean
+        cellHeight: number
     ) {
         const rowY = startY + rowIndex * cellHeight;
         const rowWidth = rowData.length * cellWidth;
@@ -623,7 +699,6 @@ export class FloydWarshall extends BaseGraph implements Graph {
         // Create a group for the row
         const rowGroup = this.edgeTable.group();
 
-        // Background highlight (CSS class)
         const rowRect = rowGroup
             .rect(rowWidth, cellHeight)
             .move(startX, rowY)
@@ -640,7 +715,7 @@ export class FloydWarshall extends BaseGraph implements Graph {
                 .move(x, y)
                 .addClass('cell');
 
-const txt = rowGroup
+            const txt = rowGroup
                 .text(rowData[col])
                 .font({
                     anchor: 'middle',
@@ -650,6 +725,7 @@ const txt = rowGroup
                 .center(x + cellWidth / 2, y + cellHeight / 2);
             if (col === 0)
                 this.matrix[rowIndex] = []
+            // Saves the text element so it can be changed in updateTable
             this.matrix[rowIndex][col] = txt
         }
         rowRect.front();
