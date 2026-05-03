@@ -44,6 +44,7 @@ export class Depth extends BaseGraph implements Graph {
         return result
     }
 
+    //Recursively travels through the graph, going fully down the path until the node has no child then returns
     private searchGraphRecursion(currNode:WeightedGraphNode,visitedNodes:WeightedGraphNode[],result:WeightedConnection<GraphNode>[]):void {
         
         if (!currNode) {
@@ -78,6 +79,7 @@ export class Depth extends BaseGraph implements Graph {
         return edges
     }
 
+    //Visualizing the algorithm going through the graph by animations and highlighting.
     async nodeTraversalVisualisation(
 ) {
     if(this.graphTraversal.length === 0) {

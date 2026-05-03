@@ -36,7 +36,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
         
     }   
     
-
+    //Visualizing the algorithm going through the graph by animations and highlighting.
     async nodeTraversalVisualisation() {
 
     if (this.start_Node === undefined) return
@@ -193,7 +193,7 @@ export class Dijkstras_algorithm extends BaseGraph implements Graph {
     this.Svg.add(this.edgeTable)
 }
    
-
+//Creates an array of type path from the entries in the MinPriorityStack
 private extractUpdateTableInformation(stack:MinPriorityStack<path>):tableInformation[] {
 
     const tableInformation:path[] = []

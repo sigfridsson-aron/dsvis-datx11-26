@@ -48,7 +48,7 @@ export abstract class BaseGraph extends Engine implements Graph {
      */
     abstract nodeTraversalVisualisation(): void
 
-    //knownEdges:Set<WeightedConnection<WeightedGraphNode>>
+    //Updates the table and redraws it using drawRow()
     abstract updateTable(
         tableInformation:tableInformation[]
       , rowHighlight:rowHighlight
@@ -235,6 +235,13 @@ export abstract class BaseGraph extends Engine implements Graph {
         this.edgeTable.clear()
     }
 
+    /**
+     * 
+     * 
+     * @param startNode - Node at the start of the edge
+     * @param endNode - Node at the end of the edge
+     * @returns edge going from startNode to endNode
+     */
     getEdge( startNode:WeightedGraphNode
            , endNode:WeightedGraphNode): WeightedConnection<WeightedGraphNode> {
         for (const key in startNode.$outgoing) {
