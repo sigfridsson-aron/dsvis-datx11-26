@@ -27,6 +27,7 @@ const config = {
         prioqueues: "./src/prioqueues.ts",
         sorting: "./src/sorting.ts",
         "avl-quiz": "./src/quizzes/AVL-quiz.ts",
+        graph: "./src/graph.ts",
     },
     output: {
         path: path.resolve(__dirname, "public"),

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <header>
+    <h1>
+      <a href="index.html">
+        Visualizations of data structures and algorithms
+      </a>
+    </h1>
+  </header>
+
+  <main>
+    <section id="graphContainer">
+      <label for="algorithmSelector">Choose a graph algorithm:</label>
+      <h2 class="selectorWrapper">
+        <select name="algorithmSelector" class="algorithmSelector">
+          <option disabled value="">
+            &mdash; Please choose a graph algorithm &mdash;
+          </option>
+          <hr />
+          <option value="Depth">Depth-first-search</option>
+          <option value="Breadth">Breadth-first-search</option>
+          <option value="FloydWarshall">Floyd-Warshall-search</option>
+          <option value="Dijkstras_algorithm">Dijkstra's algorithm</option>
+          <option value="Prim">Prim's MST</option>
+        </select>
+      </h2>
+      
+      <fieldset class="algorithmControls">
+        <span class="formgroup">
+          <select name="chooseGraphI" class="chooseGraphI disableWhenRunning">
+            <option disabled value="" selected>Choose a graph</option>
+            <hr />
+            <option value="Simple">Simple graph</option>
+            <option value="Simple_2">Simple graph 2</option>
+            <option value="Cyclic">Cyclic graph</option>
+            <option value="aCyclic">aCyclic graph</option>
+            <option value="DAG">DAG</option>
+            <option value="Weakly">Weakly connected graph</option>
+            <option value="Strongly">Strongly connected graph</option>
+            <option value="Eulerian">Eulerian graph</option>
+            <option value="Hamiltonian">Hamiltonian graph</option>
+            <option value="Chordal">Chordal graph</option>
+            <option value="Tree">Tree graph</option>
+          </select>
+          <input class="chosengraph disableWhenRunning" type="hidden">
+          <input class="runningAlgorithm disableWhenRunning" type="submit" value="Run algorithm" />
+          <span class="formgroup">
+            <label>Pick starting node:
+            <input class="insertNode disableWhenRunning" type="text" size="1" maxlength="20" />
+              <input class="startNode disableWhenRunning" type="submit" value="Pick" />
+            </label>
+          </span>
+        </span>
+      </fieldset>
+
+      <div>
+      
+        <svg> 
+        </svg>
+      </div>
+
+      <fieldset class="generalControls">
+        <span class="formgroup">
+          <button class="fastBackward">&lt;&lt;</button>
+          <button class="stepBackward">&lt;</button>
+          <button class="toggleRunner">Run</button>
+          <button class="stepForward">&gt;</button>
+          <button class="fastForward">&gt;&gt;</button>
+        </span>
+        <span class="formgroup">
+          <label>Speed:
+            <select class="animationSpeed">
+              <option value="1200">Slowest</option>
+              <option value="700" selected>Slow</option>
+              <option value="300">Fast</option>
+              <option value="100">Fastest</option>
+            </select>
+          </label>
+        </span>
+        <span class="formgroup">
+          <label>Node size:
+            <select class="objectSize">
+              <option value="12">Tiny</option>
+              <option value="20">Small</option>
+              <option value="28">Medium</option>
+              <option value="40" selected>Large</option>
+              <option value="50">Huge</option>
+            </select>
+          </label>
+        </span>
+      </fieldset>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      &copy;2024 <a href="https://github.com/heatherleaf">Peter Ljunglöf</a>,
+      open source code
+      <a href="https://github.com/ChalmersGU-data-structure-courses/dsvis">on GitHub</a>
+    </p>
+  </footer>
+</body>
+
+</html>
