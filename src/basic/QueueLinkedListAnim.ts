@@ -76,7 +76,7 @@ export class QueueLinkedListAnim<T> extends Engine implements Collection{
     async insert(...values: (string | number)[]): Promise<void>{
         for (const val of values) {
             if(this.queue.size() != 0){
-                await this.pause("Enqueue at tail.");
+                await this.pause("Enqueue at tail");
             }
             await this.insertBack(val);
         }
