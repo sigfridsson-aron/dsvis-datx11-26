@@ -24,6 +24,7 @@ type Action = {
     method: (...args: unknown[]) => Promise<void>;
     args: unknown[];
     stepCount: number;
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +64,8 @@ export class Engine implements PannableAndZoomable {
     debugger: Debugger;
     state: State;
     info: Info;
+    title: string = "Select an action from the menu above";
+    body: string = NBSP;
 
     panAndZoomHelper: PanAndZoomHelper;
 
@@ -100,6 +103,7 @@ export class Engine implements PannableAndZoomable {
     // Inititalisation
 
     constructor(containerSelector: string) {
+        
         this.debugger = new Debugger();
         this.state = new State();
 
@@ -163,6 +167,7 @@ export class Engine implements PannableAndZoomable {
     initialise(): void {
         this.resetAll();
         this.generalControls.setRunning(true);
+        
     }
 
     async resetAll(): Promise<void> {
@@ -227,8 +232,9 @@ export class Engine implements PannableAndZoomable {
     }
 
     setIdleTitle(): void {
-        this.info.setTitle("Select an action from the menu above");
-        this.info.setBody(NBSP);
+        this.info.setTitle(this.title);
+        this.info.setBody(this.body);
+
     }
 
     ///////////////////////////////////////////////////////////////////////////////
