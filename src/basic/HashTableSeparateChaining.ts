@@ -9,7 +9,7 @@ export const SortMessages = {
         value: (value: string) => `Insert value: ${value}`,
         hash: (value : string, hash: string) => `Hash value of ${value}: ${hash}`,
         mod: (value: string) => `Mod hash value by length of hash table: ${value}`,
-        insertAt: (value: string) => `Insert at end of bucket index ${value}`,
+        insertAt: (value: string) => `Insert at end of bucket at index ${value}`,
     },
     hash:{
         hash: (info: [string, string]) => `Hash value of ${info[0]}: ${info[1]}`,
@@ -19,7 +19,7 @@ export const SortMessages = {
         start: (element: string | number) => `Searching for ${element}`,
         found: (element: string | number) => `Found ${element}`,
         notfound: (element: string | number) => `Did not find ${element}`,
-        lookStart: (index: string | number) => `Looking into bucket index: ${index}`,
+        lookStart: (index: string | number) => `Looking into bucket at index: ${index}`,
         look: (index: string | number) => `Looking into index: ${index}`,
         read: (element: string | number) => `Reading the value of the index: ${element}`,
         nonExistent: (element: string | number) => `Element ${element} does not exist`,
@@ -130,7 +130,9 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
             newArray.setIndexHighlight(currentIndex, true);
 
-            await this.pause("hash.mod", currentIndex);
+            await this.pause("hash.mod", newArray.getSize());
+            
+            await this.pause("insert.insertAt", String(currentIndex));
             
             arrayLabel.setCenter(
                 newArray.getCX(currentIndex) + spacing * (chainLength),
@@ -138,13 +140,12 @@ export class HashTableSeparateChaining extends Engine implements Collection {
                 this.getAnimationSpeed()
             );
 
-            newArray.addLinkedNode(currentIndex, value);
-
-            await this.pause("insert.insertAt", String(currentIndex));
-            arrayLabel.remove();
-            
             await this.pause(undefined);
 
+            newArray.addLinkedNode(currentIndex, value);
+            
+            arrayLabel.remove();
+            
             newArray.setIndexHighlight(currentIndex, false);
 
             await this.pause(undefined);
@@ -188,7 +189,10 @@ export class HashTableSeparateChaining extends Engine implements Collection {
 
         this.hashTable.setIndexHighlight(currentIndex, true);
 
-        await this.pause("hash.mod", currentIndex);
+        await this.pause("hash.mod", this.hashTable.getSize());
+
+        await this.pause("insert.insertAt", String(currentIndex));
+
         for (let i = 0; i < this.hashTable.$nodeArrays[currentIndex].length; i++){
             this.hashTable.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(true));
         }
@@ -204,12 +208,15 @@ export class HashTableSeparateChaining extends Engine implements Collection {
         this.elementCounter++
         arrayLabel.remove();
 
-        await this.pause("insert.insertAt", String(currentIndex));
 
         for (let i = 0; i < this.hashTable.$nodeArrays[currentIndex].length; i++){
             this.hashTable.$nodeArrays[currentIndex][i].children().forEach((child) => child.setHighlight(false));
         }
         this.hashTable.setIndexHighlight(currentIndex, false);
+
+        
+        await this.pause(undefined);
+
     }
 
     /*** Find one or more values in the hashtable and returning their position */
