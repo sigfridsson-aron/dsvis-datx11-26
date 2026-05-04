@@ -1,3 +1,4 @@
+import { Element as ElementSvgDotJs, Runner, Timeline } from "@svgdotjs/svg.js";
 import { Engine, MessagesObject, NBSP } from "~/engine";
 import { RejectReason } from "./general-controls/engine-general-controls";
 
@@ -240,4 +241,24 @@ export function querySelector<T extends Element = Element>(
     }
 
     return element;
+}
+
+export function finishAllAnimationsForElement<T extends ElementSvgDotJs>(timeline: Timeline, element: T) {
+    // Extend type definitions for timeline to allow accessing hidden properties, and
+    // use these properties to finish animations of the arrows before removing them,
+    // so that there are no errors trying to animate a removed element.
+    type ExtendedTimeline = Timeline & {
+        _runners: [
+            {
+                persist: number;
+                start: number;
+                runner: Runner & { _element: ElementSvgDotJs };
+            },
+        ];
+    };
+    (timeline as ExtendedTimeline)._runners.forEach((runnerInfo) => {
+        if (runnerInfo.runner._element === element) {
+            runnerInfo.runner.finish();
+        }
+    });
 }
