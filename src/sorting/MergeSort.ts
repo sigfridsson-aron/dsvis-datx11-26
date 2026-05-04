@@ -1,5 +1,5 @@
 import { MessagesObject, NBSP } from "~/engine";
-import { compare, updateDefault } from "~/helpers";
+import { compare, finishAllAnimationsForElement, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "./BaseSorter";
 import { StapleArray } from "~/objects/staple-array";
@@ -231,6 +231,8 @@ export class MergeSort extends BaseSorter implements Sorter {
         }
 
         // Delete subarrays when all staples have been moved
+        finishAllAnimationsForElement(this.timeline, leftSubArr);
+        finishAllAnimationsForElement(this.timeline, rightSubArr);
         leftSubArr.delete();
         rightSubArr.delete();
 

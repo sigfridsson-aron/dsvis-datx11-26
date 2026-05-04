@@ -3,7 +3,7 @@ import { Runner } from "@svgdotjs/svg.js";
 import { Element } from "@svgdotjs/svg.js";
 import { Line } from "@svgdotjs/svg.js";
 import { MessagesObject } from "~/engine";
-import { compare, updateDefault } from "~/helpers";
+import { compare, finishAllAnimationsForElement, updateDefault } from "~/helpers";
 import { Arrow } from "~/objects/arrow";
 import { StapleArray } from "~/objects/staple-array";
 import { ValueStaple } from "~/objects/value-staple";
@@ -220,15 +220,8 @@ export class QuickSort extends BaseSorter implements Sorter {
 
         pivotLine.remove();
 
-        // Extend type definitions for timeline to allow accessing hidden properties, and
-        // use these properties to finish animations of the arrows before removing them,
-        // so that there are no errors trying to animate a removed element.
-        type ExtendedTimeline = Timeline & { _runners: [{ persist: number, start: number, runner: Runner & { _element: Element }}]};
-        (this.timeline as ExtendedTimeline)._runners.forEach(runnerInfo => {
-            if (runnerInfo.runner._element instanceof Arrow) {
-                runnerInfo.runner.finish();
-            }
-        });
+        finishAllAnimationsForElement(this.timeline, lowArrow)
+        finishAllAnimationsForElement(this.timeline, highArrow)
         lowArrow.remove();
         highArrow.remove();
 

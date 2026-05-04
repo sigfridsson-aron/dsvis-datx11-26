@@ -1,5 +1,5 @@
 import { MessagesObject, NBSP } from "~/engine";
-import { compare, updateDefault } from "~/helpers";
+import { compare, finishAllAnimationsForElement, updateDefault } from "~/helpers";
 import { Sorter } from "~/sorting";
 import { BaseSorter, SortMessages } from "./BaseSorter";
 import { Arrow } from "~/objects/arrow";
@@ -92,6 +92,7 @@ export class SelectionSort extends BaseSorter implements Sorter {
             await this.pause("Advance pointer.");
         }
         
+        finishAllAnimationsForElement(this.timeline, progressionArrow);
         progressionArrow.remove();
         this.sortArray.setStapleHighlight(this.sortArray.length() - 1, 'success');
         await this.pause("general.finished");
