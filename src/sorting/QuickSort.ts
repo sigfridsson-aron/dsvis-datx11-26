@@ -90,7 +90,8 @@ export class QuickSort extends BaseSorter implements Sorter {
         const pivotValue: number = this.sortArray.getValue(pivotIndex);
 
         const pivotStaple: ValueStaple = this.sortArray.getStaple(pivotIndex);
-        // @ts-ignore: Due to incorrect typing below, TS do not understand the returned type will be Line
+        // @ts-ignore: Due to incorrect typing off the .css method explained below, 
+        // TS do not understand the returned type will be Line
         const pivotLine: Line = this.Svg.line(
             Number(this.sortArray.x()),
             Number(pivotStaple.y()),

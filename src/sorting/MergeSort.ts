@@ -19,7 +19,7 @@ export const MergeSortMessages = {
 } as const satisfies MessagesObject;
 
 export class MergeSort extends BaseSorter implements Sorter {
-    VERTICAL_SEPARATION = 10; // TODO: Depend on object size
+    VERTICAL_RECURSION_SEPARATION = 10; // TODO: Depend on object size?
 
     messages: MessagesObject = updateDefault(MergeSortMessages, SortMessages);
     isFollowingRecursion: boolean = true;
@@ -74,7 +74,7 @@ export class MergeSort extends BaseSorter implements Sorter {
                 arr.setStaplesDisabled(0, mid);
 
                 // Move the new array down and slightly to the left to show split step
-                const leftSubArrDeltaMove = { x: -this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_SEPARATION }
+                const leftSubArrDeltaMove = { x: -this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_RECURSION_SEPARATION }
                 this.animate(leftSubArr)
                     .dx(leftSubArrDeltaMove.x)
                     .dy(leftSubArrDeltaMove.y);
@@ -115,7 +115,7 @@ export class MergeSort extends BaseSorter implements Sorter {
                 arr.setStaplesDisabled(mid);
 
                 // Move the new array down and slightly to the right to show split step
-                const rightSubArrDeltaMove = { x: this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_SEPARATION }
+                const rightSubArrDeltaMove = { x: this.getObjectSize(), y: Number(arr.height()) + this.VERTICAL_RECURSION_SEPARATION }
                 this.animate(rightSubArr)
                     .dx(rightSubArrDeltaMove.x)
                     .dy(rightSubArrDeltaMove.y);

@@ -56,8 +56,7 @@ export class StapleArray extends G {
         });
 
         this.$boundingBox?.remove();
-        // Width of bounding box can not be 0, because then the array
-        // won't be positioned in the center when there are no staples in the array
+        // Width of bounding box can not be 0, because then it will not be positioned correctly
         this.$boundingBox = this.rect(
             Math.max(
                 1,
@@ -75,21 +74,6 @@ export class StapleArray extends G {
         this.center(centerX, centerY);
 
         return this;
-    }
-
-    shuffle() {
-        const tmpStaples: ValueStaple[] = [];
-        while (this.$staples.length > 0) {
-            const i: number = Math.floor(Math.random() * this.$staples.length);
-            tmpStaples.push(...this.$staples.splice(i, 1));
-        }
-        this.$staples = tmpStaples;
-        this.init(this.cx(), this.cy());
-    }
-
-    reverseShuffle() {
-        this.$staples.reverse();
-        this.init(this.cx(), this.cy());
     }
 
     swap(i: number, j: number, animate: boolean = true) {
@@ -143,7 +127,7 @@ export class StapleArray extends G {
     }
 
     /**
-     * Remove values by index from start (inclusive) and end (exclusive)
+     * Remove values by index from start (inclusive) to end (exclusive)
      * This method both removes the elements from the  staple array,
      * and also removes them from the DOM.
      *
@@ -175,11 +159,6 @@ export class StapleArray extends G {
 
     getMaxValue(): number {
         return this.$maxValue;
-    }
-
-    resizeAndPositionStaples() {
-        this.resizeStaples();
-        this.positionStaples();
     }
 
     private resizeStaples() {
@@ -225,6 +204,7 @@ export class StapleArray extends G {
         return staples;
     }
 
+    // TODO: Remove or update highlighting functionality based on new interface implementation
     setStapleHighlight(
         i: number,
         type: "primary" | "success" | "info" = "primary"
@@ -255,33 +235,5 @@ export class StapleArray extends G {
         for (let i = start; i < end; i++) {
             this.$staples[i].removeClass("disabled")
         }
-    }
-
-    /**
-     * Note that this method only sets the new max height, and doesn't
-     * resize or position the staples accordingly. To make sure the staples
-     * get their correct position and size, always call
-     * {@link resizeAndPositionStaples()} afterwards.
-     *
-     * @param maxHeight height of the staple with the largest value
-     * @returns itself
-     */
-    setStapleMaxHeight(maxHeight: number) {
-        this.$stapleMaxHeight = maxHeight;
-        return this;
-    }
-
-    /**
-     * Note that this method only sets the new staple width, and doesn't
-     * resize or position the staples accordingly. To make sure the staples
-     * get their correct position and size, always call
-     * {@link resizeAndPositionStaples()} afterwards.
-     *
-     * @param maxHeight height of the staple with the largest value
-     * @returns itself
-     */
-    setStapleWidth(stapleWidth: number) {
-        this.$stapleWidth = stapleWidth;
-        return this;
     }
 }

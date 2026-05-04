@@ -16,7 +16,6 @@ let scrollSpeed: number = 1;
 export interface Sorter extends Engine {
     sort: SubmitFunction;
     insert: SubmitFunction;
-    shuffle: SubmitFunction;
     setArraySize: (size: number) => void;
     generateShuffledArray: (shuffleType: string) => number[];
 }
