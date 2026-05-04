@@ -9,7 +9,7 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
     sortSubmit: HTMLInputElement;
     pseudoCode: HTMLDivElement;
     clearSubmit: HTMLInputElement;
-    unsortSelect: HTMLSelectElement;
+    shuffleSelect: HTMLSelectElement;
     engine: Sorter;
 
     constructor(container: HTMLElement, engine: Sorter) {
@@ -40,8 +40,8 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             "input#sortSubmit",
             container
         );
-        this.unsortSelect = querySelector<HTMLSelectElement>(
-            "select#unsortSelect",
+        this.shuffleSelect = querySelector<HTMLSelectElement>(
+            "select.shuffle",
             container
         );
 
@@ -111,9 +111,32 @@ export class SortingAlgorithmControls extends EngineAlgorithmControl {
             this.engine.confirmResetAll()
         );
 
-        this.unsortSelect.addEventListener("change", () => {
-            this.engine.submit(this.engine.unsort, null);
-        });
+        if (this.shuffleSelect) {
+            this.shuffleSelect.addEventListener("change", () => {
+                const shuffleType = this.shuffleSelect.value;
+                this.shuffleSelect.value = "";
+                
+                if (shuffleType) {
+                    // Generate the shuffled array
+                    const shuffledArray = this.engine.generateShuffledArray(shuffleType);
+                    
+                    // Get current URL parameters
+                    const searchParams = new URL(window.location.href).searchParams;
+                    
+                    // Append the shuffled array as a query parameter
+                    const arrayParam = shuffledArray.join(",");
+                    searchParams.set("array", arrayParam);
+                    
+                    // Update URL and reload
+                    window.history.replaceState(
+                        "",
+                        "",
+                        `${window.location.pathname}?${searchParams}`
+                    );
+                    window.location.reload();
+                }
+            });
+        }
 
     }
 }

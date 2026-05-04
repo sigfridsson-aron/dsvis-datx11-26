@@ -75,10 +75,8 @@ export class BaseSorter extends Engine implements Sorter {
     }
 
     async swapNoAnm(arr: StapleArray, j: number, k: number) {
-        arr.swap(j, k, false);
-        arr.clearStapleHighlight(j);
-        this.sortArray.getValue(j),
-        this.sortArray.getValue(k)
+        if (j === k) return;
+        arr.swap(j, k);
     }
 
     // Kommenterade ut animeringeringen till arrayen.
@@ -117,7 +115,7 @@ export class BaseSorter extends Engine implements Sorter {
 
     async submit(
         method: SubmitFunction,
-        field: HTMLInputElement | null
+        field: HTMLInputElement | null | string
     ): Promise<boolean> {
         if (field === null) {
             await this.execute(method, [])
@@ -125,17 +123,21 @@ export class BaseSorter extends Engine implements Sorter {
         }
         let rawValue: string = "";
         try {
-                rawValue = field.value;
-                field.value = "";
-                const inputNumbers = rawValue
-                    .split(" ")
-                    .filter(
-                        (value) =>
-                            !isNaN(Number(value)) && !isNaN(parseInt(value))
-                    )
-                    .map((value) => parseInt(value));
-                await this.execute(method, inputNumbers);
+            if (typeof(field) === "string") {
+                this.execute(method, [field]);
                 return true;
+            }
+            rawValue = field.value;
+            field.value = "";
+            const inputNumbers = rawValue
+                .split(" ")
+                .filter(
+                    (value) =>
+                        !isNaN(Number(value)) && !isNaN(parseInt(value))
+                )
+                .map((value) => parseInt(value));
+            await this.execute(method, inputNumbers);
+            return true;
         } catch (e: any) {
             console.error(e);
             return false;
@@ -153,31 +155,51 @@ export class BaseSorter extends Engine implements Sorter {
         throw new Error("Sort not implemented");
     }
 
-    async unsort(args?: string | number) {
-        const unsortSelect = document.querySelector<HTMLSelectElement>("select.unsort");
-        const unsortType = unsortSelect?.value;
-        const sortingMethodSelect = document.querySelector<HTMLSelectElement>("select.sortingMethod");
-        if (unsortType === "unsortRandom") {
-            for (let i = this.sortArray.length() - 1; i > 0; i--) {
+    async shuffle(args?: string | number) {
+        console.log(`shuffling with argument ${args}`)
+        const shuffleType = args;
+        if (shuffleType === "shuffleRandom") {
+                this.sortArray.shuffle();
+                console.log("shuffling randomly");
+        } else if (shuffleType === "shuffleReversed") {
+                this.sortArray.reverseShuffle(); 
+                console.log("shuffling in reverse order");
+        } 
+    }
+
+    generateShuffledArray(shuffleType: string): number[] {
+        // Get the current array values
+        const currentValues = this.sortArray.getValues();
+        const arrayCopy = [...currentValues];
+
+        if (shuffleType === "shuffleRandom") {
+            // Fisher-Yates shuffle
+            for (let i = arrayCopy.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                await this.swapNoAnm(this.sortArray, i, j);
+                [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
             }
-        } else if (unsortType === "unsortReversed") {
-            for (let i = 0; i < Math.floor(this.sortArray.length() / 2); i++) {
-                await this.swapNoAnm(this.sortArray, i, this.sortArray.length() - 1 - i);
+        } else if (shuffleType === "shuffleReversed") {
+            // Reverse the array
+            arrayCopy.reverse();
+        } else if (shuffleType === "shuffleReversedSorted") {
+            // Reverse sorted (descending order)
+            arrayCopy.sort((a, b) => b - a);
+        } else if (shuffleType === "shuffle70Percent") {
+            // Sort first 70% of array, shuffle the rest
+            const splitIndex = Math.ceil(arrayCopy.length * 0.7);
+            const firstPart = arrayCopy.slice(0, splitIndex).sort((a, b) => a - b);
+            const secondPart = arrayCopy.slice(splitIndex);
+            
+            // Shuffle the second part (Fisher-Yates)
+            for (let i = secondPart.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [secondPart[i], secondPart[j]] = [secondPart[j], secondPart[i]];
             }
-        } else if (unsortType === "unsortGood") {
-            // I aint happy with all the if statements, should be changed
-            if (sortingMethodSelect?.value === "selectionSort") {
-                // an already sorted array is the best case for selection sort, so we can just do nothing
-            } else if (sortingMethodSelect?.value === "insertionSort") {
-                // ?
-            } else if (sortingMethodSelect?.value === "mergeSort") {
-                // ?
-            } else if (sortingMethodSelect?.value === "quickSort") {
-                // ?
-            }
+            
+            return [...firstPart, ...secondPart];
         }
+
+        return arrayCopy;
     }
 
     getObjectSize(): number {

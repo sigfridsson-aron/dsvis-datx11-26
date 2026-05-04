@@ -309,7 +309,7 @@ export class Engine implements PannableAndZoomable {
      */
     async submit(
         method: SubmitFunction,
-        field: HTMLInputElement | null
+        field: HTMLInputElement | null | string
     ): Promise<boolean> {
         let rawValue: string = "";
         try {
@@ -424,7 +424,7 @@ export class Engine implements PannableAndZoomable {
             this.debugger.log(
                 `CALL ${nAction}: ${title}, ${JSON.stringify(this.actions)}`
             );
-
+            
             this.info.setTitle(title);
             await this.pause("");
 

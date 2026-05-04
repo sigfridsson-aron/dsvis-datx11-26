@@ -77,6 +77,21 @@ export class StapleArray extends G {
         return this;
     }
 
+    shuffle() {
+        const tmpStaples: ValueStaple[] = [];
+        while (this.$staples.length > 0) {
+            const i: number = Math.floor(Math.random() * this.$staples.length);
+            tmpStaples.push(...this.$staples.splice(i, 1));
+        }
+        this.$staples = tmpStaples;
+        this.init(this.cx(), this.cy());
+    }
+
+    reverseShuffle() {
+        this.$staples.reverse();
+        this.init(this.cx(), this.cy());
+    }
+
     swap(i: number, j: number, animate: boolean = true) {
         const iStaple = this.$staples[i];
         const jStaple = this.$staples[j];

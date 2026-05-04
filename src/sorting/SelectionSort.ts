@@ -41,7 +41,7 @@ export class SelectionSort extends BaseSorter implements Sorter {
             // Highlight current min element
             this.sortArray.setStapleHighlight(minIndex, 'info');
 
-            // Find the index of the minimum element in the unsorted part of the array
+            // Find the index of the minimum element in the shuffleed part of the array
             for (let j = i + 1; j < sortSize; j++) {
                 // Highlight the current element
                 this.sortArray.setStapleHighlight(j, 'primary');
