@@ -85,7 +85,7 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         }
 
         // Create a group for the text object
-        this.$textObj = this.root().group()
+        this.$textObj = this.engine().Svg.group()
 
         // Create the text object
         this.$textObj.text(this.$weight.toString())
@@ -133,11 +133,19 @@ export class WeightedConnection<T extends GraphNode | BTreeNode | LinkedNode> ex
         }
 
         this.$textObj.font({ size: 25*this.$end.getSize()/40 })
-        this.$textObj.engine().animate(this.$textObj, animationDuration > 0)
-        .center(
-            (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*10,
-            (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*10
-        )
+        if (animationDuration > 0) {
+            this.$textObj.animate(animationDuration)
+                         .center(
+                             (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*10,
+                             (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*10
+                         )
+                        }
+        else {
+            this.$textObj.center(
+                             (x1 + x2)/2 + (y1 - y2) * this.$bend - offx*10,
+                             (y1 + y2)/2 + (x2 - x1) * this.$bend - offy*10
+                         )
+                        }
     }
 
     /**

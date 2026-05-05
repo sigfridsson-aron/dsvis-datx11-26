@@ -68,7 +68,7 @@ export class WeightedGraphNode extends GraphNode {
                 successor.$outgoing[inKey].update(successor.$outgoing[inKey].$coords)
             }
 
-            const edge = this.root()
+            const edge = this.engine().Svg
                 .put(new WeightedConnection(this, successor, weight))
                 .init(
                     strokeWidth,
