@@ -99,6 +99,7 @@ export class Connection<T extends GraphNode | BTreeNode | LinkedNode> extends Pa
     }
 
     toString(): string {
+        console.log(this.$coords);
         return `${this.getStart()} --> ${this.getEnd()}`;
     }
 

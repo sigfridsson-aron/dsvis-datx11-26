@@ -363,4 +363,12 @@ svg .highlightblue.filled, svg text.highlightblue, svg .highlightblue > .filled,
 }
 
 
+/* For pannable canvas */
+svg * {
+	user-select: none;
+	-moz-user-select: none;
+}
 
+body > main svg {
+	cursor: move;
+}
